@@ -2,4 +2,4 @@
 
 Wow! A Tactics!
 
-To play the actual "game", [click here](src/hello.html)
+To play the actual "game", [click here](src/game.html)
