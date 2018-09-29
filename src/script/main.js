@@ -49,7 +49,20 @@ Game = {
             document.getElementById("game"));
         Crafty.background("#ccc");
 
-        Crafty.e("GridObject").setPos({x: 5, y: 3}).color("#007f00");
+        Crafty.e("GridObject, Keyboard")
+            .bind('KeyDown', function(e) {
+                if (e.key == Crafty.keys.LEFT_ARROW) {
+                    this.setPos({x: this._tileX - 1, y: this._tileY});
+                } else if (e.key == Crafty.keys.RIGHT_ARROW) {
+                    this.setPos({x: this._tileX + 1, y: this._tileY});
+                } else if (e.key == Crafty.keys.UP_ARROW) {
+                    this.setPos({x: this._tileX, y: this._tileY - 1});
+                } else if (e.key == Crafty.keys.DOWN_ARROW) {
+                    this.setPos({x: this._tileX, y: this._tileY + 1});
+                }
+            })
+            .setPos({x: 5, y: 3})
+            .color("#007f00");
     },
 };
 
