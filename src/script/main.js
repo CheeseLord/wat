@@ -74,6 +74,18 @@ Game = {
             document.getElementById("game"));
         Crafty.background("#ccc");
 
+        // Random static objects
+        Crafty.e("GridObject").color("#7f0000").setPos({x: 17, y:  9});
+        Crafty.e("GridObject").color("#7f0000").setPos({x: 11, y:  3});
+        Crafty.e("GridObject").color("#7f0000").setPos({x: 19, y: 11});
+        Crafty.e("GridObject").color("#7f0000").setPos({x:  8, y: 11});
+        Crafty.e("GridObject").color("#7f0000").setPos({x: 11, y: 12});
+        Crafty.e("GridObject").color("#7f0000").setPos({x: 14, y:  9});
+        Crafty.e("GridObject").color("#7f0000").setPos({x: 21, y:  5});
+        Crafty.e("GridObject").color("#7f0000").setPos({x: 17, y: 13});
+        Crafty.e("GridObject").color("#7f0000").setPos({x:  2, y: 13});
+        Crafty.e("GridObject").color("#7f0000").setPos({x:  2, y:  9});
+
         Crafty.e("PlayerControllable")
             .setPos({x: 5, y: 3})
             .color("#007f00");
