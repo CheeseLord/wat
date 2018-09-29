@@ -54,8 +54,8 @@ Crafty.c("PlayerControllable", {
 
 Game = {
     mapGrid: {
-        width: 24,
-        height: 16,
+        width: 25,
+        height: 17,
         tile: {
             width: 16,
             height: 16,
@@ -87,9 +87,18 @@ Game = {
         Crafty.e("GridObject").color("#7f0000").setPos({x:  2, y: 13});
         Crafty.e("GridObject").color("#7f0000").setPos({x:  2, y:  9});
 
-        Crafty.e("PlayerControllable")
+        var player = Crafty.e("PlayerControllable")
             .setPos({x: 5, y: 3})
             .color("#007f00");
+
+        // Animate centering the viewport over the player, taking 1500ms to do
+        // it. Then, once the animation is done, set the viewport to follow the
+        // player (with offset (0, 0)).
+        Crafty.viewport.clampToEntities = false;
+        Crafty.one("CameraAnimationDone", function() {
+            Crafty.viewport.follow(player, 0, 0);
+        });
+        Crafty.viewport.centerOn(player, 1500);
     },
 };
 
