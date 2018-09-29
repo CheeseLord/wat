@@ -24,6 +24,14 @@ Crafty.c("GridObject", {
         // So that "setter" attributes can be chained together.
         return this;
     },
+    moveBy: function(deltaPos) {
+        // deltaPos is {x: deltaX, y: deltaY}
+        var oldPos = this.getPos();
+        this.setPos({
+            x: oldPos.x + deltaPos.x,
+            y: oldPos.y + deltaPos.y,
+        });
+    },
 });
 
 Game = {
@@ -52,13 +60,13 @@ Game = {
         Crafty.e("GridObject, Keyboard")
             .bind('KeyDown', function(e) {
                 if (e.key == Crafty.keys.LEFT_ARROW) {
-                    this.setPos({x: this._tileX - 1, y: this._tileY});
+                    this.moveBy({x: -1, y:  0});
                 } else if (e.key == Crafty.keys.RIGHT_ARROW) {
-                    this.setPos({x: this._tileX + 1, y: this._tileY});
+                    this.moveBy({x:  1, y:  0});
                 } else if (e.key == Crafty.keys.UP_ARROW) {
-                    this.setPos({x: this._tileX, y: this._tileY - 1});
+                    this.moveBy({x:  0, y: -1});
                 } else if (e.key == Crafty.keys.DOWN_ARROW) {
-                    this.setPos({x: this._tileX, y: this._tileY + 1});
+                    this.moveBy({x:  0, y:  1});
                 }
             })
             .setPos({x: 5, y: 3})
