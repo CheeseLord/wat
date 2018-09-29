@@ -31,6 +31,7 @@ Crafty.c("GridObject", {
             x: oldPos.x + deltaPos.x,
             y: oldPos.y + deltaPos.y,
         });
+        return this;
     },
 });
 
