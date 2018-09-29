@@ -34,6 +34,23 @@ Crafty.c("GridObject", {
     },
 });
 
+Crafty.c("PlayerControllable", {
+    required: "GridObject, Keyboard",
+    init: function() {
+        this.bind('KeyDown', function(e) {
+            if (e.key == Crafty.keys.LEFT_ARROW) {
+                this.moveBy({x: -1, y:  0});
+            } else if (e.key == Crafty.keys.RIGHT_ARROW) {
+                this.moveBy({x:  1, y:  0});
+            } else if (e.key == Crafty.keys.UP_ARROW) {
+                this.moveBy({x:  0, y: -1});
+            } else if (e.key == Crafty.keys.DOWN_ARROW) {
+                this.moveBy({x:  0, y:  1});
+            }
+        });
+    },
+});
+
 Game = {
     mapGrid: {
         width: 24,
@@ -57,18 +74,7 @@ Game = {
             document.getElementById("game"));
         Crafty.background("#ccc");
 
-        Crafty.e("GridObject, Keyboard")
-            .bind('KeyDown', function(e) {
-                if (e.key == Crafty.keys.LEFT_ARROW) {
-                    this.moveBy({x: -1, y:  0});
-                } else if (e.key == Crafty.keys.RIGHT_ARROW) {
-                    this.moveBy({x:  1, y:  0});
-                } else if (e.key == Crafty.keys.UP_ARROW) {
-                    this.moveBy({x:  0, y: -1});
-                } else if (e.key == Crafty.keys.DOWN_ARROW) {
-                    this.moveBy({x:  0, y:  1});
-                }
-            })
+        Crafty.e("PlayerControllable")
             .setPos({x: 5, y: 3})
             .color("#007f00");
     },
