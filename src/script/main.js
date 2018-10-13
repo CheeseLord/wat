@@ -50,7 +50,7 @@ Crafty.c("GridObject", {
 });
 
 Crafty.c("PlayerControllable", {
-    required: "GridObject, Keyboard",
+    required: "GridObject, Keyboard, Mouse",
     init: function() {
         this.bind('KeyDown', function(e) {
             if (e.key == Crafty.keys.LEFT_ARROW) {
@@ -63,7 +63,21 @@ Crafty.c("PlayerControllable", {
                 this.moveBy({x:  0, y:  1});
             }
         });
+        this._isHighlighted = false;
     },
+
+    highlight: function() {
+        this._isHighlighted = true;
+        return this.color("#00bf00");
+    },
+    unhighlight: function() {
+        // TODO HACK: What color were we originally?
+        this._isHighlighted = false;
+        return this.color("#007f00");
+    },
+    isHighlighted: function() {
+        return this._isHighlighted;
+    }
 });
 
 Game = {
@@ -110,10 +124,19 @@ Game = {
         // Basically copied from:
         //     http://craftyjs.com/api/MouseSystem.html
         Crafty.s("Mouse").bind("Click", function(e) {
-            let x = Math.floor(e.realX / Game.mapGrid.tile.width);
-            let y = Math.floor(e.realY / Game.mapGrid.tile.height);
-            player.animateTo({x:x, y:y})
-            Crafty.log(`You clicked at: (${x}, ${y})`);
+            if (e.target == player &&
+                    e.mouseButton == Crafty.mouseButtons.LEFT) {
+                player.highlight();
+                Crafty.log("You clicked on the player.");
+            } else {
+                let x = Math.floor(e.realX / Game.mapGrid.tile.width);
+                let y = Math.floor(e.realY / Game.mapGrid.tile.height);
+                Crafty.log(`You clicked at: (${x}, ${y})`);
+                if (player.isHighlighted()) {
+                    player.unhighlight();
+                    player.animateTo({x:x, y:y});
+                }
+            }
         });
 
         // Animate centering the viewport over the player, taking 1500ms to do
