@@ -133,8 +133,10 @@ Game = {
                 let y = Math.floor(e.realY / Game.mapGrid.tile.height);
                 Crafty.log(`You clicked at: (${x}, ${y})`);
                 if (player.isHighlighted()) {
-                    player.unhighlight();
                     player.animateTo({x:x, y:y});
+                    player.one("TweenEnd", function() {
+                        player.unhighlight();
+                    });
                 }
             }
         });
