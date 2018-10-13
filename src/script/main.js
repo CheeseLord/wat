@@ -91,6 +91,14 @@ Game = {
             .setPos({x: 5, y: 3})
             .color("#007f00");
 
+        // Temporary hack to log wherever you click.
+        // Basically copied from:
+        //     http://craftyjs.com/api/MouseSystem.html
+        Crafty.s("Mouse").bind("Click", function(e) {
+            Crafty.log("You clicked at: (" + e.realX.toFixed(2) + ", " +
+                e.realY.toFixed(2) + ")");
+        });
+
         // Animate centering the viewport over the player, taking 1500ms to do
         // it. Then, once the animation is done, set the viewport to follow the
         // player (with offset (0, 0)).
