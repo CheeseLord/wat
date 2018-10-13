@@ -1,6 +1,6 @@
 // Component for anything that occupies a grid space.
 Crafty.c("GridObject", {
-    required: "2D, DOM, Color",
+    required: "2D, DOM, Color, Tween",
     init: function() {
         this.attr({w: Game.mapGrid.tile.width, h: Game.mapGrid.tile.height});
         // Put us at (0, 0) by default just to ensure that _tileX and _tileY
@@ -31,6 +31,20 @@ Crafty.c("GridObject", {
             x: oldPos.x + deltaPos.x,
             y: oldPos.y + deltaPos.y,
         });
+        return this;
+    },
+    // TODO: Don't duplicate so much code between this and setPos.
+    animateTo: function(newPos) {
+        // newPos is {x: newX, y: newY}
+        this.attr({
+            _tileX: newPos.x,
+            _tileY: newPos.y,
+        });
+        this.tween({
+            x:      newPos.x * Game.mapGrid.tile.width,
+            y:      newPos.y * Game.mapGrid.tile.height,
+        }, 200);
+        // So that "setter" attributes can be chained together.
         return this;
     },
 });
@@ -98,7 +112,7 @@ Game = {
         Crafty.s("Mouse").bind("Click", function(e) {
             let x = Math.floor(e.realX / Game.mapGrid.tile.width);
             let y = Math.floor(e.realY / Game.mapGrid.tile.height);
-            player.setPos({x:x, y:y})
+            player.animateTo({x:x, y:y})
             Crafty.log(`You clicked at: (${x}, ${y})`);
         });
 
