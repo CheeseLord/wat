@@ -92,11 +92,13 @@ Game = {
             .color("#007f00");
 
         // Temporary hack to log wherever you click.
+        // Also moving player to clicked tile
         // Basically copied from:
         //     http://craftyjs.com/api/MouseSystem.html
         Crafty.s("Mouse").bind("Click", function(e) {
             let x = Math.floor(e.realX / Game.mapGrid.tile.width);
             let y = Math.floor(e.realY / Game.mapGrid.tile.height);
+            player.setPos({x:x, y:y})
             Crafty.log(`You clicked at: (${x}, ${y})`);
         });
 
