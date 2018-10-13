@@ -6,7 +6,7 @@ Crafty.c("GridObject", {
         // Put us at (0, 0) by default just to ensure that _tileX and _tileY
         // are not undefined. Hopefully the caller will immediately move us to
         // a real position.
-        this.setPos({x:0, y:0});
+        this.setPos({x: 0, y: 0});
     },
 
     // Get and set the position in map-grid tiles (not pixels).
@@ -95,8 +95,9 @@ Game = {
         // Basically copied from:
         //     http://craftyjs.com/api/MouseSystem.html
         Crafty.s("Mouse").bind("Click", function(e) {
-            Crafty.log("You clicked at: (" + e.realX.toFixed(2) + ", " +
-                e.realY.toFixed(2) + ")");
+            let x = Math.floor(e.realX / Game.mapGrid.tile.width);
+            let y = Math.floor(e.realY / Game.mapGrid.tile.height);
+            Crafty.log(`You clicked at: (${x}, ${y})`);
         });
 
         // Animate centering the viewport over the player, taking 1500ms to do
