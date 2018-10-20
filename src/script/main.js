@@ -53,13 +53,13 @@ Crafty.c("PlayerControllable", {
     required: "GridObject, Keyboard, Mouse",
     init: function() {
         this.bind('KeyDown', function(e) {
-            if (e.key == Crafty.keys.LEFT_ARROW) {
+            if (e.key === Crafty.keys.LEFT_ARROW) {
                 this.moveBy({x: -1, y:  0});
-            } else if (e.key == Crafty.keys.RIGHT_ARROW) {
+            } else if (e.key === Crafty.keys.RIGHT_ARROW) {
                 this.moveBy({x:  1, y:  0});
-            } else if (e.key == Crafty.keys.UP_ARROW) {
+            } else if (e.key === Crafty.keys.UP_ARROW) {
                 this.moveBy({x:  0, y: -1});
-            } else if (e.key == Crafty.keys.DOWN_ARROW) {
+            } else if (e.key === Crafty.keys.DOWN_ARROW) {
                 this.moveBy({x:  0, y:  1});
             }
         });
@@ -124,20 +124,23 @@ Game = {
         // Basically copied from:
         //     http://craftyjs.com/api/MouseSystem.html
         Crafty.s("Mouse").bind("Click", function(e) {
-            if (e.target == player &&
-                    e.mouseButton == Crafty.mouseButtons.LEFT) {
-                player.highlight();
-                Crafty.log("You clicked on the player.");
-            } else {
-                let x = Math.floor(e.realX / Game.mapGrid.tile.width);
-                let y = Math.floor(e.realY / Game.mapGrid.tile.height);
-                Crafty.log(`You clicked at: (${x}, ${y})`);
-                if (player.isHighlighted()) {
-                    player.animateTo({x:x, y:y});
-                    player.one("TweenEnd", function() {
-                        player.unhighlight();
-                    });
+            if (e.mouseButton === Crafty.mouseButtons.LEFT) {
+                if (e.target === player){
+                    player.highlight();
+                    Crafty.log("You clicked on the player.");
+                } else {
+                    let x = Math.floor(e.realX / Game.mapGrid.tile.width);
+                    let y = Math.floor(e.realY / Game.mapGrid.tile.height);
+                    Crafty.log(`You clicked at: (${x}, ${y})`);
+                    if (player.isHighlighted()) {
+                        player.animateTo({x:x, y:y});
+                        player.one("TweenEnd", function() {
+                            player.unhighlight();
+                        });
+                    }
                 }
+            } else {
+                Crafty.log("AAAAAAAAAA");
             }
         });
 
