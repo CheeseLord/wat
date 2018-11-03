@@ -123,7 +123,7 @@ Game = {
         // Also moving player to clicked tile
         // Basically copied from:
         //     http://craftyjs.com/api/MouseSystem.html
-        Crafty.s("Mouse").bind("Click", function(e) {
+        Crafty.s("Mouse").bind("MouseUp", function(e) {
             if (e.mouseButton === Crafty.mouseButtons.LEFT) {
                 if (e.target === player){
                     player.highlight();
@@ -133,13 +133,13 @@ Game = {
                     let y = Math.floor(e.realY / Game.mapGrid.tile.height);
                     Crafty.log(`You clicked at: (${x}, ${y})`);
                     if (player.isHighlighted()) {
-                        player.animateTo({x:x, y:y});
+                        player.animateTo({x: x, y: y});
                         player.one("TweenEnd", function() {
                             player.unhighlight();
                         });
                     }
                 }
-            } else {
+            } else if (e.mouseButton === Crafty.mouseButtons.RIGHT) {
                 Crafty.log("AAAAAAAAAA");
             }
         });
