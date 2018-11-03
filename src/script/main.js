@@ -119,14 +119,34 @@ Game = {
             .setPos({x: 5, y: 3})
             .color("#007f00");
 
+        ///////////////////////////////////////////////////////////////////////
         // Just testing out a text-button...
-        Crafty.e("2D, DOM, Text, Button")
-            .attr({x: 0, y: 0, w: 32, h: 32})
-            .text("I'm here. Click me!")
-            .unselectable()
-            .bind("Click", function(e) {
-                Crafty.log("I've been clicked!");
-            });
+        // Crafty.e("2D, DOM, Text, Button")
+        //     .attr({x: 0, y: 0, w: 32, h: 32})
+        //     .text("I'm here. Click me!")
+        //     .unselectable()
+        //     .bind("Click", function(e) {
+        //         Crafty.log("I've been clicked!");
+        //     });
+
+        // Take 2
+        Crafty.createLayer("UILayer", "DOM", {
+            // Ignore viewscreen transforms
+            xResponse: 0,
+            yResponse: 0,
+            scaleResponse: 0,
+            // On top of other layers
+            z: 40
+        });
+
+        Crafty.e("2D, HTML, UILayer")
+            .attr({x: 0, y: 0})
+            .append("<button class='mybutton'>I'm here. Click me!</button>");
+        var button = document.getElementsByClassName('mybutton')[0];
+        button.onclick = function(e) {
+            Crafty.log("I've been clicked!");
+        }
+        ///////////////////////////////////////////////////////////////////////
 
         // Temporary hack to log wherever you click.
         // Also moving player to clicked tile
