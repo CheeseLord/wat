@@ -12,21 +12,27 @@ Crafty.c("MyButton", {
     // Mouse handlers call these functions to change the displayed state.
     focus:    function() {
         this.attr({_focus:  true});
+        this._redraw();
     },
     unfocus:  function() {
         this.attr({_focus:  false});
+        this._redraw();
     },
     hover:    function() {
         this.attr({_hover:  true});
+        this._redraw();
     },
     unhover:  function() {
         this.attr({_hover:  false});
+        this._redraw();
     },
     active:   function() {
         this.attr({_active: true});
+        this._redraw();
     },
     unactive: function() {
         this.attr({_active: false});
+        this._redraw();
     },
 
     // Internal helper for when the state is (or might be) changed.
