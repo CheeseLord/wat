@@ -228,6 +228,29 @@ Game = {
             .bind("MouseUp", thing.unactive);
         // TODO: Handle keyboard.
 
+        {
+            // Create a "cube" of buttons to show off the styles.
+            for (let a = 0; a <= 1; a++) {
+                for (let h = 0; h <= 1; h++) {
+                    for (let f = 0; f <= 1; f++) {
+                        let x =  20 + 80*h + 30*a;
+                        let y = 100 + 80*f + 30*a;
+                        let theButton = Crafty.e("MyButton, UILayer")
+                            .attr({x: x, y: y, w: 20, h: 20});
+                        if (f) {
+                            theButton.focus();
+                        }
+                        if (h) {
+                            theButton.hover();
+                        }
+                        if (a) {
+                            theButton.active();
+                        }
+                    }
+                }
+            }
+        }
+
         ///////////////////////////////////////////////////////////////////////
 
         // Temporary hack to log wherever you click.
