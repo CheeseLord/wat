@@ -217,8 +217,16 @@ Game = {
             }
         }
 
-        Crafty.e("MyButton, UILayer")
+        let thing = Crafty.e("MyButton, UILayer")
             .attr({x: 200, y: 100, w: 25, h: 25});
+        thing.bind("MouseOver", thing.hover)
+            .bind("MouseOut", function(e) {
+                thing.unhover();
+                thing.unactive();
+            })
+            .bind("MouseDown", thing.active)
+            .bind("MouseUp", thing.unactive);
+        // TODO: Handle keyboard.
 
         ///////////////////////////////////////////////////////////////////////
 
