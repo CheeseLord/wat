@@ -9,7 +9,7 @@ Crafty.c("MyButton", {
         });
         this.css({
             "transition": "50ms all linear"
-        })
+        });
         this._redraw();
     },
 
@@ -33,11 +33,6 @@ Crafty.c("MyButton", {
     hover:    function() {
         this.attr({_hover:  true});
         this._redraw();
-        this.css({
-            "cursor": "pointer",
-            "display": "inline-block",
-            "position": "relative",
-        });
     },
     unhover:  function() {
         this.attr({_hover:  false});
@@ -64,6 +59,9 @@ Crafty.c("MyButton", {
 
     // Internal helper for when the state is (or might be) changed.
     _redraw: function() {
+        this.css({
+            "cursor": "pointer",
+        });
         let newColor = "#";
         if (this._focus) {
             newColor += "ff";
