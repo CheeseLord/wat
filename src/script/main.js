@@ -222,11 +222,20 @@ Game = {
         thing.bind("MouseOver", thing.hover)
             .bind("MouseOut", function(e) {
                 thing.unhover();
-                thing.unactive();
             })
             .bind("MouseDown", thing.active)
             .bind("MouseUp", thing.unactive);
         // TODO: Handle keyboard.
+
+        // Un-active every MyButton when the mouse is released, regardless of
+        // whether the mouse is actually over that button.
+        Crafty.s("Mouse").bind("MouseUp", function(evt) {
+            Crafty("MyButton").each(function(_index) {
+                // 'this' is the current entity of the iteration; our parameter
+                // is the index.
+                this.unactive();
+            });
+        });
 
         {
             // Create a "cube" of buttons to show off the styles.
