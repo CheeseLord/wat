@@ -1,3 +1,56 @@
+Crafty.c("MyButton", {
+    required: "2D, DOM, Color, Button",
+    // TODO: Support text on the button.
+    init: function() {
+        this.attr({
+            _focus:  false,
+            _hover:  false,
+            _active: false,
+        });
+    },
+
+    // Mouse handlers call these functions to change the displayed state.
+    focus:    function() {
+        this.attr({_focus:  true});
+    },
+    unfocus:  function() {
+        this.attr({_focus:  false});
+    },
+    hover:    function() {
+        this.attr({_hover:  true});
+    },
+    unhover:  function() {
+        this.attr({_hover:  false});
+    },
+    active:   function() {
+        this.attr({_active: true});
+    },
+    unactive: function() {
+        this.attr({_active: false});
+    },
+
+    // Internal helper for when the state is (or might be) changed.
+    _redraw: function() {
+        let newColor = "#";
+        if (this._focus) {
+            newColor += "ff";
+        } else {
+            newColor += "00";
+        }
+        if (this._hover) {
+            newColor += "ff";
+        } else {
+            newColor += "00";
+        }
+        if (this._active) {
+            newColor += "ff";
+        } else {
+            newColor += "00";
+        }
+        this.color(newColor);
+    },
+});
+
 // Component for anything that occupies a grid space.
 Crafty.c("GridObject", {
     required: "2D, DOM, Color, Tween",
