@@ -7,21 +7,37 @@ Crafty.c("MyButton", {
             _hover:  false,
             _active: false,
         });
+        this.css({
+            "transition": "50ms all linear"
+        })
         this._redraw();
     },
 
     // Mouse handlers call these functions to change the displayed state.
     focus:    function() {
         this.attr({_focus:  true});
+        this.css({
+            "border-radius":  "25%",
+            "border": "2px solid green"
+        });
         this._redraw();
     },
     unfocus:  function() {
         this.attr({_focus:  false});
+        this.css({
+            "border-radius":  "none",
+            "border": "none"
+        });
         this._redraw();
     },
     hover:    function() {
         this.attr({_hover:  true});
         this._redraw();
+        this.css({
+            "cursor": "pointer",
+            "display": "inline-block",
+            "position": "relative",
+        });
     },
     unhover:  function() {
         this.attr({_hover:  false});
@@ -29,10 +45,20 @@ Crafty.c("MyButton", {
     },
     active:   function() {
         this.attr({_active: true});
+        this.css({
+            "border": "1px solid #555555",
+            "box-shadow": "1px 1px 2px #aaaaaa",
+            "text-decoration": "none",
+        })
         this._redraw();
     },
     unactive: function() {
         this.attr({_active: false});
+        this.css({
+            "border": "none",
+            "box-shadow": "none",
+            "text-decoration": "none",
+        })
         this._redraw();
     },
 
