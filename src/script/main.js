@@ -7,6 +7,7 @@ Crafty.c("MyButton", {
             _hover:  false,
             _active: false,
         });
+        this._redraw();
     },
 
     // Mouse handlers call these functions to change the displayed state.
@@ -215,6 +216,9 @@ Game = {
                 Crafty.log("Clicked static button");
             }
         }
+
+        Crafty.e("MyButton, UILayer")
+            .attr({x: 200, y: 100, w: 25, h: 25});
 
         ///////////////////////////////////////////////////////////////////////
 
