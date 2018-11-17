@@ -247,8 +247,7 @@ Game = {
             .attr({x: 200, y: 100, w: 25, h: 25});
         thing.bind("MouseOver", thing.hover)
             .bind("MouseOut", thing.unhover)
-            .bind("MouseDown", thing.active)
-            .bind("MouseUp", thing.unactive);
+            .bind("MouseDown", thing.active);
         // TODO: Handle keyboard.
 
         // Un-active every MyButton when the mouse is released, regardless of
