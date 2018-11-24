@@ -42,6 +42,9 @@ Crafty.s("ButtonMenu", {
             this.moveFocus(-1);
         } else if (e.key === Crafty.keys.DOWN_ARROW) {
             this.moveFocus(+1);
+        } else if (e.key === Crafty.keys.ENTER) {
+            // TODO: Call whichever function handles clicks.
+            Crafty.log(`Clicked button ${this._focusIndex}`);
         }
     },
 
