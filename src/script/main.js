@@ -102,20 +102,10 @@ Crafty.c("MyButton", {
     // Mouse handlers call these functions to change the displayed state.
     focus:    function() {
         this.attr({_focus:  true});
-        this.css({
-            "border-radius": "25%",
-            "border": "2px solid green",
-            "box-sizing": "border-box",
-        });
         this._redraw();
     },
     unfocus:  function() {
         this.attr({_focus:  false});
-        this.css({
-            "border-radius": "none",
-            "border": "none",
-            "box-sizing": "border-box",
-        });
         this._redraw();
     },
     hover:    function() {
@@ -128,22 +118,10 @@ Crafty.c("MyButton", {
     },
     active:   function() {
         this.attr({_active: true});
-        this.css({
-            "border": "1px solid #555555",
-            "box-shadow": "1px 1px 2px #aaaaaa",
-            "text-decoration": "none",
-            "box-sizing": "border-box",
-        })
         this._redraw();
     },
     unactive: function() {
         this.attr({_active: false});
-        this.css({
-            "border": "none",
-            "box-shadow": "none",
-            "text-decoration": "none",
-            "box-sizing": "border-box",
-        })
         this._redraw();
     },
 
@@ -151,11 +129,23 @@ Crafty.c("MyButton", {
     _redraw: function() {
         this.css({
             "cursor": "pointer",
+            "border": "none",
+            "box-shadow": "none",
+            "text-decoration": "none",
+            "box-sizing": "border-box",
         });
         let newColor = "#";
         if (this._focus) {
+            this.css({
+                "border-radius": "25%",
+                "border": "2px solid green",
+            });
             newColor += "ff";
         } else {
+            this.css({
+                "border-radius": "none",
+                "border": "none",
+            });
             newColor += "00";
         }
         if (this._hover) {
@@ -165,6 +155,11 @@ Crafty.c("MyButton", {
         }
         if (this._active) {
             newColor += "ff";
+            this.css({
+                "border": "1px solid #555555",
+                "box-shadow": "1px 1px 2px #aaaaaa",
+                "text-decoration": "none",
+            });
         } else {
             newColor += "00";
         }
