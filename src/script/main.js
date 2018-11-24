@@ -7,6 +7,16 @@ Crafty.s("ButtonMenu", {
         // focus()ed, or -1 if no button is focused.
         this._focusIndex = -1;
         this.bind('KeyDown', this.onKeyPress);
+
+        // Un-active every MyButton when the mouse is released, regardless of
+        // whether the mouse is actually over that button.
+        Crafty.s("Mouse").bind("MouseUp", function(evt) {
+            Crafty("MyButton").each(function(_index) {
+                // 'this' is the current entity of the iteration; our parameter
+                // is the index.
+                this.unactive();
+            });
+        });
     },
 
     // Set the current menu to the specified list of buttons. Overrides any
@@ -74,7 +84,6 @@ Crafty.s("ButtonMenu", {
 
 Crafty.c("MyButton", {
     required: "2D, DOM, Color, Button, Text",
-    // TODO: Support text on the button.
     init: function() {
         this.attr({
             _focus:  false,
@@ -326,17 +335,6 @@ Game = {
             .attr({x: 200, y: 100, w: 100, h: 25})
             .color("#eeddcc")
             .text("Demo Button");
-        // TODO: Handle keyboard.
-
-        // Un-active every MyButton when the mouse is released, regardless of
-        // whether the mouse is actually over that button.
-        Crafty.s("Mouse").bind("MouseUp", function(evt) {
-            Crafty("MyButton").each(function(_index) {
-                // 'this' is the current entity of the iteration; our parameter
-                // is the index.
-                this.unactive();
-            });
-        });
 
         {
             let buttonList = [];
