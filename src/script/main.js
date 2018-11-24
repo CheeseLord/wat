@@ -10,6 +10,9 @@ Crafty.c("MyButton", {
         this.css({
             "transition": "50ms all linear"
         });
+        this.bind("MouseOver", this.hover)
+            .bind("MouseOut",  this.unhover)
+            .bind("MouseDown", this.active);
         this._redraw();
     },
 
@@ -245,9 +248,6 @@ Game = {
             .attr({x: 200, y: 100, w: 100, h: 25})
             .color("#eeddcc")
             .text("Demo Button");
-        thing.bind("MouseOver", thing.hover)
-            .bind("MouseOut", thing.unhover)
-            .bind("MouseDown", thing.active);
         // TODO: Handle keyboard.
 
         // Un-active every MyButton when the mouse is released, regardless of
