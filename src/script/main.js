@@ -1,13 +1,11 @@
 Crafty.s("ButtonMenu", {
     init: function() {
-        this.attr({
-            // _buttons is a list of MyButton objects that are being displayed.
-            // If we aren't currently displaying buttons, _buttons is empty.
-            _buttons:     [],
-            // _focusIndex is the index of the button that is currently
-            // focus()ed, or -1 if no button is focused.
-            _focusIndex: -1,
-        });
+        // _buttons is a list of MyButton objects that are being displayed.
+        // If we aren't currently displaying buttons, _buttons is empty.
+        this._buttons = [];
+        // _focusIndex is the index of the button that is currently
+        // focus()ed, or -1 if no button is focused.
+        this._focusIndex = -1;
         this.bind('KeyDown', this.onKeyPress);
     },
 
@@ -16,22 +14,20 @@ Crafty.s("ButtonMenu", {
     // problem, we should probably just convert this to a Menu entity, rather
     // than a subsystem.)
     setButtons: function(buttonList) {
-        clearButtons();
-        this.attr({_buttons: buttonList});
+        this.clearButtons();
+        this._buttons = buttonList;
     },
 
     // Stop tracking buttons.
     clearButtons: function() {
-        if (0 <= _focusIndex && _focusIndex < _buttons.length) {
-            _buttons[_focusIndex].unfocus();
+        if (0 <= this._focusIndex && this._focusIndex < this._buttons.length) {
+            this._buttons[this._focusIndex].unfocus();
         }
-        this.attr({
-            _buttons:     [],
-            _focusIndex: -1,
-        });
+        this._buttons    = [];
+        this._focusIndex = -1;
     },
 
-    onKeyPress: function() {
+    onKeyPress: function(e) {
         if (e.key === Crafty.keys.UP_ARROW) {
             this.moveFocus(-1);
         } else if (e.key === Crafty.keys.DOWN_ARROW) {
@@ -43,7 +39,7 @@ Crafty.s("ButtonMenu", {
     // negative, move backward.
     moveFocus: function(delta) {
         let newIndex;
-        if (_focusIndex < 0) {
+        if (this._focusIndex < 0) {
             // No focused button. Count either forward from start or backward
             // from end, depending on the direction of motion. Really delta
             // should be +1 or -1, so most of this complexity is probably
@@ -51,25 +47,27 @@ Crafty.s("ButtonMenu", {
             if (delta > 0) {
                 newIndex = delta - 1;
             } else if (delta < 0) {
-                newIndex = Math.max(0, _buttons.length + delta);
+                newIndex = Math.max(0, this._buttons.length + delta);
             } else {
                 // Uh... this probably shouldn't happen. Let's just go with the
                 // first button?
                 newIndex = 0;
             }
         } else {
-            newIndex = (_focusIndex + delta) % _buttons.length;
+            newIndex = (this._focusIndex + delta) % this._buttons.length;
+            if (newIndex < 0)
+                newIndex += this._buttons.length;
         }
         this.setFocus(newIndex);
     },
 
     setFocus: function(newIndex) {
-        if (0 <= _focusIndex && _focusIndex < _buttons.length) {
-            _buttons[_focusIndex].unfocus();
+        if (0 <= this._focusIndex && this._focusIndex < this._buttons.length) {
+            this._buttons[this._focusIndex].unfocus();
         }
-        this.attr({_focusIndex: newIndex});
-        if (0 <= _focusIndex && _focusIndex < _buttons.length) {
-            _buttons[_focusIndex].focus();
+        this._focusIndex = newIndex;
+        if (0 <= this._focusIndex && this._focusIndex < this._buttons.length) {
+            this._buttons[this._focusIndex].focus();
         }
     },
 });
@@ -337,6 +335,7 @@ Game = {
         });
 
         {
+            let buttonList = [];
             // Create a "cube" of buttons to show off the styles.
             for (let a = 0; a <= 1; a++) {
                 for (let h = 0; h <= 1; h++) {
@@ -365,9 +364,12 @@ Game = {
                             text += "a";
                         }
                         theButton.text(text);
+                        buttonList.push(theButton);
                     }
                 }
             }
+
+            Crafty.s("ButtonMenu").setButtons(buttonList);
         }
 
         ///////////////////////////////////////////////////////////////////////
