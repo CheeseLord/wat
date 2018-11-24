@@ -1,3 +1,77 @@
+Crafty.s("ButtonMenu", {
+    init: function() {
+        // _buttons is a list of MyButton objects that are being displayed.
+        // If we aren't currently displaying buttons, _buttons is empty.
+        this._buttons = [];
+        // _focusIndex is the index of the button that is currently
+        // focus()ed, or -1 if no button is focused.
+        this._focusIndex = -1;
+        this.bind('KeyDown', this.onKeyPress);
+    },
+
+    // Set the current menu to the specified list of buttons. Overrides any
+    // previous menu; there can only be one menu at a time. (If that becomes a
+    // problem, we should probably just convert this to a Menu entity, rather
+    // than a subsystem.)
+    setButtons: function(buttonList) {
+        this.clearButtons();
+        this._buttons = buttonList;
+    },
+
+    // Stop tracking buttons.
+    clearButtons: function() {
+        if (0 <= this._focusIndex && this._focusIndex < this._buttons.length) {
+            this._buttons[this._focusIndex].unfocus();
+        }
+        this._buttons    = [];
+        this._focusIndex = -1;
+    },
+
+    onKeyPress: function(e) {
+        if (e.key === Crafty.keys.UP_ARROW) {
+            this.moveFocus(-1);
+        } else if (e.key === Crafty.keys.DOWN_ARROW) {
+            this.moveFocus(+1);
+        }
+    },
+
+    // Move the focus <delta> buttons forward, wrapping around. If <delta> is
+    // negative, move backward.
+    moveFocus: function(delta) {
+        let newIndex;
+        if (this._focusIndex < 0) {
+            // No focused button. Count either forward from start or backward
+            // from end, depending on the direction of motion. Really delta
+            // should be +1 or -1, so most of this complexity is probably
+            // unnecessary...
+            if (delta > 0) {
+                newIndex = delta - 1;
+            } else if (delta < 0) {
+                newIndex = Math.max(0, this._buttons.length + delta);
+            } else {
+                // Uh... this probably shouldn't happen. Let's just go with the
+                // first button?
+                newIndex = 0;
+            }
+        } else {
+            newIndex = (this._focusIndex + delta) % this._buttons.length;
+            if (newIndex < 0)
+                newIndex += this._buttons.length;
+        }
+        this.setFocus(newIndex);
+    },
+
+    setFocus: function(newIndex) {
+        if (0 <= this._focusIndex && this._focusIndex < this._buttons.length) {
+            this._buttons[this._focusIndex].unfocus();
+        }
+        this._focusIndex = newIndex;
+        if (0 <= this._focusIndex && this._focusIndex < this._buttons.length) {
+            this._buttons[this._focusIndex].focus();
+        }
+    },
+});
+
 Crafty.c("MyButton", {
     required: "2D, DOM, Color, Button, Text",
     // TODO: Support text on the button.
@@ -265,6 +339,7 @@ Game = {
         });
 
         {
+            let buttonList = [];
             // Create a "cube" of buttons to show off the styles.
             for (let a = 0; a <= 1; a++) {
                 for (let h = 0; h <= 1; h++) {
@@ -293,9 +368,12 @@ Game = {
                             text += "a";
                         }
                         theButton.text(text);
+                        buttonList.push(theButton);
                     }
                 }
             }
+
+            Crafty.s("ButtonMenu").setButtons(buttonList);
         }
 
         ///////////////////////////////////////////////////////////////////////
