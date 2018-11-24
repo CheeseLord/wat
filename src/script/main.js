@@ -130,21 +130,19 @@ Crafty.c("MyButton", {
         this.css({
             "cursor": "pointer",
             "border": "none",
+            "border-radius": "0%",
             "box-shadow": "none",
             "text-decoration": "none",
             "box-sizing": "border-box",
-            "border-radius": "25%",
         });
         let newColor = "#";
         if (this._focus) {
             this.css({
+                "border-radius": "25%",
                 "border": "2px solid green",
             });
             newColor += "ff";
         } else {
-            this.css({
-                "border": "none",
-            });
             newColor += "00";
         }
         if (this._hover) {
