@@ -20,16 +20,18 @@ Crafty.c("MyButton", {
     focus:    function() {
         this.attr({_focus:  true});
         this.css({
-            "border-radius":  "25%",
-            "border": "2px solid green"
+            "border-radius": "25%",
+            "border": "2px solid green",
+            "box-sizing": "border-box",
         });
         this._redraw();
     },
     unfocus:  function() {
         this.attr({_focus:  false});
         this.css({
-            "border-radius":  "none",
-            "border": "none"
+            "border-radius": "none",
+            "border": "none",
+            "box-sizing": "border-box",
         });
         this._redraw();
     },
@@ -47,6 +49,7 @@ Crafty.c("MyButton", {
             "border": "1px solid #555555",
             "box-shadow": "1px 1px 2px #aaaaaa",
             "text-decoration": "none",
+            "box-sizing": "border-box",
         })
         this._redraw();
     },
@@ -56,6 +59,7 @@ Crafty.c("MyButton", {
             "border": "none",
             "box-shadow": "none",
             "text-decoration": "none",
+            "box-sizing": "border-box",
         })
         this._redraw();
     },
