@@ -264,13 +264,6 @@ Game = {
         return this.mapGrid.height * this.mapGrid.tile.height;
     },
 
-    // TODO: If you remove the static button, then when the dynamic button
-    // first appears we only render the bottom few pixels until the user next
-    // forces a redraw (or something like that). But if you include the static
-    // button, the dynamic button seems to have no such problem. Wut?
-    doStaticButton:   true,
-    hasDynamicButton: false,
-
     start: function() {
         Crafty.init(Game.width(), Game.height(),
             document.getElementById("game"));
@@ -292,16 +285,6 @@ Game = {
             .setPos({x: 5, y: 3})
             .color("#007f00");
 
-        ///////////////////////////////////////////////////////////////////////
-        // Just testing out a text-button...
-        // Crafty.e("2D, DOM, Text, Button")
-        //     .attr({x: 0, y: 0, w: 32, h: 32})
-        //     .text("I'm here. Click me!")
-        //     .unselectable()
-        //     .bind("Click", function(e) {
-        //         Crafty.log("I've been clicked!");
-        //     });
-
         // Take 2
         Crafty.createLayer("UILayer", "DOM", {
             // Ignore viewscreen transforms
@@ -311,17 +294,6 @@ Game = {
             // On top of other layers
             z: 40
         });
-
-        if (Game.doStaticButton) {
-            Crafty.e("2D, HTML, UILayer")
-                .attr({x: 0, y: 0})
-                .append("<button id='mystaticbutton' class='mybutton'>I'm " +
-                        "here. Click me!</button>");
-            var button = document.getElementById('mystaticbutton');
-            button.onclick = function(e) {
-                Crafty.log("Clicked static button");
-            }
-        }
 
         let thing = Crafty.e("MyButton, UILayer")
             .attr({x: 200, y: 100, w: 100, h: 25})
@@ -377,26 +349,6 @@ Game = {
                 if (e.target === player){
                     player.highlight();
                     Crafty.log("You clicked on the player.");
-                    if (!Game.hasDynamicButton) {
-                        Crafty.e("2D, HTML, UILayer")
-                            .attr({x: 300, y: 0})
-                            .replace("<button id='mydynamicbutton' " +
-                                    "class='mybutton'>I'm here. " +
-                                    "Click me!</button>");
-                        var button = document.getElementById(
-                            'mydynamicbutton'
-                        );
-                        button.onclick = function(e) {
-                            Crafty.log("Clicked dynamic button");
-                        }
-                        // Only create one dynamic button.
-                        Game.hasDynamicButton = true;
-                        // TODO: If you don't include the static button, then
-                        // this button doesn't fully render. I would have
-                        // thought this next line would fix it, but apparently
-                        // not.
-                        Crafty.viewport.reload();
-                    }
                 } else {
                     let x = Math.floor(e.realX / Game.mapGrid.tile.width);
                     let y = Math.floor(e.realY / Game.mapGrid.tile.height);
