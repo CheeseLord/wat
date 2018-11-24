@@ -1,5 +1,5 @@
 Crafty.c("MyButton", {
-    required: "2D, DOM, Color, Button",
+    required: "2D, DOM, Color, Button, Text",
     // TODO: Support text on the button.
     init: function() {
         this.attr({
@@ -242,7 +242,9 @@ Game = {
         }
 
         let thing = Crafty.e("MyButton, UILayer")
-            .attr({x: 200, y: 100, w: 25, h: 25});
+            .attr({x: 200, y: 100, w: 100, h: 25})
+            .color("#eeddcc")
+            .text("Demo Button");
         thing.bind("MouseOver", thing.hover)
             .bind("MouseOut", thing.unhover)
             .bind("MouseDown", thing.active);
@@ -267,15 +269,26 @@ Game = {
                         let y = 100 + 80*f + 30*a;
                         let theButton = Crafty.e("MyButton, UILayer")
                             .attr({x: x, y: y, w: 20, h: 20});
+                        let text = "";
                         if (f) {
                             theButton.focus();
+                            text += "F";
+                        } else {
+                            text += "f";
                         }
                         if (h) {
                             theButton.hover();
+                            text += "H";
+                        } else {
+                            text += "h";
                         }
                         if (a) {
                             theButton.active();
+                            text += "A";
+                        } else {
+                            text += "a";
                         }
+                        theButton.text(text);
                     }
                 }
             }
