@@ -26,6 +26,9 @@ Crafty.s("ButtonMenu", {
     setButtons: function(buttonList) {
         this.clearButtons();
         this._buttons = buttonList;
+        for (let i = 0; i < this._buttons.length; i++) {
+            this._buttons[i].index = i;
+        }
     },
 
     // Stop tracking buttons.
@@ -92,6 +95,7 @@ Crafty.c("MyButton", {
             _focus:  false,
             _hover:  false,
             _active: false,
+            index: -1,
         });
         this.css({
             "transition": "50ms all linear"
@@ -120,6 +124,7 @@ Crafty.c("MyButton", {
         this._redraw();
     },
     active:   function() {
+        Crafty.s("ButtonMenu").setFocus(this.index);
         this.attr({_active: true});
         this._redraw();
     },
