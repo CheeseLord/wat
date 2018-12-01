@@ -102,7 +102,8 @@ Crafty.c("MyButton", {
         });
         this.bind("MouseOver", this.hover)
             .bind("MouseOut",  this.unhover)
-            .bind("MouseDown", this.active);
+            .bind("MouseDown", this.active)
+            .bind("MouseUp", this.click);
         this._redraw();
     },
 
@@ -131,6 +132,9 @@ Crafty.c("MyButton", {
     unactive: function() {
         this.attr({_active: false});
         this._redraw();
+    },
+    click: function() {
+        Crafty.log(`Clicked button ${this.index}`);
     },
 
     // Internal helper for when the state is (or might be) changed.
