@@ -6,19 +6,20 @@ Crafty.s("ButtonMenu", {
         // _focusIndex is the index of the button that is currently
         // focus()ed, or -1 if no button is focused.
         this._focusIndex = -1;
+        // _activeButton points to the currently active button, or null if no
+        // button is active.
+        this._activeButton = null;
+
         this.bind('KeyDown', this.onKeyPress);
 
-        // Un-active every MyButton when the mouse is released, regardless of
-        // whether the mouse is actually over that button.
+        // Note: we need to bind to anonymous wrapper functions because
+        // callbacks are called in the context of the Mouse subsystem, but the
+        // actual handler functions need to be called in ButtonMenu's context.
+        Crafty.s("Mouse").bind("MouseDown", function(evt) {
+            Crafty.s("ButtonMenu").onMouseDown(evt);
+        });
         Crafty.s("Mouse").bind("MouseUp", function(evt) {
-            if (evt.target !== null && evt.target._active) {
-                evt.target.click();
-            }
-            Crafty("MyButton").each(function(_index) {
-                // 'this' is the current entity of the iteration; our parameter
-                // is the index.
-                this.unactive();
-            });
+            Crafty.s("ButtonMenu").onMouseUp(evt);
         });
     },
 
@@ -41,6 +42,31 @@ Crafty.s("ButtonMenu", {
         }
         this._buttons    = [];
         this._focusIndex = -1;
+    },
+
+    onMouseDown: function(evt) {
+        if (this._activeButton !== null) {
+            // This probably only happens in weird edge cases; else we'd have
+            // done this on MouseUp.
+            this._activeButton.unactive();
+            this._activeButton = null;
+        }
+        if (evt.target !== null && evt.target.isMyButton &&
+                evt.target.index >= 0) {
+            // This MouseDown is on a button that we are aware of.
+            this._activeButton = evt.target;
+            this._activeButton.active();
+        }
+    },
+
+    onMouseUp: function(evt) {
+        if (this._activeButton !== null) {
+            if (evt.target === this._activeButton) {
+                this._activeButton.click();
+            }
+            this._activeButton.unactive();
+            this._activeButton = null;
+        }
     },
 
     onKeyPress: function(e) {
@@ -95,6 +121,7 @@ Crafty.c("MyButton", {
     required: "2D, DOM, Color, Button, Text",
     init: function() {
         this.attr({
+            isMyButton: true,
             _focus:  false,
             _hover:  false,
             _active: false,
@@ -117,9 +144,7 @@ Crafty.c("MyButton", {
             "transition": "50ms all linear"
         });
         this.bind("MouseOver", this.hover)
-            .bind("MouseOut",  this.unhover)
-            .bind("MouseDown", this.active)
-            .bind("MouseUp", this.click);
+            .bind("MouseOut",  this.unhover);
         this._redraw();
     },
 
@@ -354,6 +379,7 @@ Game = {
                             text += "h";
                         }
                         if (a) {
+                            // FIXME: shouldn't call .active directly.
                             theButton.active();
                             text += "A";
                         } else {
