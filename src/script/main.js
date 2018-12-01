@@ -100,6 +100,19 @@ Crafty.c("MyButton", {
             _active: false,
             index: -1,
         });
+        // If you call .text on a Text entity without calling .textColor, it
+        // results in the following warning:
+        //     Expected color but found 'undefined'
+        // Furthermore:
+        //   - Calling .textColor before .color sets the foreground and
+        //     background colors separately, which is what we want.
+        //   - Calling .color before .textColor results in BOTH being set to
+        //     the textColor.
+        // Therefore, we call .textColor here before ._redraw, so that the
+        // colors will work like we want.
+        // (Therefore, if we want to vary text colors, we'll probably need to
+        // create a wrapper around textColor which calls _redraw after.)
+        this.textColor("#000000");
         this.css({
             "transition": "50ms all linear"
         });
