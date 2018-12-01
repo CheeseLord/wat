@@ -11,6 +11,9 @@ Crafty.s("ButtonMenu", {
         // Un-active every MyButton when the mouse is released, regardless of
         // whether the mouse is actually over that button.
         Crafty.s("Mouse").bind("MouseUp", function(evt) {
+            if (evt.target !== null && evt.target._active) {
+                evt.target.click();
+            }
             Crafty("MyButton").each(function(_index) {
                 // 'this' is the current entity of the iteration; our parameter
                 // is the index.
@@ -134,7 +137,9 @@ Crafty.c("MyButton", {
         this._redraw();
     },
     click: function() {
+        if (!this._active) { return; }
         Crafty.log(`Clicked button ${this.index}`);
+        this.unactive();
     },
 
     // Internal helper for when the state is (or might be) changed.
