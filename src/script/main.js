@@ -361,49 +361,25 @@ Game = {
             z: 40
         });
 
-        let thing = Crafty.e("MyButton, UILayer")
-            .attr({x: 200, y: 100, w: 100, h: 25})
-            .color("#eeddcc")
-            .text("Demo Button");
-
-        {
-            let buttonList = [];
-            // Create a "cube" of buttons to show off the styles.
-            for (let a = 0; a <= 1; a++) {
-                for (let h = 0; h <= 1; h++) {
-                    for (let f = 0; f <= 1; f++) {
-                        let x =  20 + 80*h + 30*a;
-                        let y = 100 + 80*f + 30*a;
-                        let theButton = Crafty.e("MyButton, UILayer")
-                            .attr({x: x, y: y, w: 20, h: 20});
-                        let text = "";
-                        if (f) {
-                            theButton.focus();
-                            text += "F";
-                        } else {
-                            text += "f";
-                        }
-                        if (h) {
-                            theButton.hover();
-                            text += "H";
-                        } else {
-                            text += "h";
-                        }
-                        if (a) {
-                            // FIXME: shouldn't call .active directly.
-                            theButton.active();
-                            text += "A";
-                        } else {
-                            text += "a";
-                        }
-                        theButton.text(text);
-                        buttonList.push(theButton);
-                    }
-                }
-            }
-
-            Crafty.s("ButtonMenu").setButtons(buttonList);
-        }
+        // Some example buttons.
+        Crafty.s("ButtonMenu").setButtons([
+            Crafty.e("MyButton, UILayer")
+                .attr({x: 50, y:  50, w: 100, h: 20})
+                .color("#eeddcc")
+                .text("Example Button 0"),
+            Crafty.e("MyButton, UILayer")
+                .attr({x: 50, y:  75, w: 100, h: 20})
+                .color("#eeddcc")
+                .text("Example Button 1"),
+            Crafty.e("MyButton, UILayer")
+                .attr({x: 50, y: 100, w: 100, h: 20})
+                .color("#eeddcc")
+                .text("Example Button 2"),
+            Crafty.e("MyButton, UILayer")
+                .attr({x: 50, y: 125, w: 100, h: 20})
+                .color("#eeddcc")
+                .text("Example Button 3"),
+        ]);
 
         ///////////////////////////////////////////////////////////////////////
 
