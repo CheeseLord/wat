@@ -45,17 +45,13 @@ Crafty.s("ButtonMenu", {
     },
 
     onMouseDown: function(evt) {
-        if (this._activeButton !== null) {
-            // This probably only happens in weird edge cases; else we'd have
-            // done this on MouseUp.
-            this._activeButton.unactive();
-            this._activeButton = null;
-        }
+        // This probably only matters in weird edge cases; normally we do this
+        // on MouseUp.
+        this.clearActive();
         if (evt.target !== null && evt.target.isMyButton &&
                 evt.target.index >= 0) {
             // This MouseDown is on a button that we are aware of.
-            this._activeButton = evt.target;
-            this._activeButton.active();
+            this.makeActive(evt.target);
         }
     },
 
@@ -64,6 +60,16 @@ Crafty.s("ButtonMenu", {
             if (evt.target === this._activeButton) {
                 this._activeButton.click();
             }
+        }
+        this.clearActive();
+    },
+
+    makeActive: function(button) {
+        this._activeButton = button;
+        this._activeButton.active();
+    },
+    clearActive: function() {
+        if (this._activeButton !== null) {
             this._activeButton.unactive();
             this._activeButton = null;
         }
