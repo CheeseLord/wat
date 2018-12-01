@@ -149,9 +149,14 @@ Crafty.c("MyButton", {
         this.css({
             "transition": "50ms all linear"
         });
-        this.bind("MouseOver", this.hover)
-            .bind("MouseOut",  this.unhover);
         this._redraw();
+    },
+
+    events: {
+        // Note that that we need anonymous functions as these events need to
+        // be defined when the events are handled.
+        "MouseOver": function() {this.hover()},
+        "MouseOut":  function() {this.unhover()},
     },
 
     // Mouse handlers call these functions to change the displayed state.
