@@ -1,3 +1,5 @@
+"use strict";
+
 Crafty.s("ButtonMenu", {
     init: function() {
         // _buttons is a list of MyButton objects that are being displayed.
@@ -133,6 +135,7 @@ Crafty.c("MyButton", {
             _focus:  false,
             _hover:  false,
             _active: false,
+            _onclick: undefined,
             index: -1,
         });
         // If you call .text on a Text entity without calling .textColor, it
@@ -187,8 +190,18 @@ Crafty.c("MyButton", {
         this.attr({_active: false});
         this._redraw();
     },
+
+    onclick: function(f) {
+        this._onclick = f;
+        return this;
+    },
     click: function() {
         Crafty.log(`Clicked button ${this.index}`);
+        if (this._onclick === undefined) {
+            Crafty.error(`No handler defined for button ${this.index}`);
+        } else {
+            this._onclick();
+        }
     },
 
     // Internal helper for when the state is (or might be) changed.
@@ -312,7 +325,7 @@ Crafty.c("PlayerControllable", {
     }
 });
 
-Game = {
+let Game = {
     mapGrid: {
         width: 25,
         height: 17,
@@ -358,7 +371,7 @@ Game = {
             yResponse: 0,
             scaleResponse: 0,
             // On top of other layers
-            z: 40
+            z: 40,
         });
 
         // Some example buttons.
@@ -366,15 +379,18 @@ Game = {
             Crafty.e("MyButton, UILayer")
                 .attr({x: 50, y:  50, w: 100, h: 20})
                 .color("#eeddcc")
-                .text("Example Button 0"),
+                .text("Example Button 0")
+                .onclick(() => Crafty.log("AAAAAAAAAA")),
             Crafty.e("MyButton, UILayer")
                 .attr({x: 50, y:  75, w: 100, h: 20})
                 .color("#eeddcc")
-                .text("Example Button 1"),
+                .text("Example Button 1")
+                .onclick(() => Crafty.log("BBBBBBBBBB")),
             Crafty.e("MyButton, UILayer")
                 .attr({x: 50, y: 100, w: 100, h: 20})
                 .color("#eeddcc")
-                .text("Example Button 2"),
+                .text("Example Button 2")
+                .onclick(() => Crafty.log("CCCCCCCCCC")),
             Crafty.e("MyButton, UILayer")
                 .attr({x: 50, y: 125, w: 100, h: 20})
                 .color("#eeddcc")
