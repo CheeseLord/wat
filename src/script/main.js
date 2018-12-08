@@ -81,8 +81,10 @@ Crafty.s("ButtonMenu", {
         } else if (e.key === Crafty.keys.DOWN_ARROW) {
             this.moveFocus(+1);
         } else if (e.key === Crafty.keys.ENTER) {
-            // TODO: Call whichever function handles clicks.
-            Crafty.log(`Clicked button ${this._focusIndex}`);
+            if (0 <= this._focusIndex &&
+                     this._focusIndex < this._buttons.length) {
+                this._buttons[this._focusIndex].click();
+            }
         }
     },
 
@@ -186,9 +188,7 @@ Crafty.c("MyButton", {
         this._redraw();
     },
     click: function() {
-        if (!this._active) { return; }
         Crafty.log(`Clicked button ${this.index}`);
-        this.unactive();
     },
 
     // Internal helper for when the state is (or might be) changed.
