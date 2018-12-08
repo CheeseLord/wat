@@ -138,19 +138,6 @@ Crafty.c("MyButton", {
             _onclick: undefined,
             index: -1,
         });
-        // If you call .text on a Text entity without calling .textColor, it
-        // results in the following warning:
-        //     Expected color but found 'undefined'
-        // Furthermore:
-        //   - Calling .textColor before .color sets the foreground and
-        //     background colors separately, which is what we want.
-        //   - Calling .color before .textColor results in BOTH being set to
-        //     the textColor.
-        // Therefore, we call .textColor here before ._redraw, so that the
-        // colors will work like we want.
-        // (Therefore, if we want to vary text colors, we'll probably need to
-        // create a wrapper around textColor which calls _redraw after.)
-        this.textColor("#000000");
         this.css({
             "transition": "50ms all linear"
         });
@@ -165,6 +152,9 @@ Crafty.c("MyButton", {
     },
 
     // Mouse handlers call these functions to change the displayed state.
+    // Do NOT change the button styles in these functions, since that
+    // introduces dependencies on the order in which different bits are set.
+    // Set all styles in _redraw instead.
     focus:    function() {
         this.attr({_focus:  true});
         this._redraw();
@@ -206,40 +196,62 @@ Crafty.c("MyButton", {
 
     // Internal helper for when the state is (or might be) changed.
     _redraw: function() {
+        // Focus: indicates which button will be selected if the user presses
+        //     "enter".
+        // Hover: indicates which button the mouse is currently over,
+        //     regardless of whether the mouse button has been clicked.
+        // Active: indicates the button that the user has MouseDown'ed on, when
+        //     the user has not yet MouseUp'ed since then (and regardless of
+        //     whether the mouse is still over the button).
+
+        // Idea:
+        //   - Default button: light bluish
+        //   - Hovered but not active: slightly lighter bluish
+        //   - Active and hovered: white text on dark blue
+        //   - Active but not hovered: same as default
+        //   - Focused: Add a green border (orthogonal to the above)
+
         this.css({
-            "cursor": "pointer",
-            "border": "none",
-            "border-radius": "0%",
-            "box-shadow": "none",
-            "text-decoration": "none",
+            "cursor":     "pointer",
             "box-sizing": "border-box",
+            "box-shadow": "1px 1px 2px #7f7f7f",
         });
-        let newColor = "#";
+
+        let bgColor = "#007fff";
+        let fgColor = "#000000";
+
+        if (this._hover) {
+            if (this._active) {
+                bgColor = "#005fbf";
+                fgColor = "#ffffff";
+            } else {
+                bgColor = "#00bfff";
+            }
+        }
+
         if (this._focus) {
             this.css({
-                "border-radius": "25%",
                 "border": "2px solid green",
             });
-            newColor += "ff";
         } else {
-            newColor += "00";
-        }
-        if (this._hover) {
-            newColor += "ff";
-        } else {
-            newColor += "00";
-        }
-        if (this._active) {
-            newColor += "ff";
             this.css({
-                "border": "1px solid #555555",
-                "box-shadow": "1px 1px 2px #aaaaaa",
-                "text-decoration": "none",
+                "border": "2px solid transparent",
             });
-        } else {
-            newColor += "00";
         }
-        this.color(newColor);
+
+        // If you call .text on a Text entity without calling .textColor, it
+        // results in the following warning:
+        //     Expected color but found 'undefined'
+        // Furthermore:
+        //   - Calling .textColor before .color sets the foreground and
+        //     background colors separately, which is what we want.
+        //   - Calling .color before .textColor results in BOTH being set to
+        //     the textColor.
+        // Therefore, we must set .textColor here, and we must do it before we
+        // set .color.
+        this.textColor(fgColor);
+        this.color(bgColor);
+        this.textAlign("center");
     },
 });
 
@@ -378,22 +390,18 @@ let Game = {
         Crafty.s("ButtonMenu").setButtons([
             Crafty.e("MyButton, UILayer")
                 .attr({x: 50, y:  50, w: 100, h: 20})
-                .color("#eeddcc")
                 .text("Example Button 0")
                 .onclick(() => Crafty.log("AAAAAAAAAA")),
             Crafty.e("MyButton, UILayer")
                 .attr({x: 50, y:  75, w: 100, h: 20})
-                .color("#eeddcc")
                 .text("Example Button 1")
                 .onclick(() => Crafty.log("BBBBBBBBBB")),
             Crafty.e("MyButton, UILayer")
                 .attr({x: 50, y: 100, w: 100, h: 20})
-                .color("#eeddcc")
                 .text("Example Button 2")
                 .onclick(() => Crafty.log("CCCCCCCCCC")),
             Crafty.e("MyButton, UILayer")
                 .attr({x: 50, y: 125, w: 100, h: 20})
-                .color("#eeddcc")
                 .text("Example Button 3"),
         ]);
 
