@@ -224,6 +224,9 @@ Crafty.c("MyButton", {
             if (this._active) {
                 bgColor = "#005fbf";
                 fgColor = "#ffffff";
+                // TODO: Move text down by a pixel or so. Or maybe move the
+                // whole thing by (1, 1) and then shrink the box-shadow
+                // accordingly?
             } else {
                 bgColor = "#00bfff";
             }
@@ -251,6 +254,8 @@ Crafty.c("MyButton", {
         // set .color.
         this.textColor(fgColor);
         this.color(bgColor);
+
+        // TODO: Also center vertically.
         this.textAlign("center");
     },
 });
