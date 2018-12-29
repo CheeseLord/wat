@@ -194,7 +194,7 @@ export let Game = {
         Crafty.one("CameraAnimationDone", function() {
             // TODO magic numbers bad
             // 50 is half the width of the side pane
-            Crafty.viewport.follow(player, 50, 0);
+            Crafty.viewport.follow(player, 60, 0);
         });
         // TODO: We need our own function for this that adds in the right
         // offset, so there isn't a sudden jump. The library implementation is
