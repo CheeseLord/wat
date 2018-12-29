@@ -1,4 +1,6 @@
 "use strict";
+import './button.js'
+
 
 // Component for anything that occupies a grid space.
 Crafty.c("GridObject", {
@@ -82,7 +84,7 @@ Crafty.c("PlayerControllable", {
     }
 });
 
-let Game = {
+export let Game = {
     mapGrid: {
         width: 25,
         height: 17,
@@ -187,4 +189,3 @@ let Game = {
         Crafty.viewport.centerOn(player, 1500);
     },
 };
-

@@ -9,9 +9,9 @@
         <p>I am some text below the game.</p>
 
         <script type="text/javascript" src="https://rawgithub.com/craftyjs/Crafty/release/dist/crafty-min.js"></script>
-        <script type="text/javascript" src="script/button.js"></script>
-        <script type="text/javascript" src="script/main.js"></script>
-        <script type="text/javascript">
+        <script type="module" src="script/main.js"></script>
+        <script type="module">
+            import {Game} from './script/main.js'
             window.addEventListener("load", Game.start);
         </script>
     </body>
