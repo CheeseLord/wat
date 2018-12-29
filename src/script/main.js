@@ -133,22 +133,30 @@ export let Game = {
             z: 40,
         });
 
+        // Background for the buttons
+        // TODO: Magic numbers bad
+        // 120 is slightly more than the width of a button
+        // ...or, button width is 120 minus half the padding.
+        Crafty.e("2D, UILayer, Color")
+            .attr({x: 0, y: 0, w: 120, h: Game.height()})
+            .color("#eee");
+
         // Some example buttons.
         Crafty.s("ButtonMenu").setButtons([
             Crafty.e("MyButton, UILayer")
-                .attr({x: 50, y:  50, w: 100, h: 20})
+                .attr({x: 10, y: 10, w: 100, h: 20})
                 .text("Example Button 0")
                 .onclick(() => Crafty.log("AAAAAAAAAA")),
             Crafty.e("MyButton, UILayer")
-                .attr({x: 50, y:  75, w: 100, h: 20})
+                .attr({x: 10, y: 35, w: 100, h: 20})
                 .text("Example Button 1")
                 .onclick(() => Crafty.log("BBBBBBBBBB")),
             Crafty.e("MyButton, UILayer")
-                .attr({x: 50, y: 100, w: 100, h: 20})
+                .attr({x: 10, y: 60, w: 100, h: 20})
                 .text("Example Button 2")
                 .onclick(() => Crafty.log("CCCCCCCCCC")),
             Crafty.e("MyButton, UILayer")
-                .attr({x: 50, y: 125, w: 100, h: 20})
+                .attr({x: 10, y: 85, w: 100, h: 20})
                 .text("Example Button 3"),
         ]);
 
