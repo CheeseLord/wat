@@ -142,23 +142,7 @@ export let Game = {
             .color("#eee");
 
         // Some example buttons.
-        Crafty.s("ButtonMenu").setButtons([
-            Crafty.e("MyButton, UILayer")
-                .attr({x: 10, y: 10, w: 100, h: 20})
-                .text("Example Button 0")
-                .onclick(() => Crafty.log("AAAAAAAAAA")),
-            Crafty.e("MyButton, UILayer")
-                .attr({x: 10, y: 35, w: 100, h: 20})
-                .text("Example Button 1")
-                .onclick(() => Crafty.log("BBBBBBBBBB")),
-            Crafty.e("MyButton, UILayer")
-                .attr({x: 10, y: 60, w: 100, h: 20})
-                .text("Example Button 2")
-                .onclick(() => Crafty.log("CCCCCCCCCC")),
-            Crafty.e("MyButton, UILayer")
-                .attr({x: 10, y: 85, w: 100, h: 20})
-                .text("Example Button 3"),
-        ]);
+        Crafty.s("ButtonMenu").setExampleButtons();
 
         ///////////////////////////////////////////////////////////////////////
 

@@ -49,6 +49,27 @@ Crafty.s("ButtonMenu", {
         this._focusIndex = -1;
     },
 
+    // FIXME: This shouldn't exist.
+    setExampleButtons: function() {
+        this.setButtons([
+            Crafty.e("MyButton, UILayer")
+                .attr({x: 10, y: 10, w: 100, h: 20})
+                .text("Example Button 0")
+                .onclick(() => Crafty.log("AAAAAAAAAA")),
+            Crafty.e("MyButton, UILayer")
+                .attr({x: 10, y: 35, w: 100, h: 20})
+                .text("Example Button 1")
+                .onclick(() => Crafty.log("BBBBBBBBBB")),
+            Crafty.e("MyButton, UILayer")
+                .attr({x: 10, y: 60, w: 100, h: 20})
+                .text("Example Button 2")
+                .onclick(() => Crafty.log("CCCCCCCCCC")),
+            Crafty.e("MyButton, UILayer")
+                .attr({x: 10, y: 85, w: 100, h: 20})
+                .text("Example Button 3"),
+        ]);
+    },
+
     onMouseDown: function(evt) {
         // This probably only matters in weird edge cases; normally we do this
         // on MouseUp.
