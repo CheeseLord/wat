@@ -42,6 +42,9 @@ Crafty.s("ButtonMenu", {
         if (0 <= this._focusIndex && this._focusIndex < this._buttons.length) {
             this._buttons[this._focusIndex].unfocus();
         }
+        for (let i = 0; i < this._buttons.length; i++) {
+            this._buttons[i].destroy();
+        }
         this._buttons    = [];
         this._focusIndex = -1;
     },
