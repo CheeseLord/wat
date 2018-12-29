@@ -141,9 +141,6 @@ export let Game = {
             .attr({x: 0, y: 0, w: 120, h: Game.height()})
             .color("#eee");
 
-        // Some example buttons.
-        Crafty.s("ButtonMenu").setExampleButtons();
-
         ///////////////////////////////////////////////////////////////////////
 
         // Temporary hack to log wherever you click.
@@ -154,8 +151,10 @@ export let Game = {
             if (e.mouseButton === Crafty.mouseButtons.LEFT) {
                 if (e.target === player){
                     player.highlight();
+                    Crafty.s("ButtonMenu").setExampleButtons();
                     Crafty.log("You clicked on the player.");
                 } else {
+                    Crafty.s("ButtonMenu").clearButtons();
                     let x = Math.floor(e.realX / Game.mapGrid.tile.width);
                     let y = Math.floor(e.realY / Game.mapGrid.tile.height);
                     Crafty.log(`You clicked at: (${x}, ${y})`);
