@@ -189,3 +189,4 @@ export let Game = {
         Crafty.viewport.centerOn(player, 1500);
     },
 };
+
