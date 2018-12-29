@@ -192,8 +192,13 @@ export let Game = {
         // player (with offset (0, 0)).
         Crafty.viewport.clampToEntities = false;
         Crafty.one("CameraAnimationDone", function() {
-            Crafty.viewport.follow(player, 0, 0);
+            // TODO magic numbers bad
+            // 50 is half the width of the side pane
+            Crafty.viewport.follow(player, 50, 0);
         });
+        // TODO: We need our own function for this that adds in the right
+        // offset, so there isn't a sudden jump. The library implementation is
+        // Crafty/viewport.js#L324-L335.
         Crafty.viewport.centerOn(player, 1500);
     },
 };
