@@ -1,6 +1,35 @@
 "use strict";
 import './button.js'
 
+// Based on https://stackoverflow.com/questions/287903/what-is-the-preferred-syntax-for-defining-enums-in-javascript
+// Always use === for checking equality, otherwise always true
+var StateEnum = Object.freeze({
+    DEFAULT: {},
+    PLAYER_SELECTED: {},
+    PLAYER_MOVE: {},
+});
+
+var GlobalState = StateEnum.DEFAULT;
+
+function createPlayerSelectMenu(player) {
+    Crafty.log("Creating Player Select Menu")
+    Crafty.s("ButtonMenu").setButtons([
+        Crafty.e("MyButton, UILayer")
+                .attr({x: 10, y: 10, w: 100, h: 20})
+                .text("Move")
+                .onclick(() => {
+                    GlobalState = StateEnum.PLAYER_MOVE;
+                }),
+        Crafty.e("MyButton, UILayer")
+                .attr({x: 10, y: 35, w: 100, h: 20})
+                .text("Cancel")
+                .onclick(() => {
+                    Crafty.s("ButtonMenu").clearButtons();
+                    GlobalState = StateEnum.DEFAULT;
+                    player.unhighlight();
+                })
+        ]);
+    }
 
 // Component for anything that occupies a grid space.
 Crafty.c("GridObject", {
@@ -151,18 +180,22 @@ export let Game = {
             if (e.mouseButton === Crafty.mouseButtons.LEFT) {
                 if (e.target === player){
                     player.highlight();
-                    Crafty.s("ButtonMenu").setExampleButtons();
+                    if (GlobalState === StateEnum.DEFAULT) {
+                        createPlayerSelectMenu(player);
+                        GlobalState = StateEnum.PLAYER_SELECTED;
+                    }
                     Crafty.log("You clicked on the player.");
                 } else {
-                    Crafty.s("ButtonMenu").clearButtons();
                     let x = Math.floor(e.realX / Game.mapGrid.tile.width);
                     let y = Math.floor(e.realY / Game.mapGrid.tile.height);
                     Crafty.log(`You clicked at: (${x}, ${y})`);
-                    if (player.isHighlighted()) {
+                    if (GlobalState ===  StateEnum.PLAYER_MOVE) {
+                        Crafty.s("ButtonMenu").clearButtons();
                         player.animateTo({x: x, y: y});
                         player.one("TweenEnd", function() {
                             player.unhighlight();
                         });
+                        GlobalState = StateEnum.DEFAULT;
                     }
                 }
             } else if (e.mouseButton === Crafty.mouseButtons.RIGHT) {
@@ -185,4 +218,3 @@ export let Game = {
         Crafty.viewport.centerOn(player, 1500);
     },
 };
-
