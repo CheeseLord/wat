@@ -29,6 +29,8 @@ Crafty.s("ButtonMenu", {
     // previous menu; there can only be one menu at a time. (If that becomes a
     // problem, we should probably just convert this to a Menu entity, rather
     // than a subsystem.)
+    // TODO: Version of this that doesn't require the caller to set the
+    // position of every button separately.
     setButtons: function(buttonList) {
         this.clearButtons();
         this._buttons = buttonList;

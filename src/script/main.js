@@ -1,7 +1,8 @@
 "use strict";
 import './button.js'
 
-// Based on https://stackoverflow.com/questions/287903/what-is-the-preferred-syntax-for-defining-enums-in-javascript
+// Based on one of the comments on:
+//     https://stackoverflow.com/a/5040502
 // Always use === for checking equality, otherwise always true
 var StateEnum = Object.freeze({
     DEFAULT: {},
