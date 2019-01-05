@@ -167,17 +167,32 @@ export let Game = {
         // TODO: Magic numbers bad
         // 120 is slightly more than the width of a button
         // ...or, button width is 120 minus half the padding.
-        Crafty.e("2D, UILayer, Color")
+        Crafty.e("2D, UILayer, Color, Mouse")
             .attr({x: 0, y: 0, w: 120, h: Game.height()})
             .color("#eee");
 
+        // Convert regular mouse events to WorldClick events, so we can handle
+        // that case without doing weird things when the player clicks on the
+        // UI pane.
+        Crafty.s("Mouse").bind("MouseUp", function(e) {
+            // HACK: I can get the world position using [e.realX, e.realY], but
+            // I can't find a way to get the screen position directly. So
+            // manually do the viewport calculation to transform it.
+            let worldX = e.realX;
+            let viewRect = Crafty.viewport.rect();
+            let screenX = (worldX - viewRect._x) * Game.width() / viewRect._w;
+
+            // TODO: Magic numbers bad
+            // 120 is the width of the UI pane.
+            if (screenX >= 120) {
+                Crafty.trigger("WorldClick", e);
+            }
+        });
+
         ///////////////////////////////////////////////////////////////////////
 
-        // Temporary hack to log wherever you click.
-        // Also moving player to clicked tile
-        // Basically copied from:
-        //     http://craftyjs.com/api/MouseSystem.html
-        Crafty.s("Mouse").bind("MouseUp", function(e) {
+        // Generic handler for clicks on the world view.
+        Crafty.bind("WorldClick", function(e) {
             if (e.mouseButton === Crafty.mouseButtons.LEFT) {
                 if (e.target === player){
                     player.highlight();
