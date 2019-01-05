@@ -2,7 +2,8 @@
 
 Wow! A Tactics!
 
-To play the actual "game", [click here](src/game.html)
+To play the actual "game", [click here](https://cheeselord.github.io/wat/src/game.html).
 
-If you're not at the github.io page, here's a link to it:
-https://cheeselord.github.io/wat/
+<!-- Relative link: [click here](src/game.html) -->
+<!-- Root of the github.io page: https://cheeselord.github.io/wat/ -->
+
