@@ -190,7 +190,8 @@ export let Game = {
                     let x = Math.floor(e.realX / Game.mapGrid.tile.width);
                     let y = Math.floor(e.realY / Game.mapGrid.tile.height);
                     Crafty.log(`You clicked at: (${x}, ${y})`);
-                    if (GlobalState ===  StateEnum.PLAYER_MOVE) {
+                    if (GlobalState === StateEnum.PLAYER_MOVE /* ||
+                            GlobalState === StateEnum.PLAYER_SELECTED */) {
                         Crafty.s("ButtonMenu").clearButtons();
                         player.animateTo({x: x, y: y});
                         player.one("TweenEnd", function() {
