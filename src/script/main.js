@@ -149,6 +149,36 @@ export let Game = {
             document.getElementById("game"));
         Crafty.background("#ccc");
 
+        // Add a test sprite at an arbitrary place in the world, to prove that
+        // we can sprite.
+        // Based on the example from:
+        //     http://craftyjs.com/documentation/sprites.html
+        // (the JS Bin link at the bottom).
+        Crafty.paths({"images": "../assets/sprites/"});
+        Crafty.load(
+            {
+                "sprites": {
+                    "test.png": {
+                        tile:     32,
+                        tileh:    32,
+                        paddingX: 1,
+                        map: {
+                            // TODO better name
+                            anim_start: [0, 0],
+                        }
+                    }
+                }
+            },
+            function() {
+                Crafty.e("2D, DOM, anim_start, SpriteAnimation")
+                    .attr({x: 50, y: -20, w: 32, h: 32})
+                    .reel("my_animation", 1000, [
+                        [0, 0], [1, 0], [2, 0], [3, 0]
+                    ])
+                    .animate("my_animation", -1);
+            }
+        );
+
         // Random static objects
         Crafty.e("GridObject").color("#7f0000").setPos({x: 17, y:  9});
         Crafty.e("GridObject").color("#7f0000").setPos({x: 11, y:  3});
