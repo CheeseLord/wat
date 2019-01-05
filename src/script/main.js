@@ -11,6 +11,7 @@ var StateEnum = Object.freeze({
 });
 
 var GlobalState = StateEnum.DEFAULT;
+var selectedPlayer;
 
 function createPlayerSelectMenu(player) {
     Crafty.log("Creating Player Select Menu")
@@ -160,12 +161,19 @@ export let Game = {
         Crafty.e("GridObject").color("#7f0000").setPos({x:  2, y: 13});
         Crafty.e("GridObject").color("#7f0000").setPos({x:  2, y:  9});
 
-        var player = Crafty.e("PlayerControllable")
+        var player1 = Crafty.e("PlayerControllable")
             .setPos({x: 5, y: 3})
             .setColors(
                 {
                     defaultColor: "#007000",
                     highlightedColor: "#00bf00",
+                });
+        var player2 = Crafty.e("PlayerControllable")
+            .setPos({x: 6, y: 3})
+            .setColors(
+                {
+                    defaultColor: "#000070",
+                    highlightedColor: "#0000bf",
                 });
 
         // Take 2
@@ -209,23 +217,26 @@ export let Game = {
         // Generic handler for clicks on the world view.
         Crafty.bind("WorldClick", function(e) {
             if (e.mouseButton === Crafty.mouseButtons.LEFT) {
-                if (e.target === player){
+                if(e.target &&  e.target.has("PlayerControllable")){
+                    var player = e.target;
                     player.highlight();
                     if (GlobalState === StateEnum.DEFAULT) {
                         createPlayerSelectMenu(player);
                         GlobalState = StateEnum.PLAYER_SELECTED;
+                        selectedPlayer = player;
                     }
                     Crafty.log("You clicked on the player.");
                 } else {
                     let x = Math.floor(e.realX / Game.mapGrid.tile.width);
                     let y = Math.floor(e.realY / Game.mapGrid.tile.height);
                     Crafty.log(`You clicked at: (${x}, ${y})`);
-                    if (GlobalState === StateEnum.PLAYER_MOVE ||
+                    if (selectedPlayer && 
+                            GlobalState === StateEnum.PLAYER_MOVE ||
                             GlobalState === StateEnum.PLAYER_SELECTED) {
                         Crafty.s("ButtonMenu").clearButtons();
-                        player.animateTo({x: x, y: y});
-                        player.one("TweenEnd", function() {
-                            player.unhighlight();
+                        selectedPlayer.animateTo({x: x, y: y});
+                        selectedPlayer.one("TweenEnd", function() {
+                            selectedPlayer.unhighlight();
                         });
                         GlobalState = StateEnum.DEFAULT;
                     }
@@ -242,11 +253,11 @@ export let Game = {
         Crafty.one("CameraAnimationDone", function() {
             // TODO magic numbers bad
             // 50 is half the width of the side pane
-            Crafty.viewport.follow(player, 60, 0);
+            Crafty.viewport.follow(player1, 60, 0);
         });
         // TODO: We need our own function for this that adds in the right
         // offset, so there isn't a sudden jump. The library implementation is
         // Crafty/viewport.js#L324-L335.
-        Crafty.viewport.centerOn(player, 1500);
+        Crafty.viewport.centerOn(player1, 1500);
     },
 };
