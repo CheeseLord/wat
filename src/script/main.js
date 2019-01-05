@@ -100,14 +100,25 @@ Crafty.c("PlayerControllable", {
         this._isHighlighted = false;
     },
 
+    setColors: function(newColors) {
+        this.attr({
+            _defaultColor:     newColors.defaultColor,
+            _highlightedColor: newColors.highlightedColor,
+        });
+        // Start out not highlighted
+        this.color(this._defaultColor)
+        // So that "setter" attributes can be chained together.
+        return this;
+    },
+
     highlight: function() {
         this._isHighlighted = true;
-        return this.color("#00bf00");
+        return this.color(this._highlightedColor);
     },
     unhighlight: function() {
         // TODO HACK: What color were we originally?
         this._isHighlighted = false;
-        return this.color("#007f00");
+        return this.color(this._defaultColor);
     },
     isHighlighted: function() {
         return this._isHighlighted;
@@ -151,7 +162,11 @@ export let Game = {
 
         var player = Crafty.e("PlayerControllable")
             .setPos({x: 5, y: 3})
-            .color("#007f00");
+            .setColors(
+                {
+                    defaultColor: "#007000",
+                    highlightedColor: "#00bf00",
+                });
 
         // Take 2
         Crafty.createLayer("UILayer", "DOM", {
