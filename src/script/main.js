@@ -171,7 +171,7 @@ export let Game = {
             },
             function() {
                 Crafty.e("2D, DOM, anim_start, SpriteAnimation")
-                    .attr({x: 50, y: -20, w: 32, h: 32})
+                    .attr({x: 48, y: -32, w: 32, h: 32})
                     .reel("my_animation", 1000, [
                         [0, 0], [1, 0], [2, 0], [3, 0]
                     ])
