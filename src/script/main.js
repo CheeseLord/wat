@@ -30,8 +30,8 @@ function createPlayerSelectMenu(player) {
                     GlobalState = StateEnum.DEFAULT;
                     player.unhighlight();
                 })
-        ]);
-    }
+    ]);
+}
 
 // Component for anything that occupies a grid space.
 Crafty.c("GridObject", {
