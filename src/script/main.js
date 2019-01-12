@@ -9,6 +9,7 @@ var StateEnum = Object.freeze({
     PLAYER_SELECTED: {},
     PLAYER_MOVE: {},
     PLAYER_SWAP: {},
+    PLAYER_ATTACK: {},
 });
 
 var globalState = StateEnum.DEFAULT;
@@ -46,6 +47,12 @@ function createPlayerSelectMenu(player) {
                 }),
         Crafty.e("MyButton, UILayer")
                 .attr({x: 10, y: 60, w: 100, h: 20})
+                .text("Attack")
+                .onclick(() => {
+                    globalState = StateEnum.PLAYER_ATTACK;
+                }),
+        Crafty.e("MyButton, UILayer")
+                .attr({x: 10, y: 85, w: 100, h: 20})
                 .text("Cancel")
                 .onclick(() => {
                     Crafty.s("ButtonMenu").clearButtons();
@@ -57,7 +64,8 @@ function createPlayerSelectMenu(player) {
 
 // Component for anything that occupies a grid space.
 Crafty.c("GridObject", {
-    required: "2D, DOM, Color, Tween",
+    // TODO: Remove Mouse (get cat?)
+    required: "2D, DOM, Color, Tween, Mouse",
     init: function() {
         this.attr({w: Game.mapGrid.tile.width, h: Game.mapGrid.tile.height});
         // Put us at (0, 0) by default just to ensure that _tileX and _tileY
@@ -308,7 +316,7 @@ export let Game = {
                     let x = Math.floor(e.realX / Game.mapGrid.tile.width);
                     let y = Math.floor(e.realY / Game.mapGrid.tile.height);
                     Crafty.log(`You clicked at: (${x}, ${y})`);
-                    if (selectedPlayer && 
+                    if (selectedPlayer &&
                             globalState === StateEnum.PLAYER_MOVE ||
                             globalState === StateEnum.PLAYER_SELECTED) {
                         Crafty.s("ButtonMenu").clearButtons();
@@ -317,6 +325,18 @@ export let Game = {
                         selectedPlayer.one("TweenEnd", function() {
                             deselectPlayer();
                         });
+                    } else if (selectedPlayer && 
+                            globalState === StateEnum.PLAYER_ATTACK) {
+                        if (Math.abs(selectedPlayer.getPos().x - x) > 1 ||
+                                Math.abs(selectedPlayer.getPos().y - y) > 1) {
+                            Crafty.error("Target not adjacent.");
+                        } else if (e.target === null) {
+                            Crafty.error("No enemy there.");
+                        } else {
+                            e.target.destroy();
+                            globalState = StateEnum.DEFAULT;
+                            deselectPlayer();
+                        }
                     } else if (globalState === StateEnum.PLAYER_SWAP) {
                         Crafty.error("Can't swap with non-player.");
                     }
