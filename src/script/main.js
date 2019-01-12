@@ -8,27 +8,49 @@ var StateEnum = Object.freeze({
     DEFAULT: {},
     PLAYER_SELECTED: {},
     PLAYER_MOVE: {},
+    PLAYER_SWAP: {},
 });
 
-var GlobalState = StateEnum.DEFAULT;
+var globalState = StateEnum.DEFAULT;
 var selectedPlayer;
+
+function selectPlayer(player) {
+    deselectPlayer();
+    selectedPlayer = player;
+    selectedPlayer.highlight();
+}
+
+function deselectPlayer() {
+    if (selectedPlayer && selectedPlayer.isHighlighted()) {
+        selectedPlayer.unhighlight();
+        selectedPlayer = null;
+    }
+}
 
 function createPlayerSelectMenu(player) {
     Crafty.log("Creating Player Select Menu")
     Crafty.s("ButtonMenu").setButtons([
+        // TODO: We shouldn't have to position and size every button whenever
+        // we call setButtons. ButtonMenu should just know how to tile them.
         Crafty.e("MyButton, UILayer")
                 .attr({x: 10, y: 10, w: 100, h: 20})
                 .text("Move")
                 .onclick(() => {
-                    GlobalState = StateEnum.PLAYER_MOVE;
+                    globalState = StateEnum.PLAYER_MOVE;
                 }),
         Crafty.e("MyButton, UILayer")
                 .attr({x: 10, y: 35, w: 100, h: 20})
+                .text("Swap places")
+                .onclick(() => {
+                    globalState = StateEnum.PLAYER_SWAP;
+                }),
+        Crafty.e("MyButton, UILayer")
+                .attr({x: 10, y: 60, w: 100, h: 20})
                 .text("Cancel")
                 .onclick(() => {
                     Crafty.s("ButtonMenu").clearButtons();
-                    GlobalState = StateEnum.DEFAULT;
-                    player.unhighlight();
+                    globalState = StateEnum.DEFAULT;
+                    deselectPlayer();
                 })
     ]);
 }
@@ -247,13 +269,39 @@ export let Game = {
         // Generic handler for clicks on the world view.
         Crafty.bind("WorldClick", function(e) {
             if (e.mouseButton === Crafty.mouseButtons.LEFT) {
-                if(e.target &&  e.target.has("PlayerControllable")){
-                    var player = e.target;
-                    player.highlight();
-                    if (GlobalState === StateEnum.DEFAULT) {
-                        createPlayerSelectMenu(player);
-                        GlobalState = StateEnum.PLAYER_SELECTED;
-                        selectedPlayer = player;
+                if (e.target && e.target.has("PlayerControllable")) {
+                    var clickedPlayer = e.target;
+                    if (globalState === StateEnum.DEFAULT ||
+                            globalState === StateEnum.PLAYER_SELECTED) {
+                        createPlayerSelectMenu(clickedPlayer);
+                        globalState = StateEnum.PLAYER_SELECTED;
+                        selectPlayer(clickedPlayer);
+                    } else if (globalState === StateEnum.PLAYER_SWAP) {
+                        if (!selectedPlayer) {
+                            Crafty.error("No player selected.");
+                        } else if (clickedPlayer === selectedPlayer) {
+                            Crafty.error("Cannot swap player with self.");
+                        } else {
+                            // Swap positions of clickedPlayer and
+                            // selectedPlayer.
+                            // TODO
+                            Crafty.s("ButtonMenu").clearButtons();
+                            globalState = StateEnum.DEFAULT;
+
+                            let selectPos = selectedPlayer.getPos();
+                            let clickPos  = clickedPlayer.getPos();
+                            clickedPlayer.animateTo(selectPos);
+                            selectedPlayer.animateTo(clickPos);
+                            selectedPlayer.one("TweenEnd", function() {
+                                deselectPlayer();
+                            });
+                        }
+                    } else if (globalState === StateEnum.PLAYER_MOVE) {
+                        Crafty.error("Can't move there; something's in the " +
+                            "way.");
+                    } else {
+                        Crafty.error("Unknown state value (should we be " +
+                            "something here?)");
                     }
                     Crafty.log("You clicked on the player.");
                 } else {
@@ -261,14 +309,16 @@ export let Game = {
                     let y = Math.floor(e.realY / Game.mapGrid.tile.height);
                     Crafty.log(`You clicked at: (${x}, ${y})`);
                     if (selectedPlayer && 
-                            GlobalState === StateEnum.PLAYER_MOVE ||
-                            GlobalState === StateEnum.PLAYER_SELECTED) {
+                            globalState === StateEnum.PLAYER_MOVE ||
+                            globalState === StateEnum.PLAYER_SELECTED) {
                         Crafty.s("ButtonMenu").clearButtons();
+                        globalState = StateEnum.DEFAULT;
                         selectedPlayer.animateTo({x: x, y: y});
                         selectedPlayer.one("TweenEnd", function() {
-                            selectedPlayer.unhighlight();
+                            deselectPlayer();
                         });
-                        GlobalState = StateEnum.DEFAULT;
+                    } else if (globalState === StateEnum.PLAYER_SWAP) {
+                        Crafty.error("Can't swap with non-player.");
                     }
                 }
             } else if (e.mouseButton === Crafty.mouseButtons.RIGHT) {
