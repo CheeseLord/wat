@@ -262,7 +262,6 @@ export let Game = {
                     highlightedColor: "#0000bf",
                 });
 
-        // Take 2
         Crafty.createLayer("UILayer", "DOM", {
             // Ignore viewscreen transforms
             xResponse: 0,
@@ -318,7 +317,6 @@ export let Game = {
                         } else {
                             // Swap positions of clickedPlayer and
                             // selectedPlayer.
-                            // TODO
                             Crafty.s("ButtonMenu").clearButtons();
                             globalState = StateEnum.DEFAULT;
 
