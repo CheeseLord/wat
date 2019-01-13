@@ -72,8 +72,8 @@ function isAdjacent(object1, object2)
 }
 
 function specialAttack(player) {
-    for( var i = enemies.length-1; i >= 0; i--){
-        if ( isAdjacent(player, enemies[i])) {
+    for (var i = enemies.length-1; i >= 0; i--) {
+        if (isAdjacent(player, enemies[i])) {
             enemies[i].destroy()
             enemies.splice(i, 1);
         }
@@ -227,7 +227,7 @@ export let Game = {
             }
         );
 
-        // Emeny objects
+        // Enemy objects
         enemies = [
             Crafty.e("GridObject").color("#7f0000").setPos({x: 11, y:  3}),
             Crafty.e("GridObject").color("#7f0000").setPos({x: 19, y: 11}),
