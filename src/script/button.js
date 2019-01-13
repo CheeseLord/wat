@@ -46,26 +46,17 @@ Crafty.s("ButtonMenu", {
     // Set the current menu to the specified list of buttons. Overrides any
     // previous menu; there can only be one menu at a time. (If that becomes a
     // problem, we should probably just convert this to a Menu entity, rather
-    // than a subsystem.)
-    // TODO: Version of this that doesn't require the caller to set the
-    // position of every button separately.
+    // than a subsystem.) Automatically positions and sizes the buttons.
     setButtons: function(buttonList) {
         this.clearButtons();
         this._buttons = buttonList;
-        for (let i = 0; i < this._buttons.length; i++) {
-            this._buttons[i].index = i;
-        }
-    },
 
-    // TODO: Replace setButtons with this. Or maybe rename the old setButtons
-    // to setButtonsNoReposition?
-    setButtonsAutoTile: function(buttonList) {
-        this.setButtons(buttonList);
         let x      = MENU_X + H_PADDING;
         let y      = MENU_Y + V_PADDING;
         let width  = MENU_WIDTH - 2*H_PADDING;
         let height = BUTTON_HEIGHT
         for (let i = 0; i < this._buttons.length; i++) {
+            this._buttons[i].index = i;
             this._buttons[i].attr({x: x, y: y, w: width, h: height});
             y += height + BUTTON_VSPACE;
         }

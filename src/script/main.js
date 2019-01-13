@@ -32,28 +32,22 @@ function deselectPlayer() {
 function createPlayerSelectMenu(player) {
     Crafty.log("Creating Player Select Menu")
     Crafty.s("ButtonMenu").setButtons([
-        // TODO: We shouldn't have to position and size every button whenever
-        // we call setButtons. ButtonMenu should just know how to tile them.
         Crafty.e("MyButton, UILayer")
-                .attr({x: 10, y: 10, w: 100, h: 20})
                 .text("Move")
                 .onclick(() => {
                     globalState = StateEnum.PLAYER_MOVE;
                 }),
         Crafty.e("MyButton, UILayer")
-                .attr({x: 10, y: 35, w: 100, h: 20})
                 .text("Swap places")
                 .onclick(() => {
                     globalState = StateEnum.PLAYER_SWAP;
                 }),
         Crafty.e("MyButton, UILayer")
-                .attr({x: 10, y: 60, w: 100, h: 20})
                 .text("Attack")
                 .onclick(() => {
                     globalState = StateEnum.PLAYER_ATTACK;
                 }),
         Crafty.e("MyButton, UILayer")
-                .attr({x: 10, y: 85, w: 100, h: 20})
                 .text("Special Attack")
                 .onclick(() => {
                     specialAttack(player);
@@ -62,7 +56,6 @@ function createPlayerSelectMenu(player) {
                     deselectPlayer();
                 }),
         Crafty.e("MyButton, UILayer")
-                .attr({x: 10, y: 110, w: 100, h: 20})
                 .text("Cancel")
                 .onclick(() => {
                     Crafty.s("ButtonMenu").clearButtons();
