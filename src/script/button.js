@@ -1,5 +1,23 @@
 "use strict";
 
+// Size parameters for autopositioning buttons.
+// TODO: Make these configurable somehow?
+
+// Position and size of the menu itself.
+const MENU_X = 0;
+const MENU_Y = 0;
+const MENU_WIDTH = 120;
+// MENU_HEIGHT not used. TODO what if the buttons go past the bottom?
+
+// Amount of space reserved between the outside of the menu and the buttons.
+const H_PADDING = 10;
+const V_PADDING = 10;
+// Height of a single button
+const BUTTON_HEIGHT = 20;
+// Amount of space between the bottom of one button and the top of the next
+// one.
+const BUTTON_VSPACE = 5;
+
 Crafty.s("ButtonMenu", {
     init: function() {
         // _buttons is a list of MyButton objects that are being displayed.
@@ -36,6 +54,20 @@ Crafty.s("ButtonMenu", {
         this._buttons = buttonList;
         for (let i = 0; i < this._buttons.length; i++) {
             this._buttons[i].index = i;
+        }
+    },
+
+    // TODO: Replace setButtons with this. Or maybe rename the old setButtons
+    // to setButtonsNoReposition?
+    setButtonsAutoTile: function(buttonList) {
+        this.setButtons(buttonList);
+        let x      = MENU_X + H_PADDING;
+        let y      = MENU_Y + V_PADDING;
+        let width  = MENU_WIDTH - 2*H_PADDING;
+        let height = BUTTON_HEIGHT
+        for (let i = 0; i < this._buttons.length; i++) {
+            this._buttons[i].attr({x: x, y: y, w: width, h: height});
+            y += height + BUTTON_VSPACE;
         }
     },
 
