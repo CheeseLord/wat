@@ -14,6 +14,7 @@ var StateEnum = Object.freeze({
 
 var globalState = StateEnum.DEFAULT;
 var selectedPlayer;
+var enemies;
 
 function selectPlayer(player) {
     deselectPlayer();
@@ -53,6 +54,15 @@ function createPlayerSelectMenu(player) {
                 }),
         Crafty.e("MyButton, UILayer")
                 .attr({x: 10, y: 85, w: 100, h: 20})
+                .text("Special Attack")
+                .onclick(() => {
+                    specialAttack(player);
+                    Crafty.s("ButtonMenu").clearButtons();
+                    globalState = StateEnum.DEFAULT;
+                    deselectPlayer();
+                }),
+        Crafty.e("MyButton, UILayer")
+                .attr({x: 10, y: 110, w: 100, h: 20})
                 .text("Cancel")
                 .onclick(() => {
                     Crafty.s("ButtonMenu").clearButtons();
@@ -60,6 +70,21 @@ function createPlayerSelectMenu(player) {
                     deselectPlayer();
                 })
     ]);
+}
+
+function isAdjacent(object1, object2)
+{
+    return (Math.abs(object1.getPos().x - object2.getPos().x) <= 1 &&
+        Math.abs(object1.getPos().y - object2.getPos().y) <= 1)
+}
+
+function specialAttack(player) {
+    for( var i = enemies.length-1; i >= 0; i--){
+        if ( isAdjacent(player, enemies[i])) {
+            enemies[i].destroy()
+            enemies.splice(i, 1);
+        }
+    }
 }
 
 // Component for anything that occupies a grid space.
@@ -209,17 +234,18 @@ export let Game = {
             }
         );
 
-        // Random static objects
-        Crafty.e("GridObject").color("#7f0000").setPos({x: 17, y:  9});
-        Crafty.e("GridObject").color("#7f0000").setPos({x: 11, y:  3});
-        Crafty.e("GridObject").color("#7f0000").setPos({x: 19, y: 11});
-        Crafty.e("GridObject").color("#7f0000").setPos({x:  8, y: 11});
-        Crafty.e("GridObject").color("#7f0000").setPos({x: 11, y: 12});
-        Crafty.e("GridObject").color("#7f0000").setPos({x: 14, y:  9});
-        Crafty.e("GridObject").color("#7f0000").setPos({x: 21, y:  5});
-        Crafty.e("GridObject").color("#7f0000").setPos({x: 17, y: 13});
-        Crafty.e("GridObject").color("#7f0000").setPos({x:  2, y: 13});
-        Crafty.e("GridObject").color("#7f0000").setPos({x:  2, y:  9});
+        // Emeny objects
+        enemies = [
+            Crafty.e("GridObject").color("#7f0000").setPos({x: 11, y:  3}),
+            Crafty.e("GridObject").color("#7f0000").setPos({x: 19, y: 11}),
+            Crafty.e("GridObject").color("#7f0000").setPos({x:  8, y: 11}),
+            Crafty.e("GridObject").color("#7f0000").setPos({x: 11, y: 12}),
+            Crafty.e("GridObject").color("#7f0000").setPos({x: 14, y:  9}),
+            Crafty.e("GridObject").color("#7f0000").setPos({x: 21, y:  5}),
+            Crafty.e("GridObject").color("#7f0000").setPos({x: 17, y: 13}),
+            Crafty.e("GridObject").color("#7f0000").setPos({x:  2, y: 13}),
+            Crafty.e("GridObject").color("#7f0000").setPos({x:  2, y:  9}),
+        ]
 
         var player1 = Crafty.e("PlayerControllable")
             .setPos({x: 5, y: 3})
@@ -333,6 +359,10 @@ export let Game = {
                         } else if (e.target === null) {
                             Crafty.error("No enemy there.");
                         } else {
+                            for (var i = 0; i < enemies.length; i++)
+                            {
+                                if (e.target === enemies[i]) {enemies.splice(i,1);}   
+                            }
                             e.target.destroy();
                             globalState = StateEnum.DEFAULT;
                             deselectPlayer();
