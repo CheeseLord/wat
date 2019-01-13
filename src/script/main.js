@@ -342,7 +342,7 @@ export let Game = {
                         selectedPlayer.one("TweenEnd", function() {
                             deselectPlayer();
                         });
-                    } else if (selectedPlayer && 
+                    } else if (selectedPlayer &&
                             globalState === StateEnum.PLAYER_ATTACK) {
                         if (Math.abs(selectedPlayer.getPos().x - x) > 1 ||
                                 Math.abs(selectedPlayer.getPos().y - y) > 1) {
@@ -352,7 +352,7 @@ export let Game = {
                         } else {
                             for (var i = 0; i < enemies.length; i++)
                             {
-                                if (e.target === enemies[i]) {enemies.splice(i,1);}   
+                                if (e.target === enemies[i]) {enemies.splice(i,1);}
                             }
                             e.target.destroy();
                             Crafty.s("ButtonMenu").clearButtons();
