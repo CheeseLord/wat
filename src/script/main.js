@@ -362,6 +362,7 @@ export let Game = {
                                 if (e.target === enemies[i]) {enemies.splice(i,1);}   
                             }
                             e.target.destroy();
+                            Crafty.s("ButtonMenu").clearButtons();
                             globalState = StateEnum.DEFAULT;
                             deselectPlayer();
                         }
