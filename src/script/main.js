@@ -36,14 +36,39 @@ function doTopLevelActionMenu(player) {
     Crafty.s("ButtonMenu").setButtonsWithTitle("Select Action", [
         Crafty.e("MyButton, UILayer")
                 .text("Move")
-                .onclick(() => {
-                    doMoveMenu();
-                }),
+                .onclick(() => doMoveMenu(player)),
         Crafty.e("MyButton, UILayer")
                 .text("Swap places")
                 .onclick(() => {
                     globalState = StateEnum.PLAYER_SWAP;
                 }),
+        Crafty.e("MyButton, UILayer")
+                .text("Attack")
+                .onclick(() => doAttackMenu(player)),
+        Crafty.e("MyButton, UILayer")
+                .text("Cancel")
+                .onclick(() => {
+                    Crafty.s("ButtonMenu").clearButtons();
+                    globalState = StateEnum.DEFAULT;
+                    deselectPlayer();
+                }),
+    ]);
+}
+
+function doMoveMenu(player) {
+    globalState = StateEnum.PLAYER_MOVE;
+    Crafty.s("ButtonMenu").setButtonsWithTitle("Moving", [
+        Crafty.e("MyButton, UILayer")
+                .text("Back")
+                .onclick(() => {
+                    doTopLevelActionMenu(player);
+                }),
+    ]);
+}
+
+function doAttackMenu(player) {
+    globalState = StateEnum.PLAYER_ATTACK;
+    Crafty.s("ButtonMenu").setButtonsWithTitle("Attack", [
         Crafty.e("MyButton, UILayer")
                 .text("Attack")
                 .onclick(() => {
@@ -58,28 +83,14 @@ function doTopLevelActionMenu(player) {
                     deselectPlayer();
                 }),
         Crafty.e("MyButton, UILayer")
-                .text("Cancel")
-                .onclick(() => {
-                    Crafty.s("ButtonMenu").clearButtons();
-                    globalState = StateEnum.DEFAULT;
-                    deselectPlayer();
-                })
-    ]);
-}
-
-function doMoveMenu(player) {
-    globalState = StateEnum.PLAYER_MOVE;
-    Crafty.s("ButtonMenu").setButtonsWithTitle("Moving", [
-        Crafty.e("MyButton, UILayer")
                 .text("Back")
                 .onclick(() => {
                     doTopLevelActionMenu(player);
-                })
+                }),
     ]);
 }
 
-function isAdjacent(object1, object2)
-{
+function isAdjacent(object1, object2) {
     return (Math.abs(object1.getPos().x - object2.getPos().x) <= 1 &&
         Math.abs(object1.getPos().y - object2.getPos().y) <= 1)
 }
