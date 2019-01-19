@@ -29,14 +29,15 @@ function deselectPlayer() {
     }
 }
 
-function createPlayerSelectMenu(player) {
-    Crafty.log("Creating Player Select Menu")
-    Crafty.s("ButtonMenu").setButtonsWithTitle("Menu Title",
-    [
+// Note: player here is really the player _character_.
+function doTopLevelActionMenu(player) {
+    Crafty.log("Creating top-level action menu")
+    globalState = StateEnum.PLAYER_SELECTED;
+    Crafty.s("ButtonMenu").setButtonsWithTitle("Select Action", [
         Crafty.e("MyButton, UILayer")
                 .text("Move")
                 .onclick(() => {
-                    globalState = StateEnum.PLAYER_MOVE;
+                    doMoveMenu();
                 }),
         Crafty.e("MyButton, UILayer")
                 .text("Swap places")
@@ -62,6 +63,17 @@ function createPlayerSelectMenu(player) {
                     Crafty.s("ButtonMenu").clearButtons();
                     globalState = StateEnum.DEFAULT;
                     deselectPlayer();
+                })
+    ]);
+}
+
+function doMoveMenu(player) {
+    globalState = StateEnum.PLAYER_MOVE;
+    Crafty.s("ButtonMenu").setButtonsWithTitle("Moving", [
+        Crafty.e("MyButton, UILayer")
+                .text("Back")
+                .onclick(() => {
+                    doTopLevelActionMenu(player);
                 })
     ]);
 }
@@ -300,8 +312,7 @@ export let Game = {
                     var clickedPlayer = e.target;
                     if (globalState === StateEnum.DEFAULT ||
                             globalState === StateEnum.PLAYER_SELECTED) {
-                        createPlayerSelectMenu(clickedPlayer);
-                        globalState = StateEnum.PLAYER_SELECTED;
+                        doTopLevelActionMenu(clickedPlayer);
                         selectPlayer(clickedPlayer);
                     } else if (globalState === StateEnum.PLAYER_SWAP) {
                         if (!selectedPlayer) {
