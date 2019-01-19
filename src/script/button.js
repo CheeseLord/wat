@@ -1,3 +1,5 @@
+/*global Crafty*/
+
 "use strict";
 
 // Size parameters for autopositioning buttons.

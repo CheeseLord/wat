@@ -1,3 +1,5 @@
+/*global Crafty*/
+
 "use strict";
 import './button.js'
 
