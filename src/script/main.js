@@ -31,7 +31,8 @@ function deselectPlayer() {
 
 function createPlayerSelectMenu(player) {
     Crafty.log("Creating Player Select Menu")
-    Crafty.s("ButtonMenu").setButtons([
+    Crafty.s("ButtonMenu").setButtonsWithTitle("Menu Title",
+    [
         Crafty.e("MyButton, UILayer")
                 .text("Move")
                 .onclick(() => {

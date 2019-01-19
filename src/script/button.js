@@ -20,6 +20,8 @@ const BUTTON_VSPACE = 5;
 
 Crafty.s("ButtonMenu", {
     init: function() {
+        // The Crafty.e representing the title. Null if no title is present.
+        this._title = null;
         // _buttons is a list of MyButton objects that are being displayed.
         // If we aren't currently displaying buttons, _buttons is empty.
         this._buttons = [];
@@ -49,10 +51,41 @@ Crafty.s("ButtonMenu", {
     // than a subsystem.) Automatically positions and sizes the buttons.
     setButtons: function(buttonList) {
         this.clearButtons();
+        this._setButtonsHelper(buttonList, MENU_Y + V_PADDING);
+    },
+
+    // Ditto, but also add a title at the top.
+    setButtonsWithTitle: function(titleText, buttonList) {
+        this.clearButtons();
+
+        // Add the title.
+        // TODO: Probably we should instead do:
+        //     x: MENU_X + H_PADDING
+        //     w: MENU_WIDTH - H_PADDING
+        // but I was having trouble getting the text to fit. Since it's
+        // centered anyway, it doesn't look too bad if it goes slightly beyond
+        // the padding, so let's allow it for now.
+        this._title = Crafty.e("2D, DOM, Color, Text, UILayer")
+            .attr({x:MENU_X, y:MENU_Y + V_PADDING, w:MENU_WIDTH, h:14})
+            .text(titleText)
+            .textAlign("center")
+            .textFont({size: "14px", weight: "bold"})
+            .css({"text-decoration": "underline"});
+
+        // TODO: How tall is the text, actually? I think we want
+        //     MENU_Y + 2*V_PADDING + <actual text height>.
+        // 19 comes from taking a screenshot and pixel-rulering in gimp...
+        // empirically the top of the title text is at y=13 and the bottom is
+        // at y=26, so we want a total height of 39 I guess. :/
+        let startY = MENU_Y + 2*V_PADDING + 19;
+        this._setButtonsHelper(buttonList, startY);
+    },
+
+    _setButtonsHelper: function(buttonList, startY) {
         this._buttons = buttonList;
 
         let x      = MENU_X + H_PADDING;
-        let y      = MENU_Y + V_PADDING;
+        let y      = startY;
         let width  = MENU_WIDTH - 2*H_PADDING;
         let height = BUTTON_HEIGHT
         for (let i = 0; i < this._buttons.length; i++) {
@@ -64,6 +97,10 @@ Crafty.s("ButtonMenu", {
 
     // Stop tracking buttons.
     clearButtons: function() {
+        if (this._title) {
+            this._title.destroy();
+            this._title = null;
+        }
         if (0 <= this._focusIndex && this._focusIndex < this._buttons.length) {
             this._buttons[this._focusIndex].unfocus();
         }
