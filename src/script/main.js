@@ -94,13 +94,13 @@ function doAttackMenu(player) {
 
 function isAdjacent(object1, object2) {
     return (Math.abs(object1.getPos().x - object2.getPos().x) <= 1 &&
-        Math.abs(object1.getPos().y - object2.getPos().y) <= 1)
+        Math.abs(object1.getPos().y - object2.getPos().y) <= 1);
 }
 
 function specialAttack(player) {
     for (var i = enemies.length - 1; i >= 0; i--) {
         if (isAdjacent(player, enemies[i])) {
-            enemies[i].destroy()
+            enemies[i].destroy();
             enemies.splice(i, 1);
         }
     }
@@ -120,7 +120,7 @@ Crafty.c("GridObject", {
 
     // Get and set the position in map-grid tiles (not pixels).
     getPos: function() {
-        return {x:this._tileX, y:this._tileY};
+        return {x: this._tileX, y: this._tileY};
     },
     setPos: function(newPos) {
         // newPos is {x: newX, y: newY}
@@ -150,8 +150,8 @@ Crafty.c("GridObject", {
             _tileY: newPos.y,
         });
         this.tween({
-            x:      newPos.x * Game.mapGrid.tile.width,
-            y:      newPos.y * Game.mapGrid.tile.height,
+            x: newPos.x * Game.mapGrid.tile.width,
+            y: newPos.y * Game.mapGrid.tile.height,
         }, 200);
         // So that "setter" attributes can be chained together.
         return this;
@@ -161,11 +161,11 @@ Crafty.c("GridObject", {
 Crafty.c("PlayerControllable", {
     required: "GridObject, Keyboard, Mouse",
     init: function() {
-        this.bind('KeyDown', function(e) {
+        this.bind("KeyDown", function(e) {
             if (e.key === Crafty.keys.LEFT_ARROW) {
-                this.moveBy({x: -1, y:  0});
+                this.moveBy({x: -1, y: 0});
             } else if (e.key === Crafty.keys.RIGHT_ARROW) {
-                this.moveBy({x:  1, y:  0});
+                this.moveBy({x:  1, y: 0});
             } else if (e.key === Crafty.keys.UP_ARROW) {
                 this.moveBy({x:  0, y: -1});
             } else if (e.key === Crafty.keys.DOWN_ARROW) {
@@ -202,10 +202,10 @@ Crafty.c("PlayerControllable", {
 
 export let Game = {
     mapGrid: {
-        width: 25,
+        width:  25,
         height: 17,
-        tile: {
-            width: 16,
+        tile: { 
+            width:  16,
             height: 16,
         },
     },
@@ -283,9 +283,10 @@ export let Game = {
 
         Crafty.createLayer("UILayer", "DOM", {
             // Ignore viewscreen transforms
-            xResponse: 0,
-            yResponse: 0,
+            xResponse:     0,
+            yResponse:     0,
             scaleResponse: 0,
+
             // On top of other layers
             z: 40,
         });
@@ -339,7 +340,7 @@ export let Game = {
                             globalState = StateEnum.DEFAULT;
 
                             let selectPos = selectedPlayer.getPos();
-                            let clickPos  = clickedPlayer.getPos();
+                            let clickPos = clickedPlayer.getPos();
                             clickedPlayer.animateTo(selectPos);
                             selectedPlayer.animateTo(clickPos);
                             selectedPlayer.one("TweenEnd", function() {

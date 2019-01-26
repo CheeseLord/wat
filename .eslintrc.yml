@@ -15,4 +15,18 @@ rules:
     - never
   comma-dangle:
     - error
-    - always-multiline
+    - only-multiline
+  key-spacing:
+    - error
+    - singleLine:
+          beforeColon: false
+          afterColon: true
+      multiLine:
+          beforeColon: false
+          align: 
+              beforeColon: false
+              afterColon: true
+              on: value
+  object-curly-spacing:
+    - error
+    - never
