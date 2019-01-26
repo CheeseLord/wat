@@ -247,11 +247,11 @@ export let Game = {
             },
             function() {
                 Crafty.e("2D, DOM, anim_start, SpriteAnimation")
-                    .attr({x: 48, y: -32, w: 32, h: 32})
-                    .reel("my_animation", 1000, [
-                        [0, 0], [1, 0], [2, 0], [3, 0]
-                    ])
-                    .animate("my_animation", -1);
+                        .attr({x: 48, y: -32, w: 32, h: 32})
+                        .reel("my_animation", 1000, [
+                            [0, 0], [1, 0], [2, 0], [3, 0]
+                        ])
+                        .animate("my_animation", -1);
             }
         );
 
@@ -269,19 +269,19 @@ export let Game = {
         ];
 
         var player1 = Crafty.e("PlayerControllable")
-            .setPos({x: 5, y: 3})
-            .setColors(
-                {
-                    defaultColor:     "#007000",
-                    highlightedColor: "#00bf00",
-                });
+                .setPos({x: 5, y: 3})
+                .setColors(
+                    {
+                        defaultColor:     "#007000",
+                        highlightedColor: "#00bf00",
+                    });
         var player2 = Crafty.e("PlayerControllable")
-            .setPos({x: 6, y: 3})
-            .setColors(
-                {
-                    defaultColor:     "#000070",
-                    highlightedColor: "#0000bf",
-                });
+                .setPos({x: 6, y: 3})
+                .setColors(
+                    {
+                        defaultColor:     "#000070",
+                        highlightedColor: "#0000bf",
+                    });
 
         Crafty.createLayer("UILayer", "DOM", {
             // Ignore viewscreen transforms
@@ -298,8 +298,8 @@ export let Game = {
         // 120 is slightly more than the width of a button
         // ...or, button width is 120 minus half the padding.
         Crafty.e("2D, UILayer, Color, Mouse")
-            .attr({x: 0, y: 0, w: 120, h: Game.height()})
-            .color("#eee");
+                .attr({x: 0, y: 0, w: 120, h: Game.height()})
+                .color("#eee");
 
         // Convert regular mouse events to WorldClick events, so we can handle
         // that case without doing weird things when the player clicks on the

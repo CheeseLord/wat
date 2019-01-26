@@ -68,11 +68,11 @@ Crafty.s("ButtonMenu", {
         // centered anyway, it doesn't look too bad if it goes slightly beyond
         // the padding, so let's allow it for now.
         this._title = Crafty.e("2D, DOM, Color, Text, UILayer")
-            .attr({x: MENU_X, y: MENU_Y + V_PADDING, w: MENU_WIDTH, h: 14})
-            .text(titleText)
-            .textAlign("center")
-            .textFont({size: "14px", weight: "bold"})
-            .css({"text-decoration": "underline"});
+                .attr({x: MENU_X, y: MENU_Y + V_PADDING, w: MENU_WIDTH, h: 14})
+                .text(titleText)
+                .textAlign("center")
+                .textFont({size: "14px", weight: "bold"})
+                .css({"text-decoration": "underline"});
 
         // TODO: How tall is the text, actually? I think we want
         //     MENU_Y + 2*V_PADDING + <actual text height>.
