@@ -275,7 +275,7 @@ export let Game = {
                         defaultColor:     "#007000",
                         highlightedColor: "#00bf00",
                     });
-        var player2 = Crafty.e("PlayerControllable")
+        Crafty.e("PlayerControllable")
                 .setPos({x: 6, y: 3})
                 .setColors(
                     {
