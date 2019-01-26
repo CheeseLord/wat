@@ -27,6 +27,7 @@ rules:
               beforeColon: false
               afterColon: true
               on: value
+      mode: minimum
   object-curly-spacing:
     - error
     - never
