@@ -43,3 +43,15 @@ rules:
     - error
     - never
     - exceptRange: true
+  no-multi-spaces:
+    - error
+    - exceptions:
+        # Using https://eslint.org/parser/
+        VariableDeclarator: true
+        AssignmentExpression: true
+        BlockStatement : true
+  spaced-comment:
+    - error
+    - always
+    - exceptions:
+      - "/"
