@@ -1,4 +1,7 @@
 # vim .swp files, so I can just "git add ." without catching them.
 .sw[nop]
 .*.sw[nop]
+
+# nodejs files, for the linter
 node_modules
+package-lock.json
