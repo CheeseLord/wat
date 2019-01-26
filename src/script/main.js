@@ -7,11 +7,11 @@ import "./button.js";
 //     https://stackoverflow.com/a/5040502
 // Always use === for checking equality, otherwise always true
 var StateEnum = Object.freeze({
-    DEFAULT: {},
+    DEFAULT:         {},
     PLAYER_SELECTED: {},
-    PLAYER_MOVE: {},
-    PLAYER_SWAP: {},
-    PLAYER_ATTACK: {},
+    PLAYER_MOVE:     {},
+    PLAYER_SWAP:     {},
+    PLAYER_ATTACK:   {},
 });
 
 var globalState = StateEnum.DEFAULT;
@@ -33,7 +33,7 @@ function deselectPlayer() {
 
 // Note: player here is really the player _character_.
 function doTopLevelActionMenu(player) {
-    Crafty.log("Creating top-level action menu")
+    Crafty.log("Creating top-level action menu");
     globalState = StateEnum.PLAYER_SELECTED;
     Crafty.s("ButtonMenu").setButtonsWithTitle("Select Action", [
         Crafty.e("MyButton, UILayer")
@@ -110,6 +110,7 @@ function specialAttack(player) {
 Crafty.c("GridObject", {
     // TODO: Remove Mouse (get cat?)
     required: "2D, DOM, Color, Tween, Mouse",
+
     init: function() {
         this.attr({w: Game.mapGrid.tile.width, h: Game.mapGrid.tile.height});
         // Put us at (0, 0) by default just to ensure that _tileX and _tileY
@@ -160,12 +161,13 @@ Crafty.c("GridObject", {
 
 Crafty.c("PlayerControllable", {
     required: "GridObject, Keyboard, Mouse",
+
     init: function() {
         this.bind("KeyDown", function(e) {
             if (e.key === Crafty.keys.LEFT_ARROW) {
-                this.moveBy({x: -1, y: 0});
+                this.moveBy({x: -1, y:  0});
             } else if (e.key === Crafty.keys.RIGHT_ARROW) {
-                this.moveBy({x:  1, y: 0});
+                this.moveBy({x:  1, y:  0});
             } else if (e.key === Crafty.keys.UP_ARROW) {
                 this.moveBy({x:  0, y: -1});
             } else if (e.key === Crafty.keys.DOWN_ARROW) {
@@ -181,7 +183,7 @@ Crafty.c("PlayerControllable", {
             _highlightedColor: newColors.highlightedColor,
         });
         // Start out not highlighted
-        this.color(this._defaultColor)
+        this.color(this._defaultColor);
         // So that "setter" attributes can be chained together.
         return this;
     },
@@ -204,7 +206,7 @@ export let Game = {
     mapGrid: {
         width:  25,
         height: 17,
-        tile: { 
+        tile: {
             width:  16,
             height: 16,
         },
@@ -264,20 +266,20 @@ export let Game = {
             Crafty.e("GridObject").color("#7f0000").setPos({x: 17, y: 13}),
             Crafty.e("GridObject").color("#7f0000").setPos({x:  2, y: 13}),
             Crafty.e("GridObject").color("#7f0000").setPos({x:  2, y:  9}),
-        ]
+        ];
 
         var player1 = Crafty.e("PlayerControllable")
             .setPos({x: 5, y: 3})
             .setColors(
                 {
-                    defaultColor: "#007000",
+                    defaultColor:     "#007000",
                     highlightedColor: "#00bf00",
                 });
         var player2 = Crafty.e("PlayerControllable")
             .setPos({x: 6, y: 3})
             .setColors(
                 {
-                    defaultColor: "#000070",
+                    defaultColor:     "#000070",
                     highlightedColor: "#0000bf",
                 });
 
@@ -376,9 +378,10 @@ export let Game = {
                         } else if (e.target === null) {
                             Crafty.error("No enemy there.");
                         } else {
-                            for (var i = 0; i < enemies.length; i++)
-                            {
-                                if (e.target === enemies[i]) {enemies.splice(i,1);}
+                            for (var i = 0; i < enemies.length; i++) {
+                                if (e.target === enemies[i]) {
+                                    enemies.splice(i,1);
+                                }
                             }
                             e.target.destroy();
                             Crafty.s("ButtonMenu").clearButtons();

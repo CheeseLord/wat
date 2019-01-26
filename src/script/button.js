@@ -1,4 +1,4 @@
-/*global Crafty*/
+/* global Crafty */
 
 "use strict";
 
@@ -34,7 +34,7 @@ Crafty.s("ButtonMenu", {
         // button is active.
         this._activeButton = null;
 
-        this.bind('KeyDown', this.onKeyPress);
+        this.bind("KeyDown", this.onKeyPress);
 
         // Note: we need to bind to anonymous wrapper functions because
         // callbacks are called in the context of the Mouse subsystem, but the
@@ -68,7 +68,7 @@ Crafty.s("ButtonMenu", {
         // centered anyway, it doesn't look too bad if it goes slightly beyond
         // the padding, so let's allow it for now.
         this._title = Crafty.e("2D, DOM, Color, Text, UILayer")
-            .attr({x:MENU_X, y:MENU_Y + V_PADDING, w:MENU_WIDTH, h:14})
+            .attr({x: MENU_X, y: MENU_Y + V_PADDING, w: MENU_WIDTH, h: 14})
             .text(titleText)
             .textAlign("center")
             .textFont({size: "14px", weight: "bold"})
@@ -89,7 +89,7 @@ Crafty.s("ButtonMenu", {
         let x      = MENU_X + H_PADDING;
         let y      = startY;
         let width  = MENU_WIDTH - 2*H_PADDING;
-        let height = BUTTON_HEIGHT
+        let height = BUTTON_HEIGHT;
         for (let i = 0; i < this._buttons.length; i++) {
             this._buttons[i].index = i;
             this._buttons[i].attr({x: x, y: y, w: width, h: height});
@@ -177,8 +177,9 @@ Crafty.s("ButtonMenu", {
             }
         } else {
             newIndex = (this._focusIndex + delta) % this._buttons.length;
-            if (newIndex < 0)
+            if (newIndex < 0) {
                 newIndex += this._buttons.length;
+            }
         }
         this.setFocus(newIndex);
     },
@@ -196,14 +197,15 @@ Crafty.s("ButtonMenu", {
 
 Crafty.c("MyButton", {
     required: "2D, DOM, Color, Button, Text",
+
     init: function() {
         this.attr({
             isMyButton: true,
-            _focus:  false,
-            _hover:  false,
-            _active: false,
-            _onclick: undefined,
-            index: -1,
+            _focus:     false,
+            _hover:     false,
+            _active:    false,
+            _onclick:   undefined,
+            index:      -1,
         });
         this.css({
             "transition": "50ms all linear"
@@ -214,8 +216,8 @@ Crafty.c("MyButton", {
     events: {
         // Note that that we need anonymous functions as these events need to
         // be defined when the events are handled.
-        "MouseOver": function() {this.hover()},
-        "MouseOut":  function() {this.unhover()},
+        "MouseOver": function() { this.hover();   },
+        "MouseOut":  function() { this.unhover(); },
     },
 
     // Mouse handlers call these functions to change the displayed state.
