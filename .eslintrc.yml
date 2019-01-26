@@ -21,13 +21,21 @@ rules:
     - singleLine:
           beforeColon: false
           afterColon: true
+          mode: minimum
       multiLine:
           beforeColon: false
           align: 
               beforeColon: false
               afterColon: true
               on: value
-      mode: minimum
+          mode: minimum
   object-curly-spacing:
     - error
     - never
+  eol-last:
+    - error
+    - always
+  no-multiple-empty-lines:
+    - error
+    - max: 2
+      maxEOF: 1
