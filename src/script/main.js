@@ -362,8 +362,8 @@ export let Game = {
                     let y = Math.floor(e.realY / Game.mapGrid.tile.height);
                     Crafty.log(`You clicked at: (${x}, ${y})`);
                     if (selectedPlayer &&
-                            globalState === StateEnum.PLAYER_MOVE ||
-                            globalState === StateEnum.PLAYER_SELECTED) {
+                            (globalState === StateEnum.PLAYER_MOVE ||
+                            globalState === StateEnum.PLAYER_SELECTED)) {
                         Crafty.s("ButtonMenu").clearButtons();
                         globalState = StateEnum.DEFAULT;
                         selectedPlayer.animateTo({x: x, y: y});
@@ -380,7 +380,7 @@ export let Game = {
                         } else {
                             for (var i = 0; i < enemies.length; i++) {
                                 if (e.target === enemies[i]) {
-                                    enemies.splice(i,1);
+                                    enemies.splice(i, 1);
                                 }
                             }
                             e.target.destroy();
