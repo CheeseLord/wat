@@ -39,3 +39,7 @@ rules:
     - error
     - max: 2
       maxEOF: 1
+  yoda:
+    - error
+    - never
+    - exceptRange: true
