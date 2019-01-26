@@ -4,4 +4,3 @@
 
 # nodejs files, for the linter
 node_modules
-package-lock.json
