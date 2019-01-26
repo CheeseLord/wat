@@ -79,7 +79,7 @@ Crafty.s("ButtonMenu", {
         // 19 comes from taking a screenshot and pixel-rulering in gimp...
         // empirically the top of the title text is at y=13 and the bottom is
         // at y=26, so we want a total height of 39 I guess. :/
-        let startY = MENU_Y + 2*V_PADDING + 19;
+        let startY = MENU_Y + (2 * V_PADDING) + 19;
         this._setButtonsHelper(buttonList, startY);
     },
 
@@ -88,7 +88,7 @@ Crafty.s("ButtonMenu", {
 
         let x      = MENU_X + H_PADDING;
         let y      = startY;
-        let width  = MENU_WIDTH - 2*H_PADDING;
+        let width  = MENU_WIDTH - (2 * H_PADDING);
         let height = BUTTON_HEIGHT;
         for (let i = 0; i < this._buttons.length; i++) {
             this._buttons[i].index = i;
