@@ -56,3 +56,6 @@ rules:
       - line:
             exceptions:
               - "/"
+    max-len:
+      - error
+      - code: 79
