@@ -1,58 +1,58 @@
 extends: standard
 rules:
-  semi: 
-    - error
-    - always
-  quotes: 
-    - error
-    - double
-  indent: 
-    - error
-    - 4
-    - MemberExpression: 2
-  space-before-function-paren:
-    - error
-    - never
-  comma-dangle:
-    - error
-    - only-multiline
-  key-spacing:
-    - error
-    - singleLine:
-          beforeColon: false
-          afterColon: true
-          mode: minimum
-      multiLine:
-          beforeColon: false
-          align: 
-              beforeColon: false
-              afterColon: true
-              on: value
-          mode: minimum
-  object-curly-spacing:
-    - error
-    - never
-  eol-last:
-    - error
-    - always
-  no-multiple-empty-lines:
-    - error
-    - max: 2
-      maxEOF: 1
-  yoda:
-    - error
-    - never
-    - exceptRange: true
-  no-multi-spaces:
-    - error
-    - exceptions:
-        # Using https://eslint.org/parser/
-        VariableDeclarator: true
-        AssignmentExpression: true
-        BlockStatement : true
-  spaced-comment:
-    - error
-    - always
-    - line:
-          exceptions:
-            - "/"
+    semi:
+      - error
+      - always
+    quotes:
+      - error
+      - double
+    indent:
+      - error
+      - 4
+      - MemberExpression: 2
+    space-before-function-paren:
+      - error
+      - never
+    comma-dangle:
+      - error
+      - only-multiline
+    key-spacing:
+      - error
+      - singleLine:
+            beforeColon: false
+            afterColon: true
+            mode: minimum
+        multiLine:
+            beforeColon: false
+            align:
+                beforeColon: false
+                afterColon: true
+                on: value
+            mode: minimum
+    object-curly-spacing:
+      - error
+      - never
+    eol-last:
+      - error
+      - always
+    no-multiple-empty-lines:
+      - error
+      - max: 2
+        maxEOF: 1
+    yoda:
+      - error
+      - never
+      - exceptRange: true
+    no-multi-spaces:
+      - error
+      - exceptions:
+          # Using https://eslint.org/parser/
+          VariableDeclarator: true
+          AssignmentExpression: true
+          BlockStatement: true
+    spaced-comment:
+      - error
+      - always
+      - line:
+            exceptions:
+              - "/"
