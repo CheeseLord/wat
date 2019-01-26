@@ -1,7 +1,7 @@
-/*global Crafty*/
+/* global Crafty */
 
 "use strict";
-import './button.js'
+import "./button.js";
 
 // Based on one of the comments on:
 //     https://stackoverflow.com/a/5040502
@@ -98,7 +98,7 @@ function isAdjacent(object1, object2) {
 }
 
 function specialAttack(player) {
-    for (var i = enemies.length-1; i >= 0; i--) {
+    for (var i = enemies.length - 1; i >= 0; i--) {
         if (isAdjacent(player, enemies[i])) {
             enemies[i].destroy()
             enemies.splice(i, 1);
