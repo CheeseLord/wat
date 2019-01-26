@@ -206,7 +206,7 @@ export let Game = {
     mapGrid: {
         width:  25,
         height: 17,
-        tile: {
+        tile:   {
             width:  16,
             height: 16,
         },
@@ -238,7 +238,7 @@ export let Game = {
                         tile:     32,
                         tileh:    32,
                         paddingX: 1,
-                        map: {
+                        map:      {
                             // TODO better name
                             anim_start: [0, 0],
                         }
