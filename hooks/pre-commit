@@ -1,0 +1,23 @@
+#!/bin/bash
+
+fail() {
+    echo
+    if (( $# > 0 )); then
+        echo "** Pre-commit hook failed: $1 **"
+    else
+        echo "** Pre-commit hook failed **"
+    fi
+    exit 1
+}
+
+# Make sure we're run from the directory containing bin/, else we're going to
+# have a bad time.
+if [ ! -d bin ]; then
+    echo "Internal error in pre-commit hook: not run from root of repository."
+    fail
+fi
+
+# Check that lint runs cleanly.
+if ! ./bin/lint.sh; then
+    fail "Lint output was not clean."
+fi
