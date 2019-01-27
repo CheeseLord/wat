@@ -208,7 +208,7 @@ Crafty.c("MyButton", {
             index:      -1,
         });
         this.css({
-            "transition": "50ms all linear"
+            "transition": "50ms all linear",
         });
         this._redraw();
     },

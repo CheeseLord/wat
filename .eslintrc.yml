@@ -15,7 +15,7 @@ rules:
       - never
     comma-dangle:
       - error
-      - only-multiline
+      - always-multiline
     key-spacing:
       - error
       - singleLine:

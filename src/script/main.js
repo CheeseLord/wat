@@ -199,7 +199,7 @@ Crafty.c("PlayerControllable", {
     },
     isHighlighted: function() {
         return this._isHighlighted;
-    }
+    },
 });
 
 export let Game = {
@@ -241,15 +241,15 @@ export let Game = {
                         map:      {
                             // TODO better name
                             anim_start: [0, 0],
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             },
             function() {
                 Crafty.e("2D, DOM, anim_start, SpriteAnimation")
                         .attr({x: 48, y: -32, w: 32, h: 32})
                         .reel("my_animation", 1000, [
-                            [0, 0], [1, 0], [2, 0], [3, 0]
+                            [0, 0], [1, 0], [2, 0], [3, 0],
                         ])
                         .animate("my_animation", -1);
             }
