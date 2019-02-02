@@ -35,82 +35,50 @@ function deselectPlayer() {
 function doTopLevelActionMenu(player) {
     Crafty.log("Creating top-level action menu");
     globalState = StateEnum.PLAYER_SELECTED;
-    Crafty.s("ButtonMenu").setButtonsWithTitle("Select Action", [
-        Crafty.e("MyButton, UILayer")
-                .text("Move")
-                .onclick(() => doMoveMenu(player)),
-        Crafty.e("MyButton, UILayer")
-                .text("Swap places")
-                .onclick(() => {
-                    doSwapPlacesMenu(player);
-                }),
-        Crafty.e("MyButton, UILayer")
-                .text("Attack")
-                .onclick(() => doAttackMenu(player)),
-        Crafty.e("MyButton, UILayer")
-                .text("Cancel")
-                .onclick(() => {
-                    Crafty.s("ButtonMenu").clearButtons();
-                    globalState = StateEnum.DEFAULT;
-                    deselectPlayer();
-                }),
+    Crafty.s("ButtonMenu").setButtonsFromDesc("Select Action", [
+        ["Move", () => doMoveMenu(player)],
+        ["Swap places", () => doSwapPlacesMenu(player)],
+        ["Attack", () => doAttackMenu(player)],
+        ["Cancel", () => {
+            Crafty.s("ButtonMenu").clearButtons();
+            globalState = StateEnum.DEFAULT;
+            deselectPlayer();
+        }],
     ]);
 }
 
 function doMoveMenu(player) {
     globalState = StateEnum.PLAYER_MOVE;
-    Crafty.s("ButtonMenu").setButtonsWithTitle("Moving", [
-        Crafty.e("MyButton, UILayer")
-                .text("Back")
-                .onclick(() => {
-                    doTopLevelActionMenu(player);
-                }),
+    Crafty.s("ButtonMenu").setButtonsFromDesc("Moving", [
+        ["Back", () => doTopLevelActionMenu(player)],
     ]);
 }
 
 function doSwapPlacesMenu(player) {
     globalState = StateEnum.PLAYER_SWAP;
-    Crafty.s("ButtonMenu").setButtonsWithTitle("Swap Places", [
-        Crafty.e("MyButton, UILayer")
-                .text("Back")
-                .onclick(() => {
-                    doTopLevelActionMenu(player);
-                }),
+    Crafty.s("ButtonMenu").setButtonsFromDesc("Swap Places", [
+        ["Back", () => doTopLevelActionMenu(player)],
     ]);
 }
 
 function doAttackMenu(player) {
     globalState = StateEnum.PLAYER_ATTACK;
-    Crafty.s("ButtonMenu").setButtonsWithTitle("Attack", [
-        Crafty.e("MyButton, UILayer")
-                .text("Attack")
-                .onclick(() => {
-                    doRegularAttackMenu(player);
-                }),
-        Crafty.e("MyButton, UILayer")
-                .text("Special Attack")
-                .onclick(() => {
-                    specialAttack(player);
-                    Crafty.s("ButtonMenu").clearButtons();
-                    globalState = StateEnum.DEFAULT;
-                    deselectPlayer();
-                }),
-        Crafty.e("MyButton, UILayer")
-                .text("Back")
-                .onclick(() => {
-                    doTopLevelActionMenu(player);
-                }),
+    Crafty.s("ButtonMenu").setButtonsFromDesc("Attack", [
+        ["Attack", () => doRegularAttackMenu(player)],
+        ["Special Attack", () => {
+            specialAttack(player);
+            Crafty.s("ButtonMenu").clearButtons();
+            globalState = StateEnum.DEFAULT;
+            deselectPlayer();
+        }],
+        ["Back", () => doTopLevelActionMenu(player)],
     ]);
 }
 
 function doRegularAttackMenu(player) {
     globalState = StateEnum.PLAYER_ATTACK;
-    Crafty.s("ButtonMenu").setButtonsWithTitle("Regular Attack", [
-        Crafty.e("MyButton, UILayer")
-                .text("Back")
-                .onclick(() => {
-                    doAttackMenu(player);
-                }),
+    Crafty.s("ButtonMenu").setButtonsFromDesc("Regular Attack", [
+        ["Back", () => doAttackMenu(player)],
     ]);
 }
 

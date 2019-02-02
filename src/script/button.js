@@ -53,7 +53,7 @@ Crafty.s("ButtonMenu", {
             if (buttonDescList[i].length !== 2) {
                 Crafty.error("Bad button desc");
             }
-            buttonList.append(Crafty.e("MyButton, UILayer")
+            buttonList.push(Crafty.e("MyButton, UILayer")
                     .text(buttonDescList[i][0])
                     .onclick(buttonDescList[i][1]));
         }
