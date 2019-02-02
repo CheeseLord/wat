@@ -35,12 +35,12 @@ function deselectPlayer() {
 function doTopLevelActionMenu(player) {
     Crafty.log("Creating top-level action menu");
     globalState = StateEnum.PLAYER_SELECTED;
-    Crafty.s("ButtonMenu").setButtonsFromDesc("Select Action", [
+    Crafty.s("ButtonMenu").pushMenu("Select Action", [
         ["Move", () => doMoveMenu(player)],
         ["Swap places", () => doSwapPlacesMenu(player)],
         ["Attack", () => doAttackMenu(player)],
         ["Cancel", () => {
-            Crafty.s("ButtonMenu").clearButtons();
+            Crafty.s("ButtonMenu").popMenu();
             globalState = StateEnum.DEFAULT;
             deselectPlayer();
         }],
@@ -49,21 +49,21 @@ function doTopLevelActionMenu(player) {
 
 function doMoveMenu(player) {
     globalState = StateEnum.PLAYER_MOVE;
-    Crafty.s("ButtonMenu").setButtonsFromDesc("Moving", [
-        ["Back", () => doTopLevelActionMenu(player)],
+    Crafty.s("ButtonMenu").pushMenu("Moving", [
+        ["Back", () => Crafty.s("ButtonMenu").popMenu()],
     ]);
 }
 
 function doSwapPlacesMenu(player) {
     globalState = StateEnum.PLAYER_SWAP;
-    Crafty.s("ButtonMenu").setButtonsFromDesc("Swap Places", [
-        ["Back", () => doTopLevelActionMenu(player)],
+    Crafty.s("ButtonMenu").pushMenu("Swap Places", [
+        ["Back", () => Crafty.s("ButtonMenu").popMenu()],
     ]);
 }
 
 function doAttackMenu(player) {
     globalState = StateEnum.PLAYER_ATTACK;
-    Crafty.s("ButtonMenu").setButtonsFromDesc("Attack", [
+    Crafty.s("ButtonMenu").pushMenu("Attack", [
         ["Attack", () => doRegularAttackMenu(player)],
         ["Special Attack", () => {
             specialAttack(player);
@@ -71,14 +71,14 @@ function doAttackMenu(player) {
             globalState = StateEnum.DEFAULT;
             deselectPlayer();
         }],
-        ["Back", () => doTopLevelActionMenu(player)],
+        ["Back", () => Crafty.s("ButtonMenu").popMenu()],
     ]);
 }
 
 function doRegularAttackMenu(player) {
     globalState = StateEnum.PLAYER_ATTACK;
-    Crafty.s("ButtonMenu").setButtonsFromDesc("Regular Attack", [
-        ["Back", () => doAttackMenu(player)],
+    Crafty.s("ButtonMenu").pushMenu("Regular Attack", [
+        ["Back", () => Crafty.s("ButtonMenu").popMenu()],
     ]);
 }
 

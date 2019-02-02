@@ -34,6 +34,10 @@ Crafty.s("ButtonMenu", {
         // button is active.
         this._activeButton = null;
 
+        // Stack of menus that we've pushed on top of.
+        this._menuStack    = [];
+        this._currMenuDesc = null;
+
         this.bind("KeyDown", this.onKeyPress);
 
         // Note: we need to bind to anonymous wrapper functions because
@@ -47,6 +51,26 @@ Crafty.s("ButtonMenu", {
         });
     },
 
+    pushMenu: function(titleText, buttonDescList) {
+        if (this._currMenuDesc) {
+            this._menuStack.push(this._currMenuDesc);
+        }
+        this.setButtonsFromDesc(titleText, buttonDescList);
+    },
+
+    popMenu: function() {
+        if (this._menuStack.length === 0) {
+            this.clearButtons();
+            this._currMenuDesc = null;
+        } else {
+            let newDesc = this._menuStack.pop();
+            if (newDesc.length !== 2) {
+                Crafty.error("Bad menu desc");
+            }
+            this.setButtonsFromDesc(newDesc[0], newDesc[1]);
+        }
+    },
+
     setButtonsFromDesc: function(titleText, buttonDescList) {
         let buttonList = [];
         for (let i = 0; i < buttonDescList.length; i++) {
@@ -58,6 +82,7 @@ Crafty.s("ButtonMenu", {
                     .onclick(buttonDescList[i][1]));
         }
         this.setButtonsWithTitle(titleText, buttonList);
+        this._currMenuDesc = [titleText, buttonDescList];
     },
 
     // Set the current menu to the specified list of buttons. Overrides any
@@ -124,8 +149,13 @@ Crafty.s("ButtonMenu", {
         for (let i = 0; i < this._buttons.length; i++) {
             this._buttons[i].destroy();
         }
-        this._buttons    = [];
-        this._focusIndex = -1;
+        this._buttons      = [];
+        this._focusIndex   = -1;
+        this._currMenuDesc = null;
+        // We can't clear the _menuStack here, because this function is called
+        // when swapping out one menu for another, including to push or pop a
+        // new one. Maybe we should have a different function which clears the
+        // whole stack?
     },
 
     onMouseDown: function(evt) {
