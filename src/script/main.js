@@ -42,7 +42,7 @@ function doTopLevelActionMenu(player) {
         Crafty.e("MyButton, UILayer")
                 .text("Swap places")
                 .onclick(() => {
-                    globalState = StateEnum.PLAYER_SWAP;
+                    doSwapPlacesMenu(player);
                 }),
         Crafty.e("MyButton, UILayer")
                 .text("Attack")
@@ -60,6 +60,17 @@ function doTopLevelActionMenu(player) {
 function doMoveMenu(player) {
     globalState = StateEnum.PLAYER_MOVE;
     Crafty.s("ButtonMenu").setButtonsWithTitle("Moving", [
+        Crafty.e("MyButton, UILayer")
+                .text("Back")
+                .onclick(() => {
+                    doTopLevelActionMenu(player);
+                }),
+    ]);
+}
+
+function doSwapPlacesMenu(player) {
+    globalState = StateEnum.PLAYER_SWAP;
+    Crafty.s("ButtonMenu").setButtonsWithTitle("Swap Places", [
         Crafty.e("MyButton, UILayer")
                 .text("Back")
                 .onclick(() => {
