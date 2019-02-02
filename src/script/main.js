@@ -85,7 +85,7 @@ function doAttackMenu(player) {
         Crafty.e("MyButton, UILayer")
                 .text("Attack")
                 .onclick(() => {
-                    globalState = StateEnum.PLAYER_ATTACK;
+                    doRegularAttackMenu(player);
                 }),
         Crafty.e("MyButton, UILayer")
                 .text("Special Attack")
@@ -99,6 +99,17 @@ function doAttackMenu(player) {
                 .text("Back")
                 .onclick(() => {
                     doTopLevelActionMenu(player);
+                }),
+    ]);
+}
+
+function doRegularAttackMenu(player) {
+    globalState = StateEnum.PLAYER_ATTACK;
+    Crafty.s("ButtonMenu").setButtonsWithTitle("Regular Attack", [
+        Crafty.e("MyButton, UILayer")
+                .text("Back")
+                .onclick(() => {
+                    doAttackMenu(player);
                 }),
     ]);
 }
