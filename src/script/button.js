@@ -47,6 +47,19 @@ Crafty.s("ButtonMenu", {
         });
     },
 
+    setButtonsFromDesc: function(titleText, buttonDescList) {
+        let buttonList = [];
+        for (let i = 0; i < buttonDescList.length; i++) {
+            if (buttonDescList[i].length !== 2) {
+                Crafty.error("Bad button desc");
+            }
+            buttonList.append(Crafty.e("MyButton, UILayer")
+                    .text(buttonDescList[i][0])
+                    .onclick(buttonDescList[i][1]));
+        }
+        this.setButtonsWithTitle(titleText, buttonList);
+    },
+
     // Set the current menu to the specified list of buttons. Overrides any
     // previous menu; there can only be one menu at a time. (If that becomes a
     // problem, we should probably just convert this to a Menu entity, rather
@@ -57,6 +70,8 @@ Crafty.s("ButtonMenu", {
     },
 
     // Ditto, but also add a title at the top.
+    // TODO: Unified function that just checks if titleText is ("" | undefined
+    // | null | whatever).
     setButtonsWithTitle: function(titleText, buttonList) {
         this.clearButtons();
 
