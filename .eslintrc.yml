@@ -10,6 +10,9 @@ rules:
       - error
       - 4
       - MemberExpression: 2
+        ignoredNodes:
+          - ForOfStatement
+          - ForInStatement
     space-before-function-paren:
       - error
       - never

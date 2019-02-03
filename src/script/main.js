@@ -24,6 +24,12 @@ function selectPlayer(player) {
     selectedPlayer.highlight();
 }
 
+function removeMovementSquares() {
+    for (var squareId of Crafty("MovementSquare").toArray()) {
+        Crafty(squareId).destroy();
+    }
+}
+
 function deselectPlayer() {
     if (selectedPlayer && selectedPlayer.isHighlighted()) {
         selectedPlayer.unhighlight();
@@ -49,10 +55,16 @@ function doTopLevelActionMenu(player) {
 
 function doMoveMenu(player) {
     globalState = StateEnum.PLAYER_MOVE;
+    createMovementGrid(player);
     Crafty.s("ButtonMenu").pushMenu("Moving", [
         ["Back", () => Crafty.s("ButtonMenu").popMenu()],
     ]);
 }
+
+function createMovementGrid(player) {
+    Crafty.e("MovementSquare").setPos({x: 0, y: 0});
+    Crafty.e("MovementSquare").setPos({x: 0, y: 3});
+};
 
 function doSwapPlacesMenu(player) {
     globalState = StateEnum.PLAYER_SWAP;
@@ -146,6 +158,14 @@ Crafty.c("GridObject", {
         }, 200);
         // So that "setter" attributes can be chained together.
         return this;
+    },
+});
+
+Crafty.c("MovementSquare", {
+    required: "GridObject, Mouse",
+
+    init: function() {
+        this.color("#00FFFF", 0.5);
     },
 });
 
@@ -354,12 +374,20 @@ export let Game = {
                     if (selectedPlayer &&
                             (globalState === StateEnum.PLAYER_MOVE ||
                             globalState === StateEnum.PLAYER_SELECTED)) {
-                        Crafty.s("ButtonMenu").clearButtons();
-                        globalState = StateEnum.DEFAULT;
-                        selectedPlayer.animateTo({x: x, y: y});
-                        selectedPlayer.one("TweenEnd", function() {
-                            deselectPlayer();
-                        });
+                        for (var squareId of
+                                Crafty("MovementSquare").toArray()) {
+                            var squarePos = Crafty(squareId).getPos();
+                            if (squarePos.x === x && squarePos.y === y) {
+                                Crafty.log("Match");
+                                Crafty.s("ButtonMenu").clearButtons();
+                                globalState = StateEnum.DEFAULT;
+                                selectedPlayer.animateTo({x: x, y: y});
+                                selectedPlayer.one("TweenEnd", function() {
+                                    removeMovementSquares();
+                                    deselectPlayer();
+                                });
+                            }
+                        }
                     } else if (selectedPlayer &&
                             globalState === StateEnum.PLAYER_ATTACK) {
                         if (Math.abs(selectedPlayer.getPos().x - x) > 1 ||
