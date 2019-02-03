@@ -25,9 +25,9 @@ function selectPlayer(player) {
 }
 
 function removeMovementSquares() {
-    for (var squareId of Crafty("MovementSquare").toArray()) {
-        Crafty(squareId).destroy();
-    }
+    Crafty("MovementSquare").each(function() {
+        this.destroy();
+    });
 }
 
 function deselectPlayer() {
@@ -374,19 +374,14 @@ export let Game = {
                     if (selectedPlayer &&
                             (globalState === StateEnum.PLAYER_MOVE ||
                             globalState === StateEnum.PLAYER_SELECTED)) {
-                        for (var squareId of
-                                Crafty("MovementSquare").toArray()) {
-                            var squarePos = Crafty(squareId).getPos();
-                            if (squarePos.x === x && squarePos.y === y) {
-                                Crafty.log("Match");
-                                Crafty.s("ButtonMenu").clearButtons();
-                                globalState = StateEnum.DEFAULT;
-                                selectedPlayer.animateTo({x: x, y: y});
-                                selectedPlayer.one("TweenEnd", function() {
-                                    removeMovementSquares();
-                                    deselectPlayer();
-                                });
-                            }
+                        if (e.target && e.target.has("MovementSquare")) {
+                            Crafty.s("ButtonMenu").clearButtons();
+                            globalState = StateEnum.DEFAULT;
+                            selectedPlayer.animateTo({x: x, y: y});
+                            selectedPlayer.one("TweenEnd", function() {
+                                removeMovementSquares();
+                                deselectPlayer();
+                            });
                         }
                     } else if (selectedPlayer &&
                             globalState === StateEnum.PLAYER_ATTACK) {
