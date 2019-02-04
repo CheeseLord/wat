@@ -62,8 +62,23 @@ function doMoveMenu(player) {
 }
 
 function createMovementGrid(player) {
-    Crafty.e("MovementSquare").setPos({x: 0, y: 0});
-    Crafty.e("MovementSquare").setPos({x: 0, y: 3});
+    var playerPos = player.getPos();
+    var x = playerPos.x;
+    var y = playerPos.y;
+    // FIXME Move distance to player attribute
+    var maxDistance = 4;
+    for (var i = 1; i < maxDistance; i++) {
+        for (var j = 1; j + i < maxDistance; j++) {
+            Crafty.e("MovementSquare").setPos({x: x + i, y: y + j});
+            Crafty.e("MovementSquare").setPos({x: x + i, y: y - j});
+            Crafty.e("MovementSquare").setPos({x: x - i, y: y + j});
+            Crafty.e("MovementSquare").setPos({x: x - i, y: y - j});
+        }
+        Crafty.e("MovementSquare").setPos({x: x + i, y: y});
+        Crafty.e("MovementSquare").setPos({x: x - i, y: y});
+        Crafty.e("MovementSquare").setPos({x: x, y: y + i});
+        Crafty.e("MovementSquare").setPos({x: x, y: y - i});
+    }
 };
 
 function doSwapPlacesMenu(player) {
