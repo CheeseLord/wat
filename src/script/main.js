@@ -61,6 +61,19 @@ function doMoveMenu(player) {
     ]);
 }
 
+function createMovementSquare(x, y) {
+    var occupied = false;
+    Crafty("SpaceFillingObject").each(function() {
+        if (this.getPos().x === x && this.getPos().y === y) {
+            occupied = true;
+        }
+    });
+    if (occupied) {
+        return;
+    }
+    Crafty.e("MovementSquare").setPos({x: x, y: y});
+}
+
 function createMovementGrid(player) {
     var playerPos = player.getPos();
     var x = playerPos.x;
@@ -69,15 +82,15 @@ function createMovementGrid(player) {
     var maxDistance = 4;
     for (var i = 1; i < maxDistance; i++) {
         for (var j = 1; j + i < maxDistance; j++) {
-            Crafty.e("MovementSquare").setPos({x: x + i, y: y + j});
-            Crafty.e("MovementSquare").setPos({x: x + i, y: y - j});
-            Crafty.e("MovementSquare").setPos({x: x - i, y: y + j});
-            Crafty.e("MovementSquare").setPos({x: x - i, y: y - j});
+            createMovementSquare(x + i, y + j);
+            createMovementSquare(x + i, y - j);
+            createMovementSquare(x - i, y + j);
+            createMovementSquare(x - i, y - j);
         }
-        Crafty.e("MovementSquare").setPos({x: x + i, y: y});
-        Crafty.e("MovementSquare").setPos({x: x - i, y: y});
-        Crafty.e("MovementSquare").setPos({x: x, y: y + i});
-        Crafty.e("MovementSquare").setPos({x: x, y: y - i});
+        createMovementSquare(x + i, y);
+        createMovementSquare(x - i, y);
+        createMovementSquare(x, y + i);
+        createMovementSquare(x, y - i);
     }
 };
 
@@ -126,7 +139,7 @@ function specialAttack(player) {
 // Component for anything that occupies a grid space.
 Crafty.c("GridObject", {
     // TODO: Remove Mouse (get cat?)
-    required: "2D, DOM, Color, Tween, Mouse",
+    required: "SpaceFillingObject, 2D, DOM, Color, Tween, Mouse",
 
     init: function() {
         this.attr({w: Game.mapGrid.tile.width, h: Game.mapGrid.tile.height});
