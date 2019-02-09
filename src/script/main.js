@@ -18,6 +18,15 @@ var globalState = StateEnum.DEFAULT;
 var selectedPlayer;
 var enemies;
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Menu-related functions (and some misc?)
+
+function reportUserError(text) {
+    // TODO: Put this somewhere the user will actually see it.
+    Crafty.error(text);
+}
+
 function selectPlayer(player) {
     deselectPlayer();
     selectedPlayer = player;
@@ -136,6 +145,10 @@ function specialAttack(player) {
     }
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Component definitions
+
 // Component for anything that occupies a grid space.
 Crafty.c("GridObject", {
     // TODO: Remove Mouse (get cat?)
@@ -231,7 +244,6 @@ Crafty.c("PlayerControllable", {
         return this.color(this._highlightedColor);
     },
     unhighlight: function() {
-        // TODO HACK: What color were we originally?
         this._isHighlighted = false;
         return this.color(this._defaultColor);
     },
@@ -239,6 +251,124 @@ Crafty.c("PlayerControllable", {
         return this._isHighlighted;
     },
 });
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Action handlers
+
+function doSelectPlayer(evt, x, y) {
+    // assert(globalState === StateEnum.DEFAULT ||
+    //        globalState === StateEnum.PLAYER_SELECTED);
+
+    if (evt.target && evt.target.has("PlayerControllable")) {
+        doTopLevelActionMenu(evt.target);
+        selectPlayer(evt.target);
+    }
+}
+
+function doAutoPlayerAction(evt, x, y) {
+    if (evt.target && evt.target.has("PlayerControllable")) {
+        doSelectPlayer(evt, x, y);
+    } else {
+        doMove(evt, x, y);
+    }
+}
+
+function doMove(evt, x, y) {
+    // assert(globalState === StateEnum.PLAYER_MOVE ||
+    //        globalState === StateEnum.PLAYER_SELECTED);
+    if (!selectedPlayer) {
+        // assert(false); -- Don't think this can happen?
+        Crafty.error("No player selected.");
+        return;
+    }
+
+    // TODO: MovementSquares shouldn't be SpaceFillingObjects.
+    if (evt.target && evt.target.has("SpaceFillingObject") &&
+            !evt.target.has("MovementSquare")) {
+        reportUserError("Can't move there; something's in the way.");
+        return;
+    } else if (!(evt.target && evt.target.has("MovementSquare"))) {
+        reportUserError("Invalid destination (out of range?).");
+        return;
+    }
+
+    Crafty.s("ButtonMenu").clearMenu();
+    globalState = StateEnum.DEFAULT;
+    selectedPlayer.animateTo({x: x, y: y});
+    selectedPlayer.one("TweenEnd", function() {
+        removeMovementSquares();
+        deselectPlayer();
+    });
+}
+
+function doSwap(evt, x, y) {
+    // assert(globalState === StateEnum.PLAYER_SWAP);
+    if (!selectedPlayer) {
+        // assert(false); -- Don't think this can happen?
+        Crafty.error("No player selected.");
+        return;
+    }
+
+    if (evt.target === null) {
+        reportUserError("There's nothing there to swap with.");
+        return;
+    } else if (!evt.target.has("PlayerControllable")) {
+        reportUserError("Can't swap with non-player.");
+        return;
+    } if (evt.target === selectedPlayer) {
+        reportUserError("Cannot swap player with self.");
+        return;
+    }
+
+    // Swap positions of clicked player and selectedPlayer.
+    Crafty.s("ButtonMenu").clearMenu();
+    globalState = StateEnum.DEFAULT;
+
+    let selectPos = selectedPlayer.getPos();
+    let clickPos  = evt.target.getPos();
+    evt.target.animateTo(selectPos);
+    selectedPlayer.animateTo(clickPos);
+    selectedPlayer.one("TweenEnd", function() { deselectPlayer(); });
+}
+
+function doAttack(evt, x, y) {
+    // assert(globalState === StateEnum.PLAYER_ATTACK);
+    if (!selectedPlayer) {
+        // assert(false); -- Don't think this can happen?
+        return;
+    }
+
+    if (evt.target === null) {
+        reportUserError("No enemy there.");
+        return;
+    } else if (Math.abs(selectedPlayer.getPos().x - x) > 1 ||
+            Math.abs(selectedPlayer.getPos().y - y) > 1) {
+        reportUserError("Target not adjacent.");
+        return;
+    } else if (evt.target.has("PlayerControllable")) {
+        reportUserError("Can't attack friendly unit.");
+        return;
+    }
+
+    for (var i = 0; i < enemies.length; i++) {
+        if (evt.target === enemies[i]) {
+            enemies.splice(i, 1);
+            break;
+        }
+    }
+    // assert(we actually found it in the enemies list);
+    // TODO - In fact, the above may not be true. Right now you can attack
+    // MovementSquares. :/
+    evt.target.destroy();
+    Crafty.s("ButtonMenu").clearMenu();
+    globalState = StateEnum.DEFAULT;
+    deselectPlayer();
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Main Game object definition and startup code
 
 export let Game = {
     mapGrid: {
@@ -360,80 +490,26 @@ export let Game = {
         ///////////////////////////////////////////////////////////////////////
 
         // Generic handler for clicks on the world view.
-        Crafty.bind("WorldClick", function(e) {
-            if (e.mouseButton === Crafty.mouseButtons.LEFT) {
-                if (e.target && e.target.has("PlayerControllable")) {
-                    var clickedPlayer = e.target;
-                    if (globalState === StateEnum.DEFAULT ||
-                            globalState === StateEnum.PLAYER_SELECTED) {
-                        doTopLevelActionMenu(clickedPlayer);
-                        selectPlayer(clickedPlayer);
-                    } else if (globalState === StateEnum.PLAYER_SWAP) {
-                        if (!selectedPlayer) {
-                            Crafty.error("No player selected.");
-                        } else if (clickedPlayer === selectedPlayer) {
-                            Crafty.error("Cannot swap player with self.");
-                        } else {
-                            // Swap positions of clickedPlayer and
-                            // selectedPlayer.
-                            Crafty.s("ButtonMenu").clearMenu();
-                            globalState = StateEnum.DEFAULT;
-
-                            let selectPos = selectedPlayer.getPos();
-                            let clickPos = clickedPlayer.getPos();
-                            clickedPlayer.animateTo(selectPos);
-                            selectedPlayer.animateTo(clickPos);
-                            selectedPlayer.one("TweenEnd", function() {
-                                deselectPlayer();
-                            });
-                        }
-                    } else if (globalState === StateEnum.PLAYER_MOVE) {
-                        Crafty.error("Can't move there; something's in the " +
-                            "way.");
-                    } else {
-                        Crafty.error("Unknown state value (should we be " +
-                            "something here?)");
-                    }
-                    Crafty.log("You clicked on the player.");
+        Crafty.bind("WorldClick", function(evt) {
+            let x = Math.floor(evt.realX / Game.mapGrid.tile.width);
+            let y = Math.floor(evt.realY / Game.mapGrid.tile.height);
+            if (evt.mouseButton === Crafty.mouseButtons.LEFT) {
+                Crafty.log(`You clicked at: (${x}, ${y})`);
+                if (globalState === StateEnum.DEFAULT) {
+                    doSelectPlayer(evt, x, y);
+                } else if (globalState === StateEnum.PLAYER_SELECTED) {
+                    doAutoPlayerAction(evt, x, y);
+                } else if (globalState === StateEnum.PLAYER_MOVE) {
+                    doMove(evt, x, y);
+                } else if (globalState === StateEnum.PLAYER_SWAP) {
+                    doSwap(evt, x, y);
+                } else if (globalState === StateEnum.PLAYER_ATTACK) {
+                    doAttack(evt, x, y);
                 } else {
-                    let x = Math.floor(e.realX / Game.mapGrid.tile.width);
-                    let y = Math.floor(e.realY / Game.mapGrid.tile.height);
-                    Crafty.log(`You clicked at: (${x}, ${y})`);
-                    if (selectedPlayer &&
-                            (globalState === StateEnum.PLAYER_MOVE ||
-                            globalState === StateEnum.PLAYER_SELECTED)) {
-                        if (e.target && e.target.has("MovementSquare")) {
-                            Crafty.s("ButtonMenu").clearMenu();
-                            globalState = StateEnum.DEFAULT;
-                            selectedPlayer.animateTo({x: x, y: y});
-                            selectedPlayer.one("TweenEnd", function() {
-                                removeMovementSquares();
-                                deselectPlayer();
-                            });
-                        }
-                    } else if (selectedPlayer &&
-                            globalState === StateEnum.PLAYER_ATTACK) {
-                        if (Math.abs(selectedPlayer.getPos().x - x) > 1 ||
-                                Math.abs(selectedPlayer.getPos().y - y) > 1) {
-                            Crafty.error("Target not adjacent.");
-                        } else if (e.target === null) {
-                            Crafty.error("No enemy there.");
-                        } else {
-                            for (var i = 0; i < enemies.length; i++) {
-                                if (e.target === enemies[i]) {
-                                    enemies.splice(i, 1);
-                                }
-                            }
-                            e.target.destroy();
-                            Crafty.s("ButtonMenu").clearMenu();
-                            globalState = StateEnum.DEFAULT;
-                            deselectPlayer();
-                        }
-                    } else if (globalState === StateEnum.PLAYER_SWAP) {
-                        Crafty.error("Can't swap with non-player.");
-                    }
+                    Crafty.error("Unknown state value.");
+                    // assert(false);
                 }
-            } else if (e.mouseButton === Crafty.mouseButtons.RIGHT) {
+            } else if (evt.mouseButton === Crafty.mouseButtons.RIGHT) {
                 Crafty.log("AAAAAAAAAA");
             }
         });
