@@ -295,11 +295,9 @@ function doMove(evt, x, y) {
 
     Crafty.s("ButtonMenu").clearMenu();
     globalState = StateEnum.DEFAULT;
+    removeMovementSquares();
     selectedPlayer.animateTo({x: x, y: y});
-    selectedPlayer.one("TweenEnd", function() {
-        removeMovementSquares();
-        deselectPlayer();
-    });
+    selectedPlayer.one("TweenEnd", function() { deselectPlayer(); });
 }
 
 function doSwap(evt, x, y) {
