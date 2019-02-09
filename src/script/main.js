@@ -266,7 +266,10 @@ function doSelectPlayer(evt, x, y) {
     }
 }
 
+// Automagically choose the right action for the player to do (corresponds to
+// state "PLAYER_SELECTED").
 function doAutoPlayerAction(evt, x, y) {
+    // assert(globalState === StateEnum.PLAYER_SELECTED);
     if (evt.target && evt.target.has("PlayerControllable")) {
         doSelectPlayer(evt, x, y);
     } else {
