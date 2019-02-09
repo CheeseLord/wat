@@ -102,22 +102,10 @@ Crafty.s("ButtonMenu", {
                     .text(buttonDescList[i][0])
                     .onclick(buttonDescList[i][1]));
         }
-        // TODO inline this? There's not really any other way to call this
-        // function anymore.
         this._setButtonsWithTitle(titleText, buttonList);
         this._currMenuDesc = [titleText, buttonDescList];
     },
 
-    // TODO delete this. It doesn't work anymore with the stacks.
-    // setButtons: function(buttonList) {
-    //     this.clearMenu();
-    //     this._setButtonsHelper(buttonList, MENU_Y + V_PADDING);
-    // },
-
-    // Ditto, but also add a title at the top.
-    // TODO: Unified function that just checks if titleText is ("" | undefined
-    // | null | whatever).
-    // TODO: Fixup comment now that setButtons is gone.
     _setButtonsWithTitle: function(titleText, buttonList) {
         // Add the title.
         // TODO: Probably we should instead do:
@@ -133,20 +121,16 @@ Crafty.s("ButtonMenu", {
                 .textFont({size: "14px", weight: "bold"})
                 .css({"text-decoration": "underline"});
 
+        // Add the buttons.
+        this._buttons = buttonList;
+
+        let x      = MENU_X + H_PADDING;
         // TODO: How tall is the text, actually? I think we want
         //     MENU_Y + 2*V_PADDING + <actual text height>.
         // 19 comes from taking a screenshot and pixel-rulering in gimp...
         // empirically the top of the title text is at y=13 and the bottom is
         // at y=26, so we want a total height of 39 I guess. :/
-        let startY = MENU_Y + (2 * V_PADDING) + 19;
-        this._setButtonsHelper(buttonList, startY);
-    },
-
-    _setButtonsHelper: function(buttonList, startY) {
-        this._buttons = buttonList;
-
-        let x      = MENU_X + H_PADDING;
-        let y      = startY;
+        let y      = MENU_Y + (2 * V_PADDING) + 19;
         let width  = MENU_WIDTH - (2 * H_PADDING);
         let height = BUTTON_HEIGHT;
         for (let i = 0; i < this._buttons.length; i++) {
