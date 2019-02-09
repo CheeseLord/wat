@@ -34,7 +34,12 @@ Crafty.s("ButtonMenu", {
         // button is active.
         this._activeButton = null;
 
-        // Stack of menus that we've pushed on top of.
+        // Stack of menus that we've pushed on top of. At a given time:
+        //   - _currMenuDesc stores a description of the currently-displayed
+        //     menu (or null if no menu is displayed).
+        //   - _menuStack stores a stack of descriptions of any higher-level
+        //     menus. The idea is that if you click a "back" button, we pop the
+        //     top description from _menuStack and display that menu.
         this._menuStack    = [];
         this._currMenuDesc = null;
 
@@ -51,27 +56,43 @@ Crafty.s("ButtonMenu", {
         });
     },
 
+    // Set the current menu to the specified list of buttons. Overrides any
+    // previous menu; there can only be one menu at a time. (If that becomes a
+    // problem, we should probably just convert this to a Menu entity, rather
+    // than a subsystem.) Also clears any higher-level menus from the stack;
+    // after calling this function you can no longer pop() back to any previous
+    // menus. Automatically positions and sizes the buttons.
+    setTopLevelMenu: function(titleText, buttonDescList) {
+        this.clearMenu();
+        this._setButtonsFromDesc(titleText, buttonDescList);
+    },
+
+    // As above, but pushes any previous menu onto a stack so that it may be
+    // restored later using popMenu().
     pushMenu: function(titleText, buttonDescList) {
         if (this._currMenuDesc) {
             this._menuStack.push(this._currMenuDesc);
         }
-        this.setButtonsFromDesc(titleText, buttonDescList);
+        this._setButtonsFromDesc(titleText, buttonDescList);
     },
 
+    // Restores the last menu that was pushed onto the stack using pushMenu().
+    // If there is no such menu, clears the current menu.
     popMenu: function() {
         if (this._menuStack.length === 0) {
-            this.clearButtons();
+            this._removeCurrentButtons();
             this._currMenuDesc = null;
         } else {
             let newDesc = this._menuStack.pop();
             if (newDesc.length !== 2) {
                 Crafty.error("Bad menu desc");
             }
-            this.setButtonsFromDesc(newDesc[0], newDesc[1]);
+            this._setButtonsFromDesc(newDesc[0], newDesc[1]);
         }
     },
 
-    setButtonsFromDesc: function(titleText, buttonDescList) {
+    _setButtonsFromDesc: function(titleText, buttonDescList) {
+        this._removeCurrentButtons();
         let buttonList = [];
         for (let i = 0; i < buttonDescList.length; i++) {
             if (buttonDescList[i].length !== 2) {
@@ -81,25 +102,23 @@ Crafty.s("ButtonMenu", {
                     .text(buttonDescList[i][0])
                     .onclick(buttonDescList[i][1]));
         }
-        this.setButtonsWithTitle(titleText, buttonList);
+        // TODO inline this? There's not really any other way to call this
+        // function anymore.
+        this._setButtonsWithTitle(titleText, buttonList);
         this._currMenuDesc = [titleText, buttonDescList];
     },
 
-    // Set the current menu to the specified list of buttons. Overrides any
-    // previous menu; there can only be one menu at a time. (If that becomes a
-    // problem, we should probably just convert this to a Menu entity, rather
-    // than a subsystem.) Automatically positions and sizes the buttons.
-    setButtons: function(buttonList) {
-        this.clearButtons();
-        this._setButtonsHelper(buttonList, MENU_Y + V_PADDING);
-    },
+    // TODO delete this. It doesn't work anymore with the stacks.
+    // setButtons: function(buttonList) {
+    //     this.clearMenu();
+    //     this._setButtonsHelper(buttonList, MENU_Y + V_PADDING);
+    // },
 
     // Ditto, but also add a title at the top.
     // TODO: Unified function that just checks if titleText is ("" | undefined
     // | null | whatever).
-    setButtonsWithTitle: function(titleText, buttonList) {
-        this.clearButtons();
-
+    // TODO: Fixup comment now that setButtons is gone.
+    _setButtonsWithTitle: function(titleText, buttonList) {
         // Add the title.
         // TODO: Probably we should instead do:
         //     x: MENU_X + H_PADDING
@@ -137,8 +156,14 @@ Crafty.s("ButtonMenu", {
         }
     },
 
-    // Stop tracking buttons.
-    clearButtons: function() {
+    // Remove any buttons being displayed, and also clear the stack of
+    // higher-level menus.
+    clearMenu: function() {
+        this._removeCurrentButtons();
+        this._menuStack = [];
+    },
+
+    _removeCurrentButtons: function() {
         if (this._title) {
             this._title.destroy();
             this._title = null;
@@ -152,10 +177,6 @@ Crafty.s("ButtonMenu", {
         this._buttons      = [];
         this._focusIndex   = -1;
         this._currMenuDesc = null;
-        // We can't clear the _menuStack here, because this function is called
-        // when swapping out one menu for another, including to push or pop a
-        // new one. Maybe we should have a different function which clears the
-        // whole stack?
     },
 
     onMouseDown: function(evt) {

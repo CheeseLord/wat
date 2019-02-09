@@ -41,12 +41,12 @@ function deselectPlayer() {
 function doTopLevelActionMenu(player) {
     Crafty.log("Creating top-level action menu");
     globalState = StateEnum.PLAYER_SELECTED;
-    Crafty.s("ButtonMenu").pushMenu("Select Action", [
+    Crafty.s("ButtonMenu").setTopLevelMenu("Select Action", [
         ["Move", () => doMoveMenu(player)],
         ["Swap places", () => doSwapPlacesMenu(player)],
         ["Attack", () => doAttackMenu(player)],
         ["Cancel", () => {
-            Crafty.s("ButtonMenu").popMenu();
+            Crafty.s("ButtonMenu").clearMenu();
             globalState = StateEnum.DEFAULT;
             deselectPlayer();
         }],
@@ -107,7 +107,7 @@ function doAttackMenu(player) {
         ["Attack", () => doRegularAttackMenu(player)],
         ["Special Attack", () => {
             specialAttack(player);
-            Crafty.s("ButtonMenu").clearButtons();
+            Crafty.s("ButtonMenu").clearMenu();
             globalState = StateEnum.DEFAULT;
             deselectPlayer();
         }],
@@ -376,7 +376,7 @@ export let Game = {
                         } else {
                             // Swap positions of clickedPlayer and
                             // selectedPlayer.
-                            Crafty.s("ButtonMenu").clearButtons();
+                            Crafty.s("ButtonMenu").clearMenu();
                             globalState = StateEnum.DEFAULT;
 
                             let selectPos = selectedPlayer.getPos();
@@ -403,7 +403,7 @@ export let Game = {
                             (globalState === StateEnum.PLAYER_MOVE ||
                             globalState === StateEnum.PLAYER_SELECTED)) {
                         if (e.target && e.target.has("MovementSquare")) {
-                            Crafty.s("ButtonMenu").clearButtons();
+                            Crafty.s("ButtonMenu").clearMenu();
                             globalState = StateEnum.DEFAULT;
                             selectedPlayer.animateTo({x: x, y: y});
                             selectedPlayer.one("TweenEnd", function() {
@@ -425,7 +425,7 @@ export let Game = {
                                 }
                             }
                             e.target.destroy();
-                            Crafty.s("ButtonMenu").clearButtons();
+                            Crafty.s("ButtonMenu").clearMenu();
                             globalState = StateEnum.DEFAULT;
                             deselectPlayer();
                         }
