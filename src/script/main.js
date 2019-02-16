@@ -352,16 +352,20 @@ function doAttack(evt, x, y) {
         return;
     }
 
+    var targetWasEnemy = false;
     for (var i = 0; i < enemies.length; i++) {
         if (evt.target === enemies[i]) {
             enemies.splice(i, 1);
+            evt.target.destroy();
+            targetWasEnemy = true;
             break;
         }
     }
-    // assert(we actually found it in the enemies list);
-    // TODO - In fact, the above may not be true. Right now you can attack
-    // MovementSquares. :/
-    evt.target.destroy();
+    if (!targetWasEnemy) {
+        reportUserError("Can't attack non-enemy.");
+        return;
+    }
+
     Crafty.s("ButtonMenu").clearMenu();
     globalState = StateEnum.DEFAULT;
     deselectPlayer();
