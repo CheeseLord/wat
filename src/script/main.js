@@ -62,6 +62,7 @@ function characterActed(character) {
 
     // If no characters are ready, start the next turn.
     if (readyCharacters.length === 0) {
+        Crafty.log("Reached end of round.");
         Crafty("PlayerControllable").each(function() {
             readyCharacters.push(this);
         });
@@ -285,7 +286,7 @@ function doSelectPlayer(evt, x, y) {
 
     if (evt.target && evt.target.has("PlayerControllable")) {
         if (readyCharacters.indexOf(evt.target) === -1) {
-            Crafty.log("Character has already acted");
+            reportUserError("Character has already acted");
             return;
         }
         doTopLevelActionMenu(evt.target);
