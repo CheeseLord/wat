@@ -206,7 +206,7 @@ Crafty.c("MovementSquare", {
     required: "GridObject, Mouse",
 
     init: function() {
-        this.color("#00FFFF", 0.5);
+        this.color("#555555", 0.5);
     },
 });
 
@@ -445,11 +445,25 @@ export let Game = {
                         highlightedColor: "#00bf00",
                     });
         Crafty.e("PlayerControllable")
-                .setPos({x: 6, y: 3})
+                .setPos({x: 7, y: 3})
                 .setColors(
                     {
                         defaultColor:     "#000070",
                         highlightedColor: "#0000bf",
+                    });
+        Crafty.e("PlayerControllable")
+                .setPos({x: 7, y: 5})
+                .setColors(
+                    {
+                        defaultColor:     "#007070",
+                        highlightedColor: "#00bfbf",
+                    });
+        Crafty.e("PlayerControllable")
+                .setPos({x: 5, y: 5})
+                .setColors(
+                    {
+                        defaultColor:     "#700070",
+                        highlightedColor: "#bf00bf",
                     });
 
         Crafty.createLayer("UILayer", "DOM", {
