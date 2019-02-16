@@ -66,8 +66,6 @@ function characterActed(character) {
             readyCharacters.push(this);
         });
     }
-    // FIXME: Remove this.
-    Crafty.error(readyCharacters);
 }
 
 
@@ -286,6 +284,10 @@ function doSelectPlayer(evt, x, y) {
     //        globalState === StateEnum.PLAYER_SELECTED);
 
     if (evt.target && evt.target.has("PlayerControllable")) {
+        if (readyCharacters.indexOf(evt.target) === -1) {
+            Crafty.log("Character has already acted");
+            return;
+        }
         doTopLevelActionMenu(evt.target);
         selectPlayer(evt.target);
     }
