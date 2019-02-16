@@ -15,6 +15,7 @@ var StateEnum = Object.freeze({
 });
 
 var globalState = StateEnum.DEFAULT;
+var readyCharacters = [];
 var selectedPlayer;
 var enemies;
 
@@ -45,6 +46,30 @@ function deselectPlayer() {
         selectedPlayer = null;
     }
 }
+
+function characterActed(character) {
+    deselectPlayer();
+
+    // The character is no longer ready.
+    let index = readyCharacters.indexOf(character);
+    if (index === -1) {
+        // TODO: We should never get here, but handle it better anyway.
+        return;
+    } else {
+        readyCharacters.splice(index, 1);
+    }
+
+
+    // If no characters are ready, start the next turn.
+    if (readyCharacters.length === 0) {
+        Crafty("PlayerControllable").each(function() {
+            readyCharacters.push(this);
+        });
+    }
+    // FIXME: Remove this.
+    Crafty.error(readyCharacters);
+}
+
 
 // Note: player here is really the player _character_.
 function doTopLevelActionMenu(player) {
@@ -118,7 +143,7 @@ function doAttackMenu(player) {
             specialAttack(player);
             Crafty.s("ButtonMenu").clearMenu();
             globalState = StateEnum.DEFAULT;
-            deselectPlayer();
+            characterActed(player);
         }],
         ["Back", () => Crafty.s("ButtonMenu").popMenu()],
     ]);
@@ -300,7 +325,9 @@ function doMove(evt, x, y) {
     globalState = StateEnum.DEFAULT;
     removeMovementSquares();
     selectedPlayer.animateTo({x: x, y: y});
-    selectedPlayer.one("TweenEnd", function() { deselectPlayer(); });
+    selectedPlayer.one("TweenEnd", function() {
+        characterActed(selectedPlayer);
+    });
 }
 
 function doSwap(evt, x, y) {
@@ -330,7 +357,9 @@ function doSwap(evt, x, y) {
     let clickPos  = evt.target.getPos();
     evt.target.animateTo(selectPos);
     selectedPlayer.animateTo(clickPos);
-    selectedPlayer.one("TweenEnd", function() { deselectPlayer(); });
+    selectedPlayer.one("TweenEnd", function() {
+        characterActed(selectedPlayer);
+    });
 }
 
 function doAttack(evt, x, y) {
@@ -368,7 +397,7 @@ function doAttack(evt, x, y) {
 
     Crafty.s("ButtonMenu").clearMenu();
     globalState = StateEnum.DEFAULT;
-    deselectPlayer();
+    characterActed(selectedPlayer);
 }
 
 
@@ -469,6 +498,10 @@ export let Game = {
                         defaultColor:     "#700070",
                         highlightedColor: "#bf00bf",
                     });
+
+        Crafty("PlayerControllable").each(function() {
+            readyCharacters.push(this);
+        });
 
         Crafty.createLayer("UILayer", "DOM", {
             // Ignore viewscreen transforms
