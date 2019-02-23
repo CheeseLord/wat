@@ -72,33 +72,6 @@ function characterActed(character) {
     }
 }
 
-
-// Note: player here is really the player _character_.
-// FIXME: Just until I merge.
-/* eslint-disable-next-line no-unused-vars */
-function doTopLevelActionMenu(player) {
-    Crafty.log("Creating top-level action menu");
-    globalState = StateEnum.PLAYER_SELECTED;
-    Crafty.s("ButtonMenu").setTopLevelMenu("Select Action", [
-        ["Move", () => doMoveMenu(player)],
-        ["Swap places", () => doSwapPlacesMenu(player)],
-        ["Attack", () => doAttackMenu(player)],
-        ["Cancel", () => {
-            Crafty.s("ButtonMenu").clearMenu();
-            globalState = StateEnum.DEFAULT;
-            deselectPlayer();
-        }],
-    ]);
-}
-
-function doMoveMenu(player) {
-    globalState = StateEnum.PLAYER_MOVE;
-    createMovementGrid(player);
-    Crafty.s("ButtonMenu").pushMenu("Moving", [
-        ["Back", () => Crafty.s("ButtonMenu").popMenu()],
-    ]);
-}
-
 function createMovementSquare(x, y) {
     var occupied = false;
     Crafty("SpaceFillingObject").each(function() {
@@ -131,34 +104,6 @@ function createMovementGrid(player) {
         createMovementSquare(x, y - i);
     }
 };
-
-function doSwapPlacesMenu(player) {
-    globalState = StateEnum.PLAYER_SWAP;
-    Crafty.s("ButtonMenu").pushMenu("Swap Places", [
-        ["Back", () => Crafty.s("ButtonMenu").popMenu()],
-    ]);
-}
-
-function doAttackMenu(player) {
-    globalState = StateEnum.PLAYER_ATTACK;
-    Crafty.s("ButtonMenu").pushMenu("Attack", [
-        ["Attack", () => doRegularAttackMenu(player)],
-        ["Special Attack", () => {
-            specialAttack(player);
-            Crafty.s("ButtonMenu").clearMenu();
-            globalState = StateEnum.DEFAULT;
-            characterActed(player);
-        }],
-        ["Back", () => Crafty.s("ButtonMenu").popMenu()],
-    ]);
-}
-
-function doRegularAttackMenu(player) {
-    globalState = StateEnum.PLAYER_ATTACK;
-    Crafty.s("ButtonMenu").pushMenu("Regular Attack", [
-        ["Back", () => Crafty.s("ButtonMenu").popMenu()],
-    ]);
-}
 
 function isAdjacent(object1, object2) {
     return (Math.abs(object1.getPos().x - object2.getPos().x) <= 1 &&
@@ -294,7 +239,6 @@ function doSelectPlayer(evt, x, y) {
             reportUserError("Character has already acted");
             return;
         }
-        // doTopLevelActionMenu(evt.target);
         selectPlayer(evt.target);
         doMenu("topMenu");
     }
