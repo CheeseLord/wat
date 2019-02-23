@@ -2,45 +2,47 @@
 
 "use strict";
 import "./button.js";
+import {worldClickHandler} from "./action.js";
 
 // Based on one of the comments on:
 //     https://stackoverflow.com/a/5040502
 // Always use === for checking equality, otherwise always true
-var StateEnum = Object.freeze({
+export var StateEnum = Object.freeze({
     DEFAULT:         {},
     PLAYER_SELECTED: {},
     PLAYER_MOVE:     {},
     PLAYER_SWAP:     {},
     PLAYER_ATTACK:   {},
 });
+export var globalState = StateEnum.DEFAULT;
+export function changeGlobalState(newState) { globalState = newState; }
 
-var globalState = StateEnum.DEFAULT;
-var readyCharacters = [];
-var selectedPlayer;
-var enemies;
+export var readyCharacters = [];
+export var selectedPlayer;
+export var enemies;
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Menu-related functions (and some misc?)
 
-function reportUserError(text) {
+export function reportUserError(text) {
     // TODO: Put this somewhere the user will actually see it.
     Crafty.error(text);
 }
 
-function selectPlayer(player) {
+export function selectPlayer(player) {
     deselectPlayer();
     selectedPlayer = player;
     selectedPlayer.highlight();
 }
 
-function removeMovementSquares() {
+export function removeMovementSquares() {
     Crafty("MovementSquare").each(function() {
         this.destroy();
     });
 }
 
-function deselectPlayer() {
+export function deselectPlayer() {
     if (selectedPlayer && selectedPlayer.isHighlighted()) {
         selectedPlayer.unhighlight();
         selectedPlayer = null;
@@ -50,7 +52,7 @@ function deselectPlayer() {
     }
 }
 
-function characterActed(character) {
+export function characterActed(character) {
     deselectPlayer();
 
     // The character is no longer ready.
@@ -228,133 +230,6 @@ Crafty.c("PlayerControllable", {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Action handlers
-
-function doSelectPlayer(evt, x, y) {
-    // assert(globalState === StateEnum.DEFAULT ||
-    //        globalState === StateEnum.PLAYER_SELECTED);
-
-    if (evt.target && evt.target.has("PlayerControllable")) {
-        if (readyCharacters.indexOf(evt.target) === -1) {
-            reportUserError("Character has already acted");
-            return;
-        }
-        selectPlayer(evt.target);
-        doMenu("topMenu");
-    }
-}
-
-// Automagically choose the right action for the player to do (corresponds to
-// state "PLAYER_SELECTED").
-function doAutoPlayerAction(evt, x, y) {
-    // assert(globalState === StateEnum.PLAYER_SELECTED);
-    if (evt.target && evt.target.has("PlayerControllable")) {
-        doSelectPlayer(evt, x, y);
-    } else {
-        doMove(evt, x, y);
-    }
-}
-
-function doMove(evt, x, y) {
-    // assert(globalState === StateEnum.PLAYER_MOVE ||
-    //        globalState === StateEnum.PLAYER_SELECTED);
-    if (!selectedPlayer) {
-        // assert(false); -- Don't think this can happen?
-        Crafty.error("No player selected.");
-        return;
-    }
-
-    // TODO: MovementSquares shouldn't be SpaceFillingObjects.
-    if (evt.target && evt.target.has("SpaceFillingObject") &&
-            !evt.target.has("MovementSquare")) {
-        reportUserError("Can't move there; something's in the way.");
-        return;
-    } else if (!(evt.target && evt.target.has("MovementSquare"))) {
-        reportUserError("Invalid destination (out of range?).");
-        return;
-    }
-
-    Crafty.s("ButtonMenu").clearMenu();
-    globalState = StateEnum.DEFAULT;
-    removeMovementSquares();
-    selectedPlayer.animateTo({x: x, y: y});
-    selectedPlayer.one("TweenEnd", function() {
-        characterActed(selectedPlayer);
-    });
-}
-
-function doSwap(evt, x, y) {
-    // assert(globalState === StateEnum.PLAYER_SWAP);
-    if (!selectedPlayer) {
-        // assert(false); -- Don't think this can happen?
-        Crafty.error("No player selected.");
-        return;
-    }
-
-    if (evt.target === null) {
-        reportUserError("There's nothing there to swap with.");
-        return;
-    } else if (!evt.target.has("PlayerControllable")) {
-        reportUserError("Can't swap with non-player.");
-        return;
-    } if (evt.target === selectedPlayer) {
-        reportUserError("Cannot swap player with self.");
-        return;
-    }
-
-    // Swap positions of clicked player and selectedPlayer.
-    Crafty.s("ButtonMenu").clearMenu();
-    globalState = StateEnum.DEFAULT;
-
-    let selectPos = selectedPlayer.getPos();
-    let clickPos  = evt.target.getPos();
-    evt.target.animateTo(selectPos);
-    selectedPlayer.animateTo(clickPos);
-    selectedPlayer.one("TweenEnd", function() {
-        characterActed(selectedPlayer);
-    });
-}
-
-function doAttack(evt, x, y) {
-    // assert(globalState === StateEnum.PLAYER_ATTACK);
-    if (!selectedPlayer) {
-        // assert(false); -- Don't think this can happen?
-        return;
-    }
-
-    if (evt.target === null) {
-        reportUserError("No enemy there.");
-        return;
-    } else if (Math.abs(selectedPlayer.getPos().x - x) > 1 ||
-            Math.abs(selectedPlayer.getPos().y - y) > 1) {
-        reportUserError("Target not adjacent.");
-        return;
-    } else if (evt.target.has("PlayerControllable")) {
-        reportUserError("Can't attack friendly unit.");
-        return;
-    }
-
-    var targetWasEnemy = false;
-    for (var i = 0; i < enemies.length; i++) {
-        if (evt.target === enemies[i]) {
-            enemies.splice(i, 1);
-            evt.target.destroy();
-            targetWasEnemy = true;
-            break;
-        }
-    }
-    if (!targetWasEnemy) {
-        reportUserError("Can't attack non-enemy.");
-        return;
-    }
-
-    Crafty.s("ButtonMenu").clearMenu();
-    globalState = StateEnum.DEFAULT;
-    characterActed(selectedPlayer);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Menu table handling
 
 var CLEAR_MENU  = {};
@@ -420,7 +295,7 @@ var menuTable = {
     },
 };
 
-function doMenu(menuName) {
+export function doMenu(menuName) {
     transitionToMenu(menuName, /* isTop = */true);
 }
 
@@ -610,51 +485,6 @@ export let Game = {
                 .attr({x: 0, y: 0, w: 120, h: Game.height()})
                 .color("#eee");
 
-        // Convert regular mouse events to WorldClick events, so we can handle
-        // that case without doing weird things when the player clicks on the
-        // UI pane.
-        Crafty.s("Mouse").bind("MouseUp", function(e) {
-            // HACK: I can get the world position using [e.realX, e.realY], but
-            // I can't find a way to get the screen position directly. So
-            // manually do the viewport calculation to transform it.
-            let worldX = e.realX;
-            let viewRect = Crafty.viewport.rect();
-            let screenX = (worldX - viewRect._x) * Game.width() / viewRect._w;
-
-            // TODO: Magic numbers bad
-            // 120 is the width of the UI pane.
-            if (screenX >= 120) {
-                Crafty.trigger("WorldClick", e);
-            }
-        });
-
-        ///////////////////////////////////////////////////////////////////////
-
-        // Generic handler for clicks on the world view.
-        Crafty.bind("WorldClick", function(evt) {
-            let x = Math.floor(evt.realX / Game.mapGrid.tile.width);
-            let y = Math.floor(evt.realY / Game.mapGrid.tile.height);
-            if (evt.mouseButton === Crafty.mouseButtons.LEFT) {
-                Crafty.log(`You clicked at: (${x}, ${y})`);
-                if (globalState === StateEnum.DEFAULT) {
-                    doSelectPlayer(evt, x, y);
-                } else if (globalState === StateEnum.PLAYER_SELECTED) {
-                    doAutoPlayerAction(evt, x, y);
-                } else if (globalState === StateEnum.PLAYER_MOVE) {
-                    doMove(evt, x, y);
-                } else if (globalState === StateEnum.PLAYER_SWAP) {
-                    doSwap(evt, x, y);
-                } else if (globalState === StateEnum.PLAYER_ATTACK) {
-                    doAttack(evt, x, y);
-                } else {
-                    Crafty.error("Unknown state value.");
-                    // assert(false);
-                }
-            } else if (evt.mouseButton === Crafty.mouseButtons.RIGHT) {
-                Crafty.log("AAAAAAAAAA");
-            }
-        });
-
         // Animate centering the viewport over the player, taking 1500ms to do
         // it. Then, once the animation is done, set the viewport to follow the
         // player (with offset (0, 0)).
@@ -668,5 +498,8 @@ export let Game = {
         // offset, so there isn't a sudden jump. The library implementation is
         // Crafty/viewport.js#L324-L335.
         Crafty.viewport.centerOn(player1, 1500);
+        Crafty.bind("WorldClick", function(evt) {
+            worldClickHandler(evt);
+        });
     },
 };
