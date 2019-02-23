@@ -46,13 +46,6 @@ rules:
       - error
       - never
       - exceptRange: true
-    no-multi-spaces:
-      - error
-      - exceptions:
-          # Using https://eslint.org/parser/
-          VariableDeclarator: true
-          AssignmentExpression: true
-          BlockStatement: true
     spaced-comment:
       - error
       - always
@@ -62,3 +55,10 @@ rules:
     max-len:
       - error
       - code: 79
+    no-multi-spaces:
+      - off
+      - exceptions:
+          # Using https://eslint.org/parser/
+          VariableDeclarator: true
+          AssignmentExpression: true
+          BlockStatement: true
