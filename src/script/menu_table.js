@@ -1,5 +1,4 @@
 // TODO get this working and linting if we're actually going to use it.
-/* eslint no-multi-spaces: 0 */
 /* eslint no-undef: 0 */
 /* eslint no-unused-vars: 0 */
 
@@ -14,45 +13,13 @@ var menuTable = {
     topMenu: {
         title:   "Select Action",
         state:   StateEnum.PLAYER_SELECTED,
-
-        // --- Alternate, much more verbose version ---
-        // buttons: [
-        //     {
-        //         text:    "Move",
-        //         newMenu: "move",
-        //         action:  doNothing,
-        //     },
-        //     {
-        //         text:    "Swap places",
-        //         newMenu: "swapPlaces",
-        //         action:  doNothing,
-        //     },
-        //     {
-        //         text:    "Attack",
-        //         newMenu: "attack",
-        //         action:  doNothing,
-        //     },
-        //     {
-        //         text:    "Cancel",
-        //         newMenu: CLEAR_MENU,
-        //         action:  () => { deselectPlayer(); },
-        //     },
-        // ],
-
         buttons: [
+            // Text         New Menu      Action
             ["Move",        "move",       doNothing],
             ["Swap places", "swapPlaces", doNothing],
             ["Attack",      "attack",     doNothing],
             ["Cancel",      CLEAR_MENU,   () => { deselectPlayer(); }],
         ],
-
-        // --- Or, for those of you who religiously oppose aligning ---
-        // buttons: [
-        //     ["Move", "move", doNothing],
-        //     ["Swap places", "swapPlaces", doNothing],
-        //     ["Attack", "attack", doNothing],
-        //     ["Cancel", CLEAR_MENU, () => { deselectPlayer(); }],
-        // ],
     },
 
     move: {
@@ -61,6 +28,7 @@ var menuTable = {
         onEntry: () => { createMovementGrid(selectedPlayer); },
         onExit:  () => { removeMovementSquares(); },
         buttons: [
+            // Text  New Menu     Action
             ["Back", PARENT_MENU, doNothing],
         ],
     },
@@ -69,6 +37,7 @@ var menuTable = {
         title:   "Swap Places",
         state:   StateEnum.PLAYER_SWAP,
         buttons: [
+            // Text  New Menu     Action
             ["Back", PARENT_MENU, doNothing],
         ],
     },
@@ -77,6 +46,7 @@ var menuTable = {
         title:   "Attack",
         state:   StateEnum.PLAYER_ATTACK,
         buttons: [
+            // Text            New Menu       Action
             ["Basic Attack",   "basicAttack", doNothing],
             ["Special Attack", CLEAR_MENU,
                 () => {
@@ -91,7 +61,8 @@ var menuTable = {
         title:   "Basic Attack",
         state:   StateEnum.PLAYER_ATTACK,
         buttons: [
-            ["Back",           PARENT_MENU,   doNothing],
+            // Text  New Menu     Action
+            ["Back", PARENT_MENU, doNothing],
         ],
     },
 };
