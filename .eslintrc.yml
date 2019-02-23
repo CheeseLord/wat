@@ -57,3 +57,8 @@ rules:
       - code: 79
     no-multi-spaces:
       - off
+      - exceptions:
+          # Using https://eslint.org/parser/
+          VariableDeclarator: true
+          AssignmentExpression: true
+          BlockStatement: true
