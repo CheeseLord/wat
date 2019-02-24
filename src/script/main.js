@@ -498,6 +498,25 @@ export let Game = {
         // offset, so there isn't a sudden jump. The library implementation is
         // Crafty/viewport.js#L324-L335.
         Crafty.viewport.centerOn(player1, 1500);
+
+        // Convert regular mouse events to WorldClick events, so we can handle
+        // that case without doing weird things when the player clicks on the
+        // UI pane.
+        Crafty.s("Mouse").bind("MouseUp", function(e) {
+            // HACK: I can get the world position using [e.realX, e.realY], but
+            // I can't find a way to get the screen position directly. So
+            // manually do the viewport calculation to transform it.
+            let worldX = e.realX;
+            let viewRect = Crafty.viewport.rect();
+            let screenX = (worldX - viewRect._x) * Game.width() / viewRect._w;
+
+            // TODO: Magic numbers bad
+            // 120 is the width of the UI pane.
+            if (screenX >= 120) {
+                Crafty.trigger("WorldClick", e);
+            }
+        });
+
         Crafty.bind("WorldClick", function(evt) {
             worldClickHandler(evt);
         });
