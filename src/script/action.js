@@ -15,6 +15,14 @@ import {
 
 export var selectedPlayer;
 
+Crafty.c("MovementSquare", {
+    required: "GridObject, Mouse",
+
+    init: function() {
+        this.color("#555555", 0.5);
+    },
+});
+
 ///////////////////////////////////////////////////////////////////////////////
 // Action handlers
 
