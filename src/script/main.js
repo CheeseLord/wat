@@ -18,7 +18,6 @@ export function getGlobalState() { return globalState; }
 export function setGlobalState(newState) { globalState = newState; }
 
 export var readyCharacters = [];
-export var selectedPlayer;
 export var enemies;
 
 
