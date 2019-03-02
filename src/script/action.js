@@ -3,7 +3,7 @@
 "use strict";
 
 import {StateEnum} from "./consts.js";
-import {doMenu} from  "./ui.js";
+import {doMenu} from "./ui.js";
 
 import {
     Game,
@@ -11,7 +11,7 @@ import {
     enemies,
     getGlobalState,
     setGlobalState,
-} from  "./main.js";
+} from "./main.js";
 
 export var selectedPlayer;
 

@@ -1,7 +1,11 @@
 /* global Crafty */
 
 "use strict";
-import {StateEnum} from "./consts.js";
+
+import {
+    MENU_WIDTH,
+    StateEnum,
+} from "./consts.js";
 import "./button.js";
 import {worldClickHandler} from "./action.js";
 
@@ -238,11 +242,8 @@ export let Game = {
         });
 
         // Background for the buttons
-        // TODO: Magic numbers bad
-        // 120 is slightly more than the width of a button
-        // ...or, button width is 120 minus half the padding.
         Crafty.e("2D, UILayer, Color, Mouse")
-                .attr({x: 0, y: 0, w: 120, h: Game.height()})
+                .attr({x: 0, y: 0, w: MENU_WIDTH, h: Game.height()})
                 .color("#eee");
 
         // Animate centering the viewport over the player, taking 1500ms to do
@@ -250,9 +251,7 @@ export let Game = {
         // player (with offset (0, 0)).
         Crafty.viewport.clampToEntities = false;
         Crafty.one("CameraAnimationDone", function() {
-            // TODO magic numbers bad
-            // 50 is half the width of the side pane
-            Crafty.viewport.follow(player1, 60, 0);
+            Crafty.viewport.follow(player1, MENU_WIDTH / 2, 0);
         });
         // TODO: We need our own function for this that adds in the right
         // offset, so there isn't a sudden jump. The library implementation is
@@ -270,9 +269,7 @@ export let Game = {
             let viewRect = Crafty.viewport.rect();
             let screenX = (worldX - viewRect._x) * Game.width() / viewRect._w;
 
-            // TODO: Magic numbers bad
-            // 120 is the width of the UI pane.
-            if (screenX >= 120) {
+            if (screenX >= MENU_WIDTH) {
                 Crafty.trigger("WorldClick", e);
             }
         });

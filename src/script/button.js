@@ -2,13 +2,16 @@
 
 "use strict";
 
+import {MENU_WIDTH} from "./consts.js";
+
 // Size parameters for autopositioning buttons.
 // TODO: Make these configurable somehow?
+// TODO: ...or maybe at least move the rest of them to consts.js? Not sure if
+// they belong there, though... no other module cares about them.
 
 // Position and size of the menu itself.
 const MENU_X = 0;
 const MENU_Y = 0;
-const MENU_WIDTH = 120;
 // MENU_HEIGHT not used. TODO what if the buttons go past the bottom?
 
 // Amount of space reserved between the outside of the menu and the buttons.
