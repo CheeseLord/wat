@@ -5,14 +5,17 @@
 import {StateEnum} from "./consts.js";
 
 import {
+    setGlobalState,
+} from  "./main.js";
+
+import {
     characterActed,
+    selectedPlayer,
     createMovementGrid,
     deselectPlayer,
     removeMovementSquares,
-    selectedPlayer,
-    setGlobalState,
     specialAttack,
-} from  "./main.js";
+} from  "./action.js";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Menu table handling
