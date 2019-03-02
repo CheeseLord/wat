@@ -15,7 +15,7 @@ export const StateEnum = Object.freeze({
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Game object definition
-export let MapGrid = {
+export const MapGrid = {
     width:  25,
     height: 17,
     tile:   {
@@ -24,7 +24,7 @@ export let MapGrid = {
     },
 };
 
-export let Game = {
+export const Game = {
     width:  MapGrid.width * MapGrid.tile.width,
     height: MapGrid.height * MapGrid.tile.height,
 };
