@@ -2,13 +2,14 @@
 
 "use strict";
 
+import {StateEnum} from "./consts.js";
+import {doMenu} from  "./ui.js";
+
 import {
     Game,
     characterActed,
     globalState,
-    StateEnum,
     selectPlayer,
-    doMenu,
     selectedPlayer,
     enemies,
     reportUserError,
