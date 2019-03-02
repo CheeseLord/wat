@@ -2,17 +2,20 @@
 
 "use strict";
 
-import {StateEnum} from "./consts.js";
+import {StateEnum, MapGrid} from "./consts.js";
 import {doMenu} from "./ui.js";
 
-import {
-    Game,
-    readyCharacters,
-    getGlobalState,
-    setGlobalState,
-} from "./main.js";
-
 export var selectedPlayer;
+
+// In JavaScript, if you import a variable and then assign a new value to it,
+// other modules don't see the new value. Therefore, instead of allowing other
+// modules import globalState directly, have them access it through
+// {get,set}GlobalState.
+var globalState = StateEnum.DEFAULT;
+export function getGlobalState() { return globalState; }
+export function setGlobalState(newState) { globalState = newState; }
+
+export var readyCharacters = [];
 
 Crafty.c("MovementSquare", {
     required: "GridObject, Mouse",
@@ -92,7 +95,7 @@ function doSwap(evt, x, y) {
     } else if (!evt.target.has("PlayerControllable")) {
         reportUserError("Can't swap with non-player.");
         return;
-    } if (evt.target === selectedPlayer) {
+    } else if (evt.target === selectedPlayer) {
         reportUserError("Cannot swap player with self.");
         return;
     }
@@ -115,9 +118,7 @@ function doAttack(evt, x, y) {
     if (!selectedPlayer) {
         // assert(false); -- Don't think this can happen?
         return;
-    }
-
-    if (evt.target === null) {
+    } else if (evt.target === null) {
         reportUserError("No enemy there.");
         return;
     } else if (Math.abs(selectedPlayer.getPos().x - x) > 1 ||
@@ -127,9 +128,7 @@ function doAttack(evt, x, y) {
     } else if (evt.target.has("PlayerControllable")) {
         reportUserError("Can't attack friendly unit.");
         return;
-    }
-
-    if (!evt.target.has("Enemy")) {
+    } else if (!evt.target.has("Enemy")) {
         reportUserError("Can't attack non-enemy.");
         return;
     }
@@ -144,8 +143,8 @@ function doAttack(evt, x, y) {
 
 // Generic handler for clicks on the world view.
 export function worldClickHandler(evt) {
-    let x = Math.floor(evt.realX / Game.mapGrid.tile.width);
-    let y = Math.floor(evt.realY / Game.mapGrid.tile.height);
+    let x = Math.floor(evt.realX / MapGrid.tile.width);
+    let y = Math.floor(evt.realY / MapGrid.tile.height);
     if (evt.mouseButton === Crafty.mouseButtons.LEFT) {
         Crafty.log(`You clicked at: (${x}, ${y})`);
         if (getGlobalState() === StateEnum.DEFAULT) {

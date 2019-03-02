@@ -12,3 +12,19 @@ export const StateEnum = Object.freeze({
     PLAYER_SWAP:     {},
     PLAYER_ATTACK:   {},
 });
+
+///////////////////////////////////////////////////////////////////////////////
+// Main Game object definition
+export let MapGrid = {
+    width:  25,
+    height: 17,
+    tile:   {
+        width:  16,
+        height: 16,
+    },
+};
+
+export let Game = {
+    width:  MapGrid.width * MapGrid.tile.width,
+    height: MapGrid.height * MapGrid.tile.height,
+};

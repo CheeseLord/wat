@@ -5,12 +5,9 @@
 import {StateEnum} from "./consts.js";
 
 import {
-    setGlobalState,
-} from  "./main.js";
-
-import {
-    characterActed,
     selectedPlayer,
+    characterActed,
+    setGlobalState,
     createMovementGrid,
     deselectPlayer,
     removeMovementSquares,

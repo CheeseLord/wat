@@ -2,7 +2,7 @@
 
 "use strict";
 
-import {Game} from  "./main.js";
+import {MapGrid} from  "./consts.js";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Component definitions
@@ -13,7 +13,7 @@ Crafty.c("GridObject", {
     required: "SpaceFillingObject, 2D, DOM, Color, Tween, Mouse",
 
     init: function() {
-        this.attr({w: Game.mapGrid.tile.width, h: Game.mapGrid.tile.height});
+        this.attr({w: MapGrid.tile.width, h: MapGrid.tile.height});
         // Put us at (0, 0) by default just to ensure that _tileX and _tileY
         // are not undefined. Hopefully the caller will immediately move us to
         // a real position.
@@ -29,8 +29,8 @@ Crafty.c("GridObject", {
         this.attr({
             _tileX: newPos.x,
             _tileY: newPos.y,
-            x:      newPos.x * Game.mapGrid.tile.width,
-            y:      newPos.y * Game.mapGrid.tile.height,
+            x:      newPos.x * MapGrid.tile.width,
+            y:      newPos.y * MapGrid.tile.height,
         });
         // So that "setter" attributes can be chained together.
         return this;
@@ -52,8 +52,8 @@ Crafty.c("GridObject", {
             _tileY: newPos.y,
         });
         this.tween({
-            x: newPos.x * Game.mapGrid.tile.width,
-            y: newPos.y * Game.mapGrid.tile.height,
+            x: newPos.x * MapGrid.tile.width,
+            y: newPos.y * MapGrid.tile.height,
         }, 200);
         // So that "setter" attributes can be chained together.
         return this;
