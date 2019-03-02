@@ -5,12 +5,12 @@
 import {StateEnum} from "./consts.js";
 
 import {
-    changeGlobalState,
     characterActed,
     createMovementGrid,
     deselectPlayer,
     removeMovementSquares,
     selectedPlayer,
+    setGlobalState,
     specialAttack,
 } from  "./main.js";
 
@@ -117,7 +117,7 @@ function transitionToMenu(menuName, isTop) {
         onExit = doNothing;
     }
 
-    changeGlobalState(state);
+    setGlobalState(state);
 
     let buttonList = [];
     for (let i = 0; i < menuDesc["buttons"].length; i++) {

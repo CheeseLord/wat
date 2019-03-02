@@ -5,8 +5,13 @@ import {StateEnum} from "./consts.js";
 import "./button.js";
 import {worldClickHandler} from "./action.js";
 
-export var globalState = StateEnum.DEFAULT;
-export function changeGlobalState(newState) { globalState = newState; }
+// In JavaScript, if you import a variable and then assign a new value to it,
+// other modules don't see the new value. Therefore, instead of allowing other
+// modules import globalState directly, have them access it through
+// {get,set}GlobalState.
+var globalState = StateEnum.DEFAULT;
+export function getGlobalState() { return globalState; }
+export function setGlobalState(newState) { globalState = newState; }
 
 export var readyCharacters = [];
 export var selectedPlayer;

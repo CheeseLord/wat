@@ -8,14 +8,14 @@ import {doMenu} from  "./ui.js";
 import {
     Game,
     characterActed,
-    globalState,
+    getGlobalState,
     selectPlayer,
     selectedPlayer,
     enemies,
     reportUserError,
     readyCharacters,
     removeMovementSquares,
-    changeGlobalState,
+    setGlobalState,
 } from  "./main.js";
 
 
@@ -23,8 +23,8 @@ import {
 // Action handlers
 
 function doSelectPlayer(evt, x, y) {
-    // assert(globalState === StateEnum.DEFAULT ||
-    //        globalState === StateEnum.PLAYER_SELECTED);
+    // assert(getGlobalState() === StateEnum.DEFAULT ||
+    //        getGlobalState() === StateEnum.PLAYER_SELECTED);
 
     if (evt.target && evt.target.has("PlayerControllable")) {
         if (readyCharacters.indexOf(evt.target) === -1) {
@@ -39,7 +39,7 @@ function doSelectPlayer(evt, x, y) {
 // Automagically choose the right action for the player to do (corresponds to
 // state "PLAYER_SELECTED").
 function doAutoPlayerAction(evt, x, y) {
-    // assert(globalState === StateEnum.PLAYER_SELECTED);
+    // assert(getGlobalState() === StateEnum.PLAYER_SELECTED);
     if (evt.target && evt.target.has("PlayerControllable")) {
         doSelectPlayer(evt, x, y);
     } else {
@@ -48,8 +48,8 @@ function doAutoPlayerAction(evt, x, y) {
 }
 
 function doMove(evt, x, y) {
-    // assert(globalState === StateEnum.PLAYER_MOVE ||
-    //        globalState === StateEnum.PLAYER_SELECTED);
+    // assert(getGlobalState() === StateEnum.PLAYER_MOVE ||
+    //        getGlobalState() === StateEnum.PLAYER_SELECTED);
     if (!selectedPlayer) {
         // assert(false); -- Don't think this can happen?
         Crafty.error("No player selected.");
@@ -67,7 +67,7 @@ function doMove(evt, x, y) {
     }
 
     Crafty.s("ButtonMenu").clearMenu();
-    changeGlobalState(StateEnum.DEFAULT);
+    setGlobalState(StateEnum.DEFAULT);
     removeMovementSquares();
     selectedPlayer.animateTo({x: x, y: y});
     selectedPlayer.one("TweenEnd", function() {
@@ -76,7 +76,7 @@ function doMove(evt, x, y) {
 }
 
 function doSwap(evt, x, y) {
-    // assert(globalState === StateEnum.PLAYER_SWAP);
+    // assert(getGlobalState() === StateEnum.PLAYER_SWAP);
     if (!selectedPlayer) {
         // assert(false); -- Don't think this can happen?
         Crafty.error("No player selected.");
@@ -96,7 +96,7 @@ function doSwap(evt, x, y) {
 
     // Swap positions of clicked player and selectedPlayer.
     Crafty.s("ButtonMenu").clearMenu();
-    changeGlobalState(StateEnum.DEFAULT);
+    setGlobalState(StateEnum.DEFAULT);
 
     let selectPos = selectedPlayer.getPos();
     let clickPos  = evt.target.getPos();
@@ -108,7 +108,7 @@ function doSwap(evt, x, y) {
 }
 
 function doAttack(evt, x, y) {
-    // assert(globalState === StateEnum.PLAYER_ATTACK);
+    // assert(getGlobalState() === StateEnum.PLAYER_ATTACK);
     if (!selectedPlayer) {
         // assert(false); -- Don't think this can happen?
         return;
@@ -141,7 +141,7 @@ function doAttack(evt, x, y) {
     }
 
     Crafty.s("ButtonMenu").clearMenu();
-    changeGlobalState(StateEnum.DEFAULT);
+    setGlobalState(StateEnum.DEFAULT);
     characterActed(selectedPlayer);
 }
 
@@ -153,15 +153,15 @@ export function worldClickHandler(evt) {
     let y = Math.floor(evt.realY / Game.mapGrid.tile.height);
     if (evt.mouseButton === Crafty.mouseButtons.LEFT) {
         Crafty.log(`You clicked at: (${x}, ${y})`);
-        if (globalState === StateEnum.DEFAULT) {
+        if (getGlobalState() === StateEnum.DEFAULT) {
             doSelectPlayer(evt, x, y);
-        } else if (globalState === StateEnum.PLAYER_SELECTED) {
+        } else if (getGlobalState() === StateEnum.PLAYER_SELECTED) {
             doAutoPlayerAction(evt, x, y);
-        } else if (globalState === StateEnum.PLAYER_MOVE) {
+        } else if (getGlobalState() === StateEnum.PLAYER_MOVE) {
             doMove(evt, x, y);
-        } else if (globalState === StateEnum.PLAYER_SWAP) {
+        } else if (getGlobalState() === StateEnum.PLAYER_SWAP) {
             doSwap(evt, x, y);
-        } else if (globalState === StateEnum.PLAYER_ATTACK) {
+        } else if (getGlobalState() === StateEnum.PLAYER_ATTACK) {
             doAttack(evt, x, y);
         } else {
             Crafty.error("Unknown state value.");
