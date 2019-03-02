@@ -60,6 +60,14 @@ Crafty.c("GridObject", {
     },
 });
 
+Crafty.c("Enemy", {
+    required: "GridObject",
+
+    init: function() {
+        this.color("#7f0000");
+    },
+});
+
 Crafty.c("PlayerControllable", {
     required: "GridObject, Keyboard, Mouse",
 

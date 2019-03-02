@@ -8,7 +8,6 @@ import {doMenu} from "./ui.js";
 import {
     Game,
     readyCharacters,
-    enemies,
     getGlobalState,
     setGlobalState,
 } from "./main.js";
@@ -130,19 +129,11 @@ function doAttack(evt, x, y) {
         return;
     }
 
-    var targetWasEnemy = false;
-    for (var i = 0; i < enemies.length; i++) {
-        if (evt.target === enemies[i]) {
-            enemies.splice(i, 1);
-            evt.target.destroy();
-            targetWasEnemy = true;
-            break;
-        }
-    }
-    if (!targetWasEnemy) {
+    if (!evt.target.has("Enemy")) {
         reportUserError("Can't attack non-enemy.");
         return;
     }
+    evt.target.destroy();
 
     Crafty.s("ButtonMenu").clearMenu();
     setGlobalState(StateEnum.DEFAULT);
@@ -267,10 +258,9 @@ function isAdjacent(object1, object2) {
 }
 
 export function specialAttack(player) {
-    for (var i = enemies.length - 1; i >= 0; i--) {
-        if (isAdjacent(player, enemies[i])) {
-            enemies[i].destroy();
-            enemies.splice(i, 1);
+    Crafty("Enemy").each(function() {
+        if (isAdjacent(player, this)) {
+            this.destroy();
         }
-    }
+    });
 }
