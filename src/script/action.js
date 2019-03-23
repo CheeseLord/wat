@@ -207,15 +207,17 @@ export function characterActed(character) {
     } else {
         readyCharacters.splice(index, 1);
     }
-
-
-    // If no characters are ready, start the next turn.
     if (readyCharacters.length === 0) {
-        Crafty.log("Reached end of round.");
-        Crafty("PlayerControllable").each(function() {
-            readyCharacters.push(this);
-        });
+        endTurn();
     }
+}
+
+
+export function endTurn() {
+    Crafty.log("Reached end of round.");
+    Crafty("PlayerControllable").each(function() {
+        readyCharacters.push(this);
+    });
 }
 
 function createMovementSquare(x, y) {

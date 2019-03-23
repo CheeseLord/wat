@@ -12,6 +12,7 @@ import {
     deselectPlayer,
     removeMovementSquares,
     specialAttack,
+    endTurn,
 } from  "./action.js";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,6 +32,10 @@ var menuTable = {
             ["Move",        "move",       doNothing],
             ["Swap places", "swapPlaces", doNothing],
             ["Attack",      "attack",     doNothing],
+            ["End Turn",    CLEAR_MENU,   () => {
+                deselectPlayer();
+                endTurn();
+            }],
             ["Cancel",      CLEAR_MENU,   () => { deselectPlayer(); }],
         ],
     },
