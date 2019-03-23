@@ -219,6 +219,7 @@ export function characterActed(character) {
 
 export function endTurn() {
     Crafty.log(`Reached end of turn for team ${currentTeam}.`);
+    readyCharacters = [];
     currentTeam = (currentTeam + 1) % NUM_TEAMS;
     Crafty("PlayerControllable").each(function() {
         if (this.team === currentTeam) {
