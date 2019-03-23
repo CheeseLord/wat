@@ -77,7 +77,7 @@ function doMove(evt, x, y) {
         return;
     }
 
-    Crafty.s("ButtonMenu").clearMenu();
+    Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
     setGlobalState(StateEnum.DEFAULT);
     removeMovementSquares();
     selectedPlayer.animateTo({x: x, y: y});
@@ -109,7 +109,7 @@ function doSwap(evt, x, y) {
     }
 
     // Swap positions of clicked player and selectedPlayer.
-    Crafty.s("ButtonMenu").clearMenu();
+    Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
     setGlobalState(StateEnum.DEFAULT);
 
     let selectPos = selectedPlayer.getPos();
@@ -133,16 +133,17 @@ function doAttack(evt, x, y) {
             Math.abs(selectedPlayer.getPos().y - y) > 1) {
         reportUserError("Target not adjacent.");
         return;
-    } else if (evt.target.has("Character")) {
-        reportUserError("Can't attack friendly unit.");
-        return;
-    } else if (!evt.target.has("Enemy")) {
+    } else if (!evt.target.has("Character") && !evt.target.has("Enemy")) {
+        // TODO: Remove Enemy component.
         reportUserError("Can't attack non-enemy.");
+        return;
+    } else if (evt.target.team === currentTeam) {
+        reportUserError("Can't attack friendly unit.");
         return;
     }
     evt.target.destroy();
 
-    Crafty.s("ButtonMenu").clearMenu();
+    Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
     setGlobalState(StateEnum.DEFAULT);
     characterActed(selectedPlayer);
 }
@@ -270,8 +271,14 @@ function isAdjacent(object1, object2) {
 }
 
 export function specialAttack(player) {
+    // TODO: Remove Enemy component.
     Crafty("Enemy").each(function() {
         if (isAdjacent(player, this)) {
+            this.destroy();
+        }
+    });
+    Crafty("Character").each(function() {
+        if (this.team !== player.team && isAdjacent(player, this)) {
             this.destroy();
         }
     });
