@@ -149,6 +149,11 @@ function doAttack(evt, x, y) {
 
     Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
     setGlobalState(StateEnum.ANIMATING);
+    // Close over a copy of evt.target so we can destroy it at the end of the
+    // animation. Empirically if we simply close over evt, sometimes its
+    // .target gets set to null by the time we want to destroy it, which was
+    // causing the destroy() call to fail.
+    let target  = evt.target;
     let currPos = selectedPlayer.getPos();
     let halfPos = midpoint(currPos, evt.target.getPos());
     selectedPlayer.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
@@ -156,7 +161,7 @@ function doAttack(evt, x, y) {
         // TODO: Better way to chain these together?
         selectedPlayer.animateTo(currPos, ANIM_DUR_HALF_ATTACK);
         selectedPlayer.one("TweenEnd", function() {
-            evt.target.destroy();
+            target.destroy();
             setGlobalState(StateEnum.DEFAULT);
             characterActed(selectedPlayer);
         });
