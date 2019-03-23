@@ -9,8 +9,8 @@ import {
 import "./button.js";
 import "./world_component.js";
 import {
+    newTurn,
     worldClickHandler,
-    readyCharacters,
 } from "./action.js";
 
 
@@ -93,11 +93,8 @@ export function doTheThing() {
                     highlightedColor: "#bf00bf",
                 });
 
-    Crafty("Character").each(function() {
-        if (this.team === 0) {
-            readyCharacters.push(this);
-        }
-    });
+    newTurn(0);
+    // assert(readyCharacters.length > 0);
 
     Crafty.createLayer("UILayer", "DOM", {
         // Ignore viewscreen transforms

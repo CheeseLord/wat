@@ -222,10 +222,32 @@ export function characterActed(character) {
 
 export function endTurn() {
     Crafty.log(`Reached end of turn for team ${currentTeam}.`);
+    let team = currentTeam;
+    let maxTries = NUM_TEAMS;
+    // If the next team has no one on it to act, skip over them. Repeat until
+    // we find a team that has someone ready to act, or until we've tried all
+    // teams.
+    do {
+        team = (team + 1) % NUM_TEAMS;
+        newTurn(team);
+        maxTries--;
+    } while (readyCharacters.length === 0 && maxTries > 0);
+
+    if (readyCharacters.length === 0) {
+        // Eventually, this should probably be detected and result in something
+        // actually happening in-game. (Maybe a game-over screen since your
+        // whole team is dead?)
+        Crafty.error("There's no one left to act.");
+    }
+}
+
+export function newTurn(team) {
+    Crafty.log(`Starting turn for team ${team}.`);
+
+    currentTeam = team;
     readyCharacters = [];
-    currentTeam = (currentTeam + 1) % NUM_TEAMS;
     Crafty("Character").each(function() {
-        if (this.team === currentTeam) {
+        if (this.team === team) {
             readyCharacters.push(this);
         }
     });

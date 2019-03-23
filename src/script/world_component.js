@@ -60,6 +60,8 @@ Crafty.c("GridObject", {
     },
 });
 
+// Note: don't check for this directly. This is just a convenience alias for
+// Characters on an "other" team that don't move.
 Crafty.c("Enemy", {
     required: "Character",
 
