@@ -76,17 +76,18 @@ Crafty.c("Character", {
     required: "GridObject, Keyboard, Mouse",
 
     init: function() {
-        this.bind("KeyDown", function(e) {
-            if (e.key === Crafty.keys.LEFT_ARROW) {
-                this.moveBy({x: -1, y:  0});
-            } else if (e.key === Crafty.keys.RIGHT_ARROW) {
-                this.moveBy({x:  1, y:  0});
-            } else if (e.key === Crafty.keys.UP_ARROW) {
-                this.moveBy({x:  0, y: -1});
-            } else if (e.key === Crafty.keys.DOWN_ARROW) {
-                this.moveBy({x:  0, y:  1});
-            }
-        });
+        // Insert grumpy cat "no" image here.
+        // this.bind("KeyDown", function(e) {
+        //     if (e.key === Crafty.keys.LEFT_ARROW) {
+        //         this.moveBy({x: -1, y:  0});
+        //     } else if (e.key === Crafty.keys.RIGHT_ARROW) {
+        //         this.moveBy({x:  1, y:  0});
+        //     } else if (e.key === Crafty.keys.UP_ARROW) {
+        //         this.moveBy({x:  0, y: -1});
+        //     } else if (e.key === Crafty.keys.DOWN_ARROW) {
+        //         this.moveBy({x:  0, y:  1});
+        //     }
+        // });
         this._isHighlighted = false;
         this.team = -1;
     },
