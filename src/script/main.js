@@ -49,7 +49,7 @@ export function doTheThing() {
         }
     );
 
-    // Enemy objects
+    // Static enemies
     Crafty.e("Enemy").setPos({x: 11, y:  3});
     Crafty.e("Enemy").setPos({x: 19, y: 11});
     Crafty.e("Enemy").setPos({x:  8, y: 11});

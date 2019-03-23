@@ -133,9 +133,8 @@ function doAttack(evt, x, y) {
             Math.abs(selectedPlayer.getPos().y - y) > 1) {
         reportUserError("Target not adjacent.");
         return;
-    } else if (!evt.target.has("Character") && !evt.target.has("Enemy")) {
-        // TODO: Remove Enemy component.
-        reportUserError("Can't attack non-enemy.");
+    } else if (!evt.target.has("Character")) {
+        reportUserError("Can't attack non-character.");
         return;
     } else if (evt.target.team === currentTeam) {
         reportUserError("Can't attack friendly unit.");
@@ -271,12 +270,6 @@ function isAdjacent(object1, object2) {
 }
 
 export function specialAttack(player) {
-    // TODO: Remove Enemy component.
-    Crafty("Enemy").each(function() {
-        if (isAdjacent(player, this)) {
-            this.destroy();
-        }
-    });
     Crafty("Character").each(function() {
         if (this.team !== player.team && isAdjacent(player, this)) {
             this.destroy();

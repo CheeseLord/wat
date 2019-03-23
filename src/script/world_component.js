@@ -61,10 +61,12 @@ Crafty.c("GridObject", {
 });
 
 Crafty.c("Enemy", {
-    required: "GridObject",
+    required: "Character",
 
     init: function() {
         this.color("#7f0000");
+        // Enemies don't move for now.
+        this.setTeam(-1);
     },
 });
 
