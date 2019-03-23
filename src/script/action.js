@@ -100,6 +100,9 @@ function doSwap(evt, x, y) {
     } else if (!evt.target.has("PlayerControllable")) {
         reportUserError("Can't swap with non-player.");
         return;
+    } else if (evt.target.team !== currentTeam) {
+        reportUserError("Cannot swap with other player's unit.");
+        return;
     } else if (evt.target === selectedPlayer) {
         reportUserError("Cannot swap player with self.");
         return;
