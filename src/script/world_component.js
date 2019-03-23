@@ -68,7 +68,7 @@ Crafty.c("Enemy", {
     },
 });
 
-Crafty.c("PlayerControllable", {
+Crafty.c("Character", {
     required: "GridObject, Keyboard, Mouse",
 
     init: function() {

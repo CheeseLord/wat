@@ -33,7 +33,7 @@ function doSelectPlayer(evt, x, y) {
     // assert(getGlobalState() === StateEnum.DEFAULT ||
     //        getGlobalState() === StateEnum.PLAYER_SELECTED);
 
-    if (evt.target && evt.target.has("PlayerControllable")) {
+    if (evt.target && evt.target.has("Character")) {
         if (evt.target.team !== currentTeam) {
             reportUserError("Character is on another team");
             return;
@@ -51,7 +51,7 @@ function doSelectPlayer(evt, x, y) {
 // state "PLAYER_SELECTED").
 function doAutoPlayerAction(evt, x, y) {
     // assert(getGlobalState() === StateEnum.PLAYER_SELECTED);
-    if (evt.target && evt.target.has("PlayerControllable")) {
+    if (evt.target && evt.target.has("Character")) {
         doSelectPlayer(evt, x, y);
     } else {
         doMove(evt, x, y);
@@ -97,7 +97,7 @@ function doSwap(evt, x, y) {
     if (evt.target === null) {
         reportUserError("There's nothing there to swap with.");
         return;
-    } else if (!evt.target.has("PlayerControllable")) {
+    } else if (!evt.target.has("Character")) {
         reportUserError("Can't swap with non-player.");
         return;
     } else if (evt.target.team !== currentTeam) {
@@ -133,7 +133,7 @@ function doAttack(evt, x, y) {
             Math.abs(selectedPlayer.getPos().y - y) > 1) {
         reportUserError("Target not adjacent.");
         return;
-    } else if (evt.target.has("PlayerControllable")) {
+    } else if (evt.target.has("Character")) {
         reportUserError("Can't attack friendly unit.");
         return;
     } else if (!evt.target.has("Enemy")) {
@@ -224,7 +224,7 @@ export function endTurn() {
     Crafty.log(`Reached end of turn for team ${currentTeam}.`);
     readyCharacters = [];
     currentTeam = (currentTeam + 1) % NUM_TEAMS;
-    Crafty("PlayerControllable").each(function() {
+    Crafty("Character").each(function() {
         if (this.team === currentTeam) {
             readyCharacters.push(this);
         }

@@ -60,7 +60,7 @@ export function doTheThing() {
     Crafty.e("Enemy").setPos({x:  2, y: 13});
     Crafty.e("Enemy").setPos({x:  2, y:  9});
 
-    var player1 = Crafty.e("PlayerControllable")
+    var player1 = Crafty.e("Character")
             .setPos({x: 5, y: 3})
             .setTeam(0)
             .setColors(
@@ -68,7 +68,7 @@ export function doTheThing() {
                     defaultColor:     "#007000",
                     highlightedColor: "#00bf00",
                 });
-    Crafty.e("PlayerControllable")
+    Crafty.e("Character")
             .setPos({x: 7, y: 3})
             .setTeam(0)
             .setColors(
@@ -76,7 +76,7 @@ export function doTheThing() {
                     defaultColor:     "#000070",
                     highlightedColor: "#0000bf",
                 });
-    Crafty.e("PlayerControllable")
+    Crafty.e("Character")
             .setPos({x: 7, y: 5})
             .setTeam(1)
             .setColors(
@@ -84,7 +84,7 @@ export function doTheThing() {
                     defaultColor:     "#007070",
                     highlightedColor: "#00bfbf",
                 });
-    Crafty.e("PlayerControllable")
+    Crafty.e("Character")
             .setPos({x: 5, y: 5})
             .setTeam(1)
             .setColors(
@@ -93,7 +93,7 @@ export function doTheThing() {
                     highlightedColor: "#bf00bf",
                 });
 
-    Crafty("PlayerControllable").each(function() {
+    Crafty("Character").each(function() {
         if (this.team === 0) {
             readyCharacters.push(this);
         }
