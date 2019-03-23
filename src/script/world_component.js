@@ -45,7 +45,7 @@ Crafty.c("GridObject", {
         return this;
     },
     // TODO: Don't duplicate so much code between this and setPos.
-    animateTo: function(newPos) {
+    animateTo: function(newPos, duration) {
         // newPos is {x: newX, y: newY}
         this.attr({
             _tileX: newPos.x,
@@ -54,7 +54,7 @@ Crafty.c("GridObject", {
         this.tween({
             x: newPos.x * MapGrid.tile.width,
             y: newPos.y * MapGrid.tile.height,
-        }, 200);
+        }, duration);
         // So that "setter" attributes can be chained together.
         return this;
     },

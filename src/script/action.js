@@ -2,7 +2,13 @@
 
 "use strict";
 
-import {NUM_TEAMS, StateEnum, MapGrid} from "./consts.js";
+import {
+    ANIM_DUR_HALF_ATTACK,
+    ANIM_DUR_MOVE,
+    MapGrid,
+    NUM_TEAMS,
+    StateEnum,
+} from "./consts.js";
 import {doMenu} from "./ui.js";
 
 export var selectedPlayer;
@@ -80,7 +86,7 @@ function doMove(evt, x, y) {
     Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
     setGlobalState(StateEnum.DEFAULT);
     removeMovementSquares();
-    selectedPlayer.animateTo({x: x, y: y});
+    selectedPlayer.animateTo({x: x, y: y}, ANIM_DUR_MOVE);
     selectedPlayer.one("TweenEnd", function() {
         characterActed(selectedPlayer);
     });
@@ -114,8 +120,8 @@ function doSwap(evt, x, y) {
 
     let selectPos = selectedPlayer.getPos();
     let clickPos  = evt.target.getPos();
-    evt.target.animateTo(selectPos);
-    selectedPlayer.animateTo(clickPos);
+    evt.target.animateTo(selectPos, ANIM_DUR_MOVE);
+    selectedPlayer.animateTo(clickPos, ANIM_DUR_MOVE);
     selectedPlayer.one("TweenEnd", function() {
         characterActed(selectedPlayer);
     });
@@ -140,11 +146,25 @@ function doAttack(evt, x, y) {
         reportUserError("Can't attack friendly unit.");
         return;
     }
-    evt.target.destroy();
 
     Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
-    setGlobalState(StateEnum.DEFAULT);
-    characterActed(selectedPlayer);
+    setGlobalState(StateEnum.ANIMATING);
+    let currPos = selectedPlayer.getPos();
+    let halfPos = midpoint(currPos, evt.target.getPos());
+    selectedPlayer.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
+    selectedPlayer.one("TweenEnd", function() {
+        // TODO: Better way to chain these together?
+        selectedPlayer.animateTo(currPos, ANIM_DUR_HALF_ATTACK);
+        selectedPlayer.one("TweenEnd", function() {
+            evt.target.destroy();
+            setGlobalState(StateEnum.DEFAULT);
+            characterActed(selectedPlayer);
+        });
+    });
+}
+
+function midpoint(pos1, pos2) {
+    return {x: 0.5 * (pos1.x + pos2.x), y: 0.5 * (pos1.y + pos2.y)};
 }
 
 ///////////////////////////////////////////////////////////////////////
