@@ -62,6 +62,7 @@ export function doTheThing() {
 
     var player1 = Crafty.e("PlayerControllable")
             .setPos({x: 5, y: 3})
+            .setTeam(0)
             .setColors(
                 {
                     defaultColor:     "#007000",
@@ -69,6 +70,7 @@ export function doTheThing() {
                 });
     Crafty.e("PlayerControllable")
             .setPos({x: 7, y: 3})
+            .setTeam(0)
             .setColors(
                 {
                     defaultColor:     "#000070",
@@ -76,6 +78,7 @@ export function doTheThing() {
                 });
     Crafty.e("PlayerControllable")
             .setPos({x: 7, y: 5})
+            .setTeam(1)
             .setColors(
                 {
                     defaultColor:     "#007070",
@@ -83,6 +86,7 @@ export function doTheThing() {
                 });
     Crafty.e("PlayerControllable")
             .setPos({x: 5, y: 5})
+            .setTeam(1)
             .setColors(
                 {
                     defaultColor:     "#700070",
@@ -90,7 +94,9 @@ export function doTheThing() {
                 });
 
     Crafty("PlayerControllable").each(function() {
-        readyCharacters.push(this);
+        if (this.team === 0) {
+            readyCharacters.push(this);
+        }
     });
 
     Crafty.createLayer("UILayer", "DOM", {

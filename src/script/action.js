@@ -2,7 +2,7 @@
 
 "use strict";
 
-import {StateEnum, MapGrid} from "./consts.js";
+import {NUM_TEAMS, StateEnum, MapGrid} from "./consts.js";
 import {doMenu} from "./ui.js";
 
 export var selectedPlayer;
@@ -16,6 +16,7 @@ export function getGlobalState() { return globalState; }
 export function setGlobalState(newState) { globalState = newState; }
 
 export var readyCharacters = [];
+export var currentTeam = 0;
 
 Crafty.c("MovementSquare", {
     required: "GridObject, Mouse",
@@ -33,6 +34,10 @@ function doSelectPlayer(evt, x, y) {
     //        getGlobalState() === StateEnum.PLAYER_SELECTED);
 
     if (evt.target && evt.target.has("PlayerControllable")) {
+        if (evt.target.team !== currentTeam) {
+            reportUserError("Character is on another team");
+            return;
+        }
         if (readyCharacters.indexOf(evt.target) === -1) {
             reportUserError("Character has already acted");
             return;
@@ -212,11 +217,13 @@ export function characterActed(character) {
     }
 }
 
-
 export function endTurn() {
-    Crafty.log("Reached end of round.");
+    Crafty.log(`Reached end of turn for team ${currentTeam}.`);
+    currentTeam = (currentTeam + 1) % NUM_TEAMS;
     Crafty("PlayerControllable").each(function() {
-        readyCharacters.push(this);
+        if (this.team === currentTeam) {
+            readyCharacters.push(this);
+        }
     });
 }
 

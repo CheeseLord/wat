@@ -84,6 +84,12 @@ Crafty.c("PlayerControllable", {
             }
         });
         this._isHighlighted = false;
+        this.team = -1;
+    },
+
+    setTeam: function(team) {
+        this.team = team;
+        return this;
     },
 
     setColors: function(newColors) {

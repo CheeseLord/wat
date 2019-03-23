@@ -2,6 +2,8 @@
 
 export const MENU_WIDTH = 120;
 
+export const NUM_TEAMS = 2;
+
 // Based on one of the comments on:
 //     https://stackoverflow.com/a/5040502
 // Always use === for checking equality, otherwise always true
