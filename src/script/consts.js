@@ -1,6 +1,6 @@
 "use strict";
 
-export const MENU_WIDTH = 120;
+export const MENU_WIDTH = 240;
 
 export const NUM_TEAMS = 2;
 
@@ -25,8 +25,8 @@ export const MapGrid = {
     width:  25,
     height: 17,
     tile:   {
-        width:  16,
-        height: 16,
+        width:  32,
+        height: 32,
     },
 };
 

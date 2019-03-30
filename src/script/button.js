@@ -15,13 +15,13 @@ const MENU_Y = 0;
 // MENU_HEIGHT not used. TODO what if the buttons go past the bottom?
 
 // Amount of space reserved between the outside of the menu and the buttons.
-const H_PADDING = 10;
-const V_PADDING = 10;
+const H_PADDING = 20;
+const V_PADDING = 20;
 // Height of a single button
-const BUTTON_HEIGHT = 20;
+const BUTTON_HEIGHT = 40;
 // Amount of space between the bottom of one button and the top of the next
 // one.
-const BUTTON_VSPACE = 5;
+const BUTTON_VSPACE = 10;
 
 Crafty.s("ButtonMenu", {
     init: function() {
@@ -117,11 +117,12 @@ Crafty.s("ButtonMenu", {
         // but I was having trouble getting the text to fit. Since it's
         // centered anyway, it doesn't look too bad if it goes slightly beyond
         // the padding, so let's allow it for now.
+        // TODO: Text size -> consts.js
         this._title = Crafty.e("2D, DOM, Color, Text, UILayer")
-                .attr({x: MENU_X, y: MENU_Y + V_PADDING, w: MENU_WIDTH, h: 14})
+                .attr({x: MENU_X, y: MENU_Y + V_PADDING, w: MENU_WIDTH, h: 28})
                 .text(titleText)
                 .textAlign("center")
-                .textFont({size: "14px", weight: "bold"})
+                .textFont({size: "28px", weight: "bold"})
                 .css({"text-decoration": "underline"});
 
         // Add the buttons.
@@ -133,7 +134,9 @@ Crafty.s("ButtonMenu", {
         // 19 comes from taking a screenshot and pixel-rulering in gimp...
         // empirically the top of the title text is at y=13 and the bottom is
         // at y=26, so we want a total height of 39 I guess. :/
-        let y      = MENU_Y + (2 * V_PADDING) + 19;
+        // TODO: ...and now we're not using 13px anymore, so this is totally a
+        // guess :(
+        let y      = MENU_Y + (2 * V_PADDING) + 38;
         let width  = MENU_WIDTH - (2 * H_PADDING);
         let height = BUTTON_HEIGHT;
         for (let i = 0; i < this._buttons.length; i++) {
@@ -377,8 +380,9 @@ Crafty.c("MyButton", {
         this.textColor(fgColor);
         this.color(bgColor);
 
-        // TODO: Also center vertically.
+        this.textFont({size: "20px"});
         this.textAlign("center");
+        // TODO: Also center vertically.
     },
 });
 
