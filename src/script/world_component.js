@@ -2,7 +2,10 @@
 
 "use strict";
 
-import {MapGrid} from  "./consts.js";
+import {
+    MapGrid,
+    SPRITE_DUR_PER_FRAME,
+} from  "./consts.js";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Component definitions
@@ -57,18 +60,6 @@ Crafty.c("GridObject", {
         }, duration);
         // So that "setter" attributes can be chained together.
         return this;
-    },
-});
-
-// Note: don't check for this directly. This is just a convenience alias for
-// Characters on an "other" team that don't move.
-Crafty.c("Enemy", {
-    required: "Character, Color",
-
-    init: function() {
-        this.color("#7f0000");
-        // Enemies don't move for now.
-        this.setTeam(-1);
     },
 });
 
@@ -129,5 +120,31 @@ Crafty.c("Character", {
     },
     isHighlighted: function() {
         return this._isHighlighted;
+    },
+});
+
+// Note: don't check for this directly. This is just a convenience alias for
+// Characters on an "other" team that don't move.
+Crafty.c("Enemy", {
+    required: "Character, Color",
+
+    init: function() {
+        this.color("#7f0000");
+        // Enemies don't move for now.
+        this.setTeam(-1);
+    },
+});
+
+Crafty.c("SpriteCharacter", {
+    required: "Character, anim_start, SpriteAnimation",
+
+    setAnimation: function(row, count) {
+        let frames = [];
+        for (let x = 0; x < count; x++) {
+            frames.push([x, row]);
+        }
+        this.reel("my_animation", count * SPRITE_DUR_PER_FRAME, frames);
+        this.animate("my_animation", -1);
+        return this;
     },
 });
