@@ -28,7 +28,7 @@ export function doTheThing() {
     Crafty.load(
         {
             "sprites": {
-                "test.png": {
+                "characters.png": {
                     tile:     32,
                     tileh:    32,
                     paddingX: 1,
@@ -41,11 +41,32 @@ export function doTheThing() {
         },
         function() {
             Crafty.e("2D, DOM, anim_start, SpriteAnimation")
-                    .attr({x: 48, y: -32, w: 32, h: 32})
-                    .reel("my_animation", 1000, [
+                    .attr({x: 32, y: -32, w: 32, h: 32})
+                    .reel("p1_animation", 1000, [
                         [0, 0], [1, 0], [2, 0], [3, 0],
                     ])
-                    .animate("my_animation", -1);
+                    .animate("p1_animation", -1);
+
+            Crafty.e("2D, DOM, anim_start, SpriteAnimation")
+                    .attr({x: 96, y: -32, w: 32, h: 32})
+                    .reel("p2_animation", 1000, [
+                        [0, 1], [1, 1], [2, 1], [3, 1],
+                    ])
+                    .animate("p2_animation", -1);
+
+            Crafty.e("2D, DOM, anim_start, SpriteAnimation")
+                    .attr({x: 32, y:  32, w: 32, h: 32})
+                    .reel("p3_animation", 1000, [
+                        [0, 2], [1, 2], [2, 2], [3, 2],
+                    ])
+                    .animate("p3_animation", -1);
+
+            Crafty.e("2D, DOM, anim_start, SpriteAnimation")
+                    .attr({x: 96, y:  32, w: 32, h: 32})
+                    .reel("p4_animation", 1000, [
+                        [0, 3], [1, 3], [2, 3], [3, 3],
+                    ])
+                    .animate("p4_animation", -1);
         }
     );
 
