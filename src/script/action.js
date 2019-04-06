@@ -3,6 +3,7 @@
 "use strict";
 
 import {
+    ANIM_DUR_CENTER_TURN,
     ANIM_DUR_HALF_ATTACK,
     ANIM_DUR_MOVE,
     MapGrid,
@@ -254,7 +255,7 @@ function setFocusOn(character) {
     Crafty.one("CameraAnimationDone", function() {
         Crafty.viewport.follow(character, MENU_WIDTH / 2, 0);
     });
-    centerCameraOn(character, 1500);
+    centerCameraOn(character, ANIM_DUR_CENTER_TURN);
 }
 
 function centerCameraOn(target, time) {

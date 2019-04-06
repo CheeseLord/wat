@@ -4,7 +4,8 @@ export const MENU_WIDTH = 240;
 
 export const NUM_TEAMS = 2;
 
-export const ANIM_DUR_MOVE   = 200;
+export const ANIM_DUR_CENTER_TURN = 200;
+export const ANIM_DUR_MOVE        = 200;
 export const ANIM_DUR_HALF_ATTACK = 100;
 
 // Based on one of the comments on:
