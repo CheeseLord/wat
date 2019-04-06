@@ -3,8 +3,10 @@
 "use strict";
 
 import {
+    ANIM_DUR_SCROLL,
     MENU_WIDTH,
     Game,
+    MapGrid,
 } from "./consts.js";
 import "./button.js";
 import "./world_component.js";
@@ -131,6 +133,18 @@ export function doTheThing() {
 
     Crafty.bind("WorldClick", function(evt) {
         worldClickHandler(evt);
+    });
+
+    Crafty.s("Keyboard").bind("KeyDown", function(e) {
+        if (e.key === Crafty.keys.LEFT_ARROW) {
+            Crafty.viewport.pan(-MapGrid.tile.width, 0, ANIM_DUR_SCROLL);
+        } else if (e.key === Crafty.keys.RIGHT_ARROW) {
+            Crafty.viewport.pan(MapGrid.tile.width, 0, ANIM_DUR_SCROLL);
+        } else if (e.key === Crafty.keys.UP_ARROW) {
+            Crafty.viewport.pan(0, -MapGrid.tile.height, ANIM_DUR_SCROLL);
+        } else if (e.key === Crafty.keys.DOWN_ARROW) {
+            Crafty.viewport.pan(0, MapGrid.tile.height, ANIM_DUR_SCROLL);
+        }
     });
 }
 
