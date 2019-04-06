@@ -18,8 +18,15 @@ import {
 ///////////////////////////////////////////////////////////////////////////////
 // Menu table handling
 
-var CLEAR_MENU  = {};
-var PARENT_MENU = {};
+const CLEAR_MENU  = {};
+const PARENT_MENU = {};
+
+// menuStack - list of menus that would be transitioned to if you click a
+//     "back" button. Does not include the current menu.
+// currMenuName - the name of the currently-displayed menu, or null if there is
+//     no menu displayed.
+var menuStack    = [];
+var currMenuName = null;
 
 function doNothing() {}
 
@@ -94,8 +101,14 @@ function transitionToMenu(menuName, isTop) {
         Crafty.s("ButtonMenu").clearMenu();
         return;
     } else if (menuName === PARENT_MENU) {
-        Crafty.s("ButtonMenu").popMenu();
-        return;
+        // Pop menu
+        if (menuStack.length === 0) {
+            Crafty.s("ButtonMenu").clearMenu();
+            currMenuName = null;
+            return;
+        } else {
+            menuName = menuStack.pop();
+        }
     }
 
     let menuDesc = menuTable[menuName];
@@ -147,9 +160,10 @@ function transitionToMenu(menuName, isTop) {
 
     Crafty.log("Enter menu: " + menuName);
     onEntry();
-    if (isTop) {
-        Crafty.s("ButtonMenu").setTopLevelMenu(title, buttonList);
-    } else {
-        Crafty.s("ButtonMenu").pushMenu(title, buttonList);
+    if (currMenuName && !isTop) {
+        // Push menu
+        menuStack.push(currMenuName);
     }
+    Crafty.s("ButtonMenu").setTopLevelMenu(title, buttonList);
+    currMenuName = menuName;
 }

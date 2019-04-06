@@ -65,34 +65,35 @@ Crafty.s("ButtonMenu", {
     // than a subsystem.) Also clears any higher-level menus from the stack;
     // after calling this function you can no longer pop() back to any previous
     // menus. Automatically positions and sizes the buttons.
+    // TODO: Rename to simply setMenu or some such.
     setTopLevelMenu: function(titleText, buttonDescList) {
         this.clearMenu();
         this._setButtonsFromDesc(titleText, buttonDescList);
     },
 
-    // As above, but pushes any previous menu onto a stack so that it may be
-    // restored later using popMenu().
-    pushMenu: function(titleText, buttonDescList) {
-        if (this._currMenuDesc) {
-            this._menuStack.push(this._currMenuDesc);
-        }
-        this._setButtonsFromDesc(titleText, buttonDescList);
-    },
+    // // As above, but pushes any previous menu onto a stack so that it may be
+    // // restored later using popMenu().
+    // pushMenu: function(titleText, buttonDescList) {
+    //     if (this._currMenuDesc) {
+    //         this._menuStack.push(this._currMenuDesc);
+    //     }
+    //     this._setButtonsFromDesc(titleText, buttonDescList);
+    // },
 
-    // Restores the last menu that was pushed onto the stack using pushMenu().
-    // If there is no such menu, clears the current menu.
-    popMenu: function() {
-        if (this._menuStack.length === 0) {
-            this._removeCurrentButtons();
-            this._currMenuDesc = null;
-        } else {
-            let newDesc = this._menuStack.pop();
-            if (newDesc.length !== 2) {
-                Crafty.error("Bad menu desc");
-            }
-            this._setButtonsFromDesc(newDesc[0], newDesc[1]);
-        }
-    },
+    // // Restores the last menu that was pushed onto the stack using
+    // // pushMenu(). If there is no such menu, clears the current menu.
+    // popMenu: function() {
+    //     if (this._menuStack.length === 0) {
+    //         this._removeCurrentButtons();
+    //         this._currMenuDesc = null;
+    //     } else {
+    //         let newDesc = this._menuStack.pop();
+    //         if (newDesc.length !== 2) {
+    //             Crafty.error("Bad menu desc");
+    //         }
+    //         this._setButtonsFromDesc(newDesc[0], newDesc[1]);
+    //     }
+    // },
 
     _setButtonsFromDesc: function(titleText, buttonDescList) {
         this._removeCurrentButtons();
