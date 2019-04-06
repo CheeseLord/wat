@@ -7,6 +7,7 @@ import {
     ANIM_DUR_MOVE,
     MapGrid,
     NUM_TEAMS,
+    MENU_WIDTH,
     StateEnum,
 } from "./consts.js";
 import {doMenu} from "./ui.js";
@@ -243,6 +244,34 @@ export function characterActed(character) {
     if (readyCharacters.length === 0) {
         endTurn();
     }
+    if (readyCharacters.length > 0) {
+        setFocusOn(readyCharacters[0]);
+    }
+}
+
+function setFocusOn(character) {
+    Crafty.viewport.clampToEntities = false;
+    Crafty.one("CameraAnimationDone", function() {
+        Crafty.viewport.follow(character, MENU_WIDTH / 2, 0);
+    });
+    centerCameraOn(character, 1500);
+}
+
+function centerCameraOn(target, time) {
+    var x = target.x + Crafty.viewport.x;
+    var y = target.y + Crafty.viewport.y;
+    // TODO Do we want to camera center based on the grid
+    //      or based on the center of characters
+    var midX = target.w / 2;
+    var midY = target.h / 2;
+
+    var centX = ((Crafty.viewport.width + MENU_WIDTH) / 2) /
+        Crafty.viewport._scale;
+    var centY = Crafty.viewport.height / 2 / Crafty.viewport._scale;
+    var newX = x + midX - centX;
+    var newY = y + midY - centY;
+
+    Crafty.viewport.pan(newX, newY, time);
 }
 
 export function endTurn() {
