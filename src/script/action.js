@@ -26,7 +26,7 @@ export var readyCharacters = [];
 export var currentTeam = 0;
 
 Crafty.c("MovementSquare", {
-    required: "GridObject, Mouse",
+    required: "GridObject, Color, Mouse",
 
     init: function() {
         this.color("#555555", 0.5);

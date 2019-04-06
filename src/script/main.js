@@ -40,6 +40,7 @@ export function doTheThing() {
             },
         },
         function() {
+            // TODO: Player 1 as well.
             Crafty.e("2D, DOM, anim_start, SpriteAnimation")
                     .attr({x: 32, y: -32, w: 32, h: 32})
                     .reel("p1_animation", 1000, [
@@ -47,26 +48,35 @@ export function doTheThing() {
                     ])
                     .animate("p1_animation", -1);
 
-            Crafty.e("2D, DOM, anim_start, SpriteAnimation")
-                    .attr({x: 96, y: -32, w: 32, h: 32})
+            Crafty.e("Character, anim_start, SpriteAnimation")
+                    // .attr({x: 96, y: -32, w: 32, h: 32})
+                    .setPos({x: 7, y: 3})
+                    .setTeam(0)
                     .reel("p2_animation", 1000, [
                         [0, 1], [1, 1], [2, 1], [3, 1],
                     ])
                     .animate("p2_animation", -1);
 
-            Crafty.e("2D, DOM, anim_start, SpriteAnimation")
-                    .attr({x: 32, y:  32, w: 32, h: 32})
+            Crafty.e("Character, anim_start, SpriteAnimation")
+                    // .attr({x: 32, y:  32, w: 32, h: 32})
+                    .setPos({x: 7, y: 5})
+                    .setTeam(1)
                     .reel("p3_animation", 1000, [
                         [0, 2], [1, 2], [2, 2], [3, 2],
                     ])
                     .animate("p3_animation", -1);
 
-            Crafty.e("2D, DOM, anim_start, SpriteAnimation")
-                    .attr({x: 96, y:  32, w: 32, h: 32})
+            Crafty.e("Character, anim_start, SpriteAnimation")
+                    // .attr({x: 96, y:  32, w: 32, h: 32})
+                    .setPos({x: 5, y: 5})
+                    .setTeam(1)
                     .reel("p4_animation", 1000, [
                         [0, 3], [1, 3], [2, 3], [3, 3],
                     ])
                     .animate("p4_animation", -1);
+
+            newTurn(0);
+            // assert(readyCharacters.length > 0);
         }
     );
 
@@ -81,7 +91,7 @@ export function doTheThing() {
     Crafty.e("Enemy").setPos({x:  2, y: 13});
     Crafty.e("Enemy").setPos({x:  2, y:  9});
 
-    var player1 = Crafty.e("Character")
+    var player1 = Crafty.e("Character, Color")
             .setPos({x: 5, y: 3})
             .setTeam(0)
             .setColors(
@@ -89,33 +99,6 @@ export function doTheThing() {
                     defaultColor:     "#007000",
                     highlightedColor: "#00bf00",
                 });
-    Crafty.e("Character")
-            .setPos({x: 7, y: 3})
-            .setTeam(0)
-            .setColors(
-                {
-                    defaultColor:     "#000070",
-                    highlightedColor: "#0000bf",
-                });
-    Crafty.e("Character")
-            .setPos({x: 7, y: 5})
-            .setTeam(1)
-            .setColors(
-                {
-                    defaultColor:     "#007070",
-                    highlightedColor: "#00bfbf",
-                });
-    Crafty.e("Character")
-            .setPos({x: 5, y: 5})
-            .setTeam(1)
-            .setColors(
-                {
-                    defaultColor:     "#700070",
-                    highlightedColor: "#bf00bf",
-                });
-
-    newTurn(0);
-    // assert(readyCharacters.length > 0);
 
     Crafty.createLayer("UILayer", "DOM", {
         // Ignore viewscreen transforms

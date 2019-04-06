@@ -10,7 +10,7 @@ import {MapGrid} from  "./consts.js";
 // Component for anything that occupies a grid space.
 Crafty.c("GridObject", {
     // TODO: Remove Mouse (get cat?)
-    required: "SpaceFillingObject, 2D, DOM, Color, Tween, Mouse",
+    required: "SpaceFillingObject, 2D, DOM, Tween, Mouse",
 
     init: function() {
         this.attr({w: MapGrid.tile.width, h: MapGrid.tile.height});
@@ -63,7 +63,7 @@ Crafty.c("GridObject", {
 // Note: don't check for this directly. This is just a convenience alias for
 // Characters on an "other" team that don't move.
 Crafty.c("Enemy", {
-    required: "Character",
+    required: "Character, Color",
 
     init: function() {
         this.color("#7f0000");
@@ -103,18 +103,29 @@ Crafty.c("Character", {
             _highlightedColor: newColors.highlightedColor,
         });
         // Start out not highlighted
-        this.color(this._defaultColor);
+        if (this.has("Color")) {
+            this.color(this._defaultColor);
+        }
+        // TODO: Provide an alternative for sprites.
         // So that "setter" attributes can be chained together.
         return this;
     },
 
     highlight: function() {
         this._isHighlighted = true;
-        return this.color(this._highlightedColor);
+        if (this.has("Color")) {
+            return this.color(this._highlightedColor);
+        }
+        // TODO: Provide an alternative for sprites.
+        return this;
     },
     unhighlight: function() {
         this._isHighlighted = false;
-        return this.color(this._defaultColor);
+        if (this.has("Color")) {
+            return this.color(this._defaultColor);
+        }
+        // TODO: Provide an alternative for sprites.
+        return this;
     },
     isHighlighted: function() {
         return this._isHighlighted;
