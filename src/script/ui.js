@@ -25,6 +25,9 @@ const PARENT_MENU = {};
 //     "back" button. Does not include the current menu.
 // currMenuName - the name of the currently-displayed menu, or null if there is
 //     no menu displayed.
+// FIXME: Currently it's possible to get this logic stuck in a loop. Something
+// like: go to attack -> basic attack, then back a couple times? Need to figure
+// out exactly how this happens.
 var menuStack    = [];
 var currMenuName = null;
 
