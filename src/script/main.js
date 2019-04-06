@@ -40,16 +40,15 @@ export function doTheThing() {
             },
         },
         function() {
-            // TODO: Player 1 as well.
-            Crafty.e("2D, DOM, anim_start, SpriteAnimation")
-                    .attr({x: 32, y: -32, w: 32, h: 32})
+            let player1 = Crafty.e("Character, anim_start, SpriteAnimation")
+                    .setPos({x: 5, y: 3})
+                    .setTeam(0)
                     .reel("p1_animation", 1000, [
                         [0, 0], [1, 0], [2, 0], [3, 0],
                     ])
                     .animate("p1_animation", -1);
 
             Crafty.e("Character, anim_start, SpriteAnimation")
-                    // .attr({x: 96, y: -32, w: 32, h: 32})
                     .setPos({x: 7, y: 3})
                     .setTeam(0)
                     .reel("p2_animation", 1000, [
@@ -58,7 +57,6 @@ export function doTheThing() {
                     .animate("p2_animation", -1);
 
             Crafty.e("Character, anim_start, SpriteAnimation")
-                    // .attr({x: 32, y:  32, w: 32, h: 32})
                     .setPos({x: 7, y: 5})
                     .setTeam(1)
                     .reel("p3_animation", 1000, [
@@ -67,7 +65,6 @@ export function doTheThing() {
                     .animate("p3_animation", -1);
 
             Crafty.e("Character, anim_start, SpriteAnimation")
-                    // .attr({x: 96, y:  32, w: 32, h: 32})
                     .setPos({x: 5, y: 5})
                     .setTeam(1)
                     .reel("p4_animation", 1000, [
@@ -77,6 +74,16 @@ export function doTheThing() {
 
             newTurn(0);
             // assert(readyCharacters.length > 0);
+
+            // Animate centering the viewport over the player, taking 1500ms to
+            // do it.
+            Crafty.viewport.clampToEntities = false;
+            // TODO: We need our own function for this that adds in the right
+            // offset, so there isn't a sudden jump. The library implementation
+            // is Crafty/viewport.js#L324-L335.
+            Crafty.viewport.centerOn(player1, 1500);
+            // TODO: Handle this using the usual start-of-turn code, rather
+            // than having a special case here.
         }
     );
 
@@ -90,15 +97,6 @@ export function doTheThing() {
     Crafty.e("Enemy").setPos({x: 17, y: 13});
     Crafty.e("Enemy").setPos({x:  2, y: 13});
     Crafty.e("Enemy").setPos({x:  2, y:  9});
-
-    var player1 = Crafty.e("Character, Color")
-            .setPos({x: 5, y: 3})
-            .setTeam(0)
-            .setColors(
-                {
-                    defaultColor:     "#007000",
-                    highlightedColor: "#00bf00",
-                });
 
     Crafty.createLayer("UILayer", "DOM", {
         // Ignore viewscreen transforms
@@ -114,18 +112,6 @@ export function doTheThing() {
     Crafty.e("2D, UILayer, Color, Mouse")
             .attr({x: 0, y: 0, w: MENU_WIDTH, h: Game.height})
             .color("#eee");
-
-    // Animate centering the viewport over the player, taking 1500ms to do
-    // it. Then, once the animation is done, set the viewport to follow the
-    // player (with offset (0, 0)).
-    Crafty.viewport.clampToEntities = false;
-    Crafty.one("CameraAnimationDone", function() {
-        Crafty.viewport.follow(player1, MENU_WIDTH / 2, 0);
-    });
-    // TODO: We need our own function for this that adds in the right
-    // offset, so there isn't a sudden jump. The library implementation is
-    // Crafty/viewport.js#L324-L335.
-    Crafty.viewport.centerOn(player1, 1500);
 
     // Convert regular mouse events to WorldClick events, so we can handle
     // that case without doing weird things when the player clicks on the
