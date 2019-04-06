@@ -42,37 +42,25 @@ export function doTheThing() {
             },
         },
         function() {
-            let player1 = Crafty.e("Character, anim_start, SpriteAnimation")
+            let player1 = Crafty.e("SpriteCharacter")
                     .setPos({x: 5, y: 3})
                     .setTeam(0)
-                    .reel("p1_animation", 1000, [
-                        [0, 0], [1, 0], [2, 0], [3, 0],
-                    ])
-                    .animate("p1_animation", -1);
+                    .setAnimation(0, 4);
 
-            Crafty.e("Character, anim_start, SpriteAnimation")
+            Crafty.e("SpriteCharacter")
                     .setPos({x: 7, y: 3})
                     .setTeam(0)
-                    .reel("p2_animation", 1000, [
-                        [0, 1], [1, 1], [2, 1], [3, 1],
-                    ])
-                    .animate("p2_animation", -1);
+                    .setAnimation(1, 4);
 
-            Crafty.e("Character, anim_start, SpriteAnimation")
+            Crafty.e("SpriteCharacter")
                     .setPos({x: 7, y: 5})
                     .setTeam(1)
-                    .reel("p3_animation", 1000, [
-                        [0, 2], [1, 2], [2, 2], [3, 2],
-                    ])
-                    .animate("p3_animation", -1);
+                    .setAnimation(2, 4);
 
-            Crafty.e("Character, anim_start, SpriteAnimation")
+            Crafty.e("SpriteCharacter")
                     .setPos({x: 5, y: 5})
                     .setTeam(1)
-                    .reel("p4_animation", 1000, [
-                        [0, 3], [1, 3], [2, 3], [3, 3],
-                    ])
-                    .animate("p4_animation", -1);
+                    .setAnimation(3, 4);
 
             newTurn(0);
             // assert(readyCharacters.length > 0);
