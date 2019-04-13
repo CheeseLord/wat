@@ -4,6 +4,9 @@ export const MENU_WIDTH = 240;
 
 export const NUM_TEAMS = 2;
 
+// TODO - This should depend on which player is moving.
+export const MOVE_RANGE = 4;
+
 export const SPRITE_DUR_PER_FRAME = 250;
 export const ANIM_DUR_SCROLL      = 50;
 export const ANIM_DUR_CENTER_TURN = 200;

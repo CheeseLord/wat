@@ -7,10 +7,15 @@ import {
     ANIM_DUR_HALF_ATTACK,
     ANIM_DUR_MOVE,
     MapGrid,
+    MOVE_RANGE,
     NUM_TEAMS,
     MENU_WIDTH,
     StateEnum,
 } from "./consts.js";
+import {
+    getDistance,
+    isAdjacent,
+} from "./util.js";
 import {doMenu} from "./ui.js";
 
 export var selectedPlayer;
@@ -75,13 +80,16 @@ function doMove(evt, x, y) {
         return;
     }
 
-    // TODO: MovementSquares shouldn't be SpaceFillingObjects.
-    if (evt.target && evt.target.has("SpaceFillingObject") &&
-            !evt.target.has("MovementSquare")) {
+    if (evt.target && evt.target.has("SpaceFillingObject")) {
         reportUserError("Can't move there; something's in the way.");
         return;
-    } else if (!(evt.target && evt.target.has("MovementSquare"))) {
-        reportUserError("Invalid destination (out of range?).");
+    } else if (getDistance({x: x, y: y}, selectedPlayer.getPos()) >
+            MOVE_RANGE) {
+        reportUserError("You can't move that far.");
+        return;
+    } else if (!(evt.target && (evt.target.has("MovementSquare") ||
+            evt.target.has("Ground")))) {
+        reportUserError("That's not a tile.");
         return;
     }
 
@@ -309,13 +317,19 @@ export function newTurn(team) {
 }
 
 function createMovementSquare(x, y) {
-    var occupied = false;
+    let occupied  = false;
+    let hasGround = false;
     Crafty("SpaceFillingObject").each(function() {
         if (this.getPos().x === x && this.getPos().y === y) {
             occupied = true;
         }
     });
-    if (occupied) {
+    Crafty("Ground").each(function() {
+        if (this.getPos().x === x && this.getPos().y === y) {
+            hasGround = true;
+        }
+    });
+    if (occupied || !hasGround) {
         return;
     }
     Crafty.e("MovementSquare").setPos({x: x, y: y});
@@ -325,10 +339,9 @@ export function createMovementGrid(player) {
     var playerPos = player.getPos();
     var x = playerPos.x;
     var y = playerPos.y;
-    // FIXME Move distance to player attribute
-    var maxDistance = 4;
-    for (var i = 1; i < maxDistance; i++) {
-        for (var j = 1; j + i < maxDistance; j++) {
+    var maxDistance = MOVE_RANGE;
+    for (var i = 1; i <= maxDistance; i++) {
+        for (var j = 1; j + i <= maxDistance; j++) {
             createMovementSquare(x + i, y + j);
             createMovementSquare(x + i, y - j);
             createMovementSquare(x - i, y + j);
@@ -341,14 +354,10 @@ export function createMovementGrid(player) {
     }
 };
 
-function isAdjacent(object1, object2) {
-    return (Math.abs(object1.getPos().x - object2.getPos().x) <= 1 &&
-        Math.abs(object1.getPos().y - object2.getPos().y) <= 1);
-}
-
 export function specialAttack(player) {
     Crafty("Character").each(function() {
-        if (this.team !== player.team && isAdjacent(player, this)) {
+        if (this.team !== player.team &&
+                isAdjacent(player.getPos(), this.getPos())) {
             this.destroy();
         }
     });

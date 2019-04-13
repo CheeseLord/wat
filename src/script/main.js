@@ -88,6 +88,13 @@ export function doTheThing() {
     Crafty.e("Enemy").setPos({x:  2, y: 13});
     Crafty.e("Enemy").setPos({x:  2, y:  9});
 
+    // The ground
+    for (let y = 0; y < 20; y++) {
+        for (let x = 0; x < 30; x++) {
+            Crafty.e("Ground").setPos({x: x, y: y});
+        }
+    }
+
     Crafty.createLayer("UILayer", "DOM", {
         // Ignore viewscreen transforms
         xResponse:     0,

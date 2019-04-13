@@ -13,7 +13,7 @@ import {
 // Component for anything that occupies a grid space.
 Crafty.c("GridObject", {
     // TODO: Remove Mouse (get cat?)
-    required: "SpaceFillingObject, 2D, DOM, Tween, Mouse",
+    required: "2D, DOM, Tween, Mouse",
 
     init: function() {
         this.attr({w: MapGrid.tile.width, h: MapGrid.tile.height});
@@ -63,8 +63,12 @@ Crafty.c("GridObject", {
     },
 });
 
+Crafty.c("SpaceFillingObject", {
+    required: "GridObject",
+});
+
 Crafty.c("Character", {
-    required: "GridObject, Keyboard, Mouse",
+    required: "SpaceFillingObject, Keyboard, Mouse",
 
     init: function() {
         // Insert grumpy cat "no" image here.
@@ -146,5 +150,14 @@ Crafty.c("SpriteCharacter", {
         this.reel("my_animation", count * SPRITE_DUR_PER_FRAME, frames);
         this.animate("my_animation", -1);
         return this;
+    },
+});
+
+Crafty.c("Ground", {
+    required: "GridObject, Color, Mouse",
+
+    init: function() {
+        this.color("#3f773f");
+        this.attr({z: 0});
     },
 });
