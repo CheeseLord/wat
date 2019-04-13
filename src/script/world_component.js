@@ -14,8 +14,7 @@ import {
 
 // Component for anything that occupies a grid space.
 Crafty.c("GridObject", {
-    // TODO: Remove Mouse (get cat?)
-    required: "2D, DOM, Tween, Mouse",
+    required: "2D, DOM, Tween",
 
     init: function() {
         this.attr({w: MapGrid.tile.width, h: MapGrid.tile.height});

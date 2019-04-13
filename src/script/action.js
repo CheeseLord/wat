@@ -34,10 +34,10 @@ export var readyCharacters = [];
 export var currentTeam = 0;
 
 Crafty.c("MovementSquare", {
-    required: "GridObject, Color, Mouse",
+    required: "GridObject, Color",
 
     init: function() {
-        this.color("#555555", 0.5);
+        this.color("#00ff00", 0.25);
         this.attr({z: Z_MOVE_SQUARE});
     },
 });
@@ -90,8 +90,7 @@ function doMove(evt, x, y) {
             MOVE_RANGE) {
         reportUserError("You can't move that far.");
         return;
-    } else if (!(evt.target && (evt.target.has("MovementSquare") ||
-            evt.target.has("Ground")))) {
+    } else if (!(evt.target && evt.target.has("Ground"))) {
         reportUserError("That's not a tile.");
         return;
     }
