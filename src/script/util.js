@@ -12,3 +12,8 @@ export function getDistance(pos1, pos2) {
 export function isAdjacent(pos1, pos2) {
     return (Math.abs(pos2.x - pos1.x) <= 1 && Math.abs(pos2.y - pos1.y) <= 1);
 }
+
+export function midpoint(pos1, pos2) {
+    return {x: 0.5 * (pos1.x + pos2.x), y: 0.5 * (pos1.y + pos2.y)};
+}
+

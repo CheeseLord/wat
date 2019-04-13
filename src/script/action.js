@@ -16,6 +16,7 @@ import {
 import {
     getDistance,
     isAdjacent,
+    midpoint,
 } from "./util.js";
 import {doMenu} from "./ui.js";
 
@@ -147,8 +148,7 @@ function doAttack(evt, x, y) {
     } else if (evt.target === null) {
         reportUserError("No enemy there.");
         return;
-    } else if (Math.abs(selectedPlayer.getPos().x - x) > 1 ||
-            Math.abs(selectedPlayer.getPos().y - y) > 1) {
+    } else if (!isAdjacent({x: x, y: y}, selectedPlayer.getPos())) {
         reportUserError("Target not adjacent.");
         return;
     } else if (!evt.target.has("Character")) {
@@ -178,10 +178,6 @@ function doAttack(evt, x, y) {
             characterActed(selectedPlayer);
         });
     });
-}
-
-function midpoint(pos1, pos2) {
-    return {x: 0.5 * (pos1.x + pos2.x), y: 0.5 * (pos1.y + pos2.y)};
 }
 
 ///////////////////////////////////////////////////////////////////////
