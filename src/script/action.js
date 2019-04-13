@@ -11,6 +11,7 @@ import {
     NUM_TEAMS,
     MENU_WIDTH,
     StateEnum,
+    Z_MOVE_SQUARE,
 } from "./consts.js";
 import {
     getDistance,
@@ -36,6 +37,7 @@ Crafty.c("MovementSquare", {
 
     init: function() {
         this.color("#555555", 0.5);
+        this.attr({z: Z_MOVE_SQUARE});
     },
 });
 

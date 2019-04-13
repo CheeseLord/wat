@@ -7,6 +7,7 @@ import {
     MENU_WIDTH,
     Game,
     MapGrid,
+    Z_UI,
 } from "./consts.js";
 import "./button.js";
 import "./world_component.js";
@@ -102,7 +103,7 @@ export function doTheThing() {
         scaleResponse: 0,
 
         // On top of other layers
-        z: 40,
+        z: Z_UI,
     });
 
     // Background for the buttons

@@ -5,6 +5,8 @@
 import {
     MapGrid,
     SPRITE_DUR_PER_FRAME,
+    Z_GROUND,
+    Z_CHARACTER,
 } from  "./consts.js";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -87,6 +89,7 @@ Crafty.c("Character", {
         // });
         this._isHighlighted = false;
         this.team = -1;
+        this.attr({z: Z_CHARACTER});
     },
 
     setTeam: function(team) {
@@ -160,6 +163,6 @@ Crafty.c("Ground", {
 
     init: function() {
         this.color("#3f773f");
-        this.attr({z: 0});
+        this.attr({z: Z_GROUND});
     },
 });
