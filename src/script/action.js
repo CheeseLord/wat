@@ -186,8 +186,11 @@ function midpoint(pos1, pos2) {
 
 // Generic handler for clicks on the world view.
 export function worldClickHandler(evt) {
-    let x = Math.floor(evt.realX / MapGrid.tile.width);
-    let y = Math.floor(evt.realY / MapGrid.tile.height);
+    // TODO: Can't we just use evt.target.getPos()? If there's no target, we
+    // sholdn't be doing anything anyway...
+    let x = Math.floor(evt.realX / (MapGrid.tile.width + MapGrid.tile.hspace));
+    let y = Math.floor(evt.realY /
+            (MapGrid.tile.height + MapGrid.tile.vspace));
     if (evt.mouseButton === Crafty.mouseButtons.LEFT) {
         Crafty.log(`You clicked at: (${x}, ${y})`);
         if (getGlobalState() === StateEnum.DEFAULT) {

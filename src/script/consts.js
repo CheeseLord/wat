@@ -31,8 +31,12 @@ export const MapGrid = {
     width:  25,
     height: 17,
     tile:   {
+        // Dimensions of a tile
         width:  32,
         height: 32,
+        // Amount of space between two tiles
+        hspace: 4,
+        vspace: 4,
     },
 };
 

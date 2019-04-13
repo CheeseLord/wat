@@ -32,8 +32,10 @@ Crafty.c("GridObject", {
         this.attr({
             _tileX: newPos.x,
             _tileY: newPos.y,
-            x:      newPos.x * MapGrid.tile.width,
-            y:      newPos.y * MapGrid.tile.height,
+            // TODO: Refactor all the places that use width + hspace and
+            // height + vspace. Maybe just add (computed) constants for those?
+            x:      newPos.x * (MapGrid.tile.width  + MapGrid.tile.hspace),
+            y:      newPos.y * (MapGrid.tile.height + MapGrid.tile.vspace),
         });
         // So that "setter" attributes can be chained together.
         return this;
@@ -55,8 +57,8 @@ Crafty.c("GridObject", {
             _tileY: newPos.y,
         });
         this.tween({
-            x: newPos.x * MapGrid.tile.width,
-            y: newPos.y * MapGrid.tile.height,
+            x: newPos.x * (MapGrid.tile.width  + MapGrid.tile.hspace),
+            y: newPos.y * (MapGrid.tile.height + MapGrid.tile.vspace),
         }, duration);
         // So that "setter" attributes can be chained together.
         return this;
