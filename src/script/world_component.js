@@ -121,7 +121,7 @@ Crafty.c("Character", {
         if (this.has("Color")) {
             return this.color(this._highlightedColor);
         } else {
-            // TODO: _highlightEntity should follow this when this moves.
+            // Add a "border" around this.
             this._highlightEntity = Crafty.e("Highlight")
                     .color("#ff9f00")
                     .attr({
@@ -131,6 +131,10 @@ Crafty.c("Character", {
                         w: this.w + 2 * HL_RADIUS,
                         h: this.h + 2 * HL_RADIUS,
                     });
+            // Make the "border" follow us when we move.
+            // TODO: This rapidly makes it clear that the border is just a
+            // solid square behind us. Can we make it more of an actual border?
+            this.attach(this._highlightEntity);
         }
         return this;
     },
