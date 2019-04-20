@@ -8,6 +8,7 @@ export const NUM_TEAMS = 2;
 export const MOVE_RANGE = 4;
 
 export const Z_BACKGROUND  =  0; // Probably no entities here?
+export const Z_HIGHLIGHT   =  5; // Behind all objects
 export const Z_GROUND      = 10;
 export const Z_SCENERY     = 20; // Walls, doodads
 export const Z_CHARACTER   = 30; // Things that move around
@@ -32,8 +33,13 @@ export const StateEnum = Object.freeze({
     PLAYER_ATTACK:   {},
 });
 
+// TODO: Maybe separate horiz. and vert.? Should probably in general be
+// MapGrid.tile.[hv]space/2, or something like that.
+export const HL_RADIUS = 2;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Main Game object definition
+// TODO Can these just be top-level globals named in ALL_CAPS?
 export const MapGrid = {
     width:  25,
     height: 17,

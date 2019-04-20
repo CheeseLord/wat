@@ -4,7 +4,9 @@
 
 import {
     MapGrid,
+    HL_RADIUS,
     SPRITE_DUR_PER_FRAME,
+    Z_HIGHLIGHT,
     Z_GROUND,
     Z_CHARACTER,
 } from  "./consts.js";
@@ -89,6 +91,7 @@ Crafty.c("Character", {
         this._isHighlighted = false;
         this.team = -1;
         this.attr({z: Z_CHARACTER});
+        this._highlightEntity = null;
     },
 
     setTeam: function(team) {
@@ -111,19 +114,36 @@ Crafty.c("Character", {
     },
 
     highlight: function() {
+        if (this._isHighlighted) {
+            return this;
+        }
         this._isHighlighted = true;
         if (this.has("Color")) {
             return this.color(this._highlightedColor);
+        } else {
+            // TODO: _highlightEntity should follow this when this moves.
+            this._highlightEntity = Crafty.e("Highlight")
+                    .color("#ff9f00")
+                    .attr({
+                        x: this.x - HL_RADIUS,
+                        y: this.y - HL_RADIUS,
+                        z: Z_HIGHLIGHT,
+                        w: this.w + 2 * HL_RADIUS,
+                        h: this.h + 2 * HL_RADIUS,
+                    });
         }
-        // TODO: Provide an alternative for sprites.
         return this;
     },
     unhighlight: function() {
+        if (!this._isHighlighted) {
+            return this;
+        }
         this._isHighlighted = false;
         if (this.has("Color")) {
             return this.color(this._defaultColor);
+        } else {
+            this._highlightEntity.destroy();
         }
-        // TODO: Provide an alternative for sprites.
         return this;
     },
     isHighlighted: function() {
@@ -164,4 +184,8 @@ Crafty.c("Ground", {
         this.color("#3f773f");
         this.attr({z: Z_GROUND});
     },
+});
+
+Crafty.c("Highlight", {
+    required: "2D, DOM, Tween, Color",
 });
