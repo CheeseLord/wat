@@ -231,7 +231,7 @@ export function removeMovementSquares() {
 
 export function deselectPlayer() {
     if (selectedPlayer) {
-        selectedPlayer.unmark();
+        selectedPlayer.markUnselected();
         selectedPlayer = null;
         // TODO: Probably the menu table should instead define the state we
         // transition to on CLEAR_MENU?
@@ -243,6 +243,7 @@ export function characterActed(character) {
     deselectPlayer();
 
     // The character is no longer ready.
+    character.markUnready();
     let index = readyCharacters.indexOf(character);
     if (index === -1) {
         // TODO: We should never get here, but handle it better anyway.
@@ -285,6 +286,11 @@ function centerCameraOn(target, time) {
 
 export function endTurn() {
     Crafty.log(`Reached end of turn for team ${currentTeam}.`);
+
+    Crafty("Highlightable").each(function() {
+        this.markUnready();
+    });
+
     let team = currentTeam;
     let maxTries = NUM_TEAMS;
     // If the next team has no one on it to act, skip over them. Repeat until
@@ -311,6 +317,7 @@ export function newTurn(team) {
     readyCharacters = [];
     Crafty("Character").each(function() {
         if (this.team === team) {
+            this.markReady();
             readyCharacters.push(this);
         }
     });

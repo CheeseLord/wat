@@ -78,10 +78,11 @@ Crafty.c("Highlightable", {
     required: "GridObject",
 
     init: function() {
-        this._isHighlighted = false;
+        this._isReady    = false;
+        this._isSelected = false;
     },
 
-    _addBorder: function(color) {
+    _setBorder: function(color) {
         return this.css({
             "outline": "solid " + (HL_RADIUS) + "px " + color,
         });
@@ -91,15 +92,34 @@ Crafty.c("Highlightable", {
             "outline": "none",
         });
     },
+    _redraw: function() {
+        if (this._isSelected) {
+            return this._setBorder("#ff9f00");
+        } else if (this._isReady) {
+            return this._setBorder("#1f3f9f");
+        } else {
+            return this._clearBorder();
+        }
+    },
 
     markSelected: function() {
-        return this._addBorder("#ff9f00");
+        this._isSelected = true;
+        return this._redraw();
     },
+    markUnselected: function() {
+        this._isSelected = false;
+        return this._redraw();
+    },
+    // Note: if you don't like this name, at least don't change it to simply
+    // "ready()". That name is already taken, so reusing it will cause things
+    // to break horribly.
     markReady: function() {
-        return this._addBorder("#333333");
+        this._isReady = true;
+        return this._redraw();
     },
-    unmark: function() {
-        return this._clearBorder();
+    markUnready: function() {
+        this._isReady = false;
+        return this._redraw();
     },
 });
 
