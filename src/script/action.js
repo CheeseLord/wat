@@ -254,6 +254,8 @@ export function characterActed(character) {
     if (readyCharacters.length === 0) {
         endTurn();
     }
+    // TODO: Also do this in endTurn, but not redundantly. Can we have a custom
+    // event for like "it's a new player's turn" and do it when that fires?
     if (readyCharacters.length > 0) {
         setFocusOn(readyCharacters[0]);
     }
