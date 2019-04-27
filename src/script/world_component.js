@@ -90,25 +90,10 @@ Crafty.c("Character", {
         this._isHighlighted = false;
         this.team = -1;
         this.attr({z: Z_CHARACTER});
-        this._highlightEntity = null;
     },
 
     setTeam: function(team) {
         this.team = team;
-        return this;
-    },
-
-    setColors: function(newColors) {
-        this.attr({
-            _defaultColor:     newColors.defaultColor,
-            _highlightedColor: newColors.highlightedColor,
-        });
-        // Start out not highlighted
-        if (this.has("Color")) {
-            this.color(this._defaultColor);
-        }
-        // TODO: Provide an alternative for sprites.
-        // So that "setter" attributes can be chained together.
         return this;
     },
 
@@ -117,16 +102,12 @@ Crafty.c("Character", {
             return this;
         }
         this._isHighlighted = true;
-        if (this.has("Color")) {
-            return this.color(this._highlightedColor);
-        } else {
-            // Add a border around this. (Note: in CSS, an outline seems to be
-            // basically the same as a border except it doesn't offset the
-            // element.)
-            this.css({
-                "outline": "solid " + (HL_RADIUS) + "px #ff9f00",
-            });
-        }
+        // Add an outline around this. (Note: in CSS, an outline seems to be
+        // basically the same as a border except it doesn't offset the
+        // element.)
+        this.css({
+            "outline": "solid " + (HL_RADIUS) + "px #ff9f00",
+        });
         return this;
     },
     unhighlight: function() {
@@ -134,13 +115,9 @@ Crafty.c("Character", {
             return this;
         }
         this._isHighlighted = false;
-        if (this.has("Color")) {
-            return this.color(this._defaultColor);
-        } else {
-            this.css({
-                "outline": "none",
-            });
-        }
+        this.css({
+            "outline": "none",
+        });
         return this;
     },
     isHighlighted: function() {
