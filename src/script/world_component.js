@@ -67,12 +67,45 @@ Crafty.c("GridObject", {
     },
 });
 
+// Anything that takes up space, in the sense that you can't have two of them
+// on the same tile. Provides no new functionality, but the component is
+// checked in movement code.
 Crafty.c("SpaceFillingObject", {
     required: "GridObject",
 });
 
+Crafty.c("Highlightable", {
+    required: "GridObject",
+
+    init: function() {
+        this._isHighlighted = false;
+    },
+
+    _addBorder: function(color) {
+        return this.css({
+            "outline": "solid " + (HL_RADIUS) + "px " + color,
+        });
+    },
+    _clearBorder: function() {
+        return this.css({
+            "outline": "none",
+        });
+    },
+
+    markSelected: function() {
+        return this._addBorder("#ff9f00");
+    },
+    markReady: function() {
+        return this._addBorder("#333333");
+    },
+    unmark: function() {
+        return this._clearBorder();
+    },
+});
+
 Crafty.c("Character", {
-    required: "SpaceFillingObject, Keyboard, Mouse",
+    // TODO: Remove Keyboard? It's not used anymore, right?
+    required: "Highlightable, SpaceFillingObject, Keyboard, Mouse",
 
     init: function() {
         // Insert grumpy cat "no" image here.
@@ -87,7 +120,6 @@ Crafty.c("Character", {
         //         this.moveBy({x:  0, y:  1});
         //     }
         // });
-        this._isHighlighted = false;
         this.team = -1;
         this.attr({z: Z_CHARACTER});
     },
@@ -95,33 +127,6 @@ Crafty.c("Character", {
     setTeam: function(team) {
         this.team = team;
         return this;
-    },
-
-    highlight: function() {
-        if (this._isHighlighted) {
-            return this;
-        }
-        this._isHighlighted = true;
-        // Add an outline around this. (Note: in CSS, an outline seems to be
-        // basically the same as a border except it doesn't offset the
-        // element.)
-        this.css({
-            "outline": "solid " + (HL_RADIUS) + "px #ff9f00",
-        });
-        return this;
-    },
-    unhighlight: function() {
-        if (!this._isHighlighted) {
-            return this;
-        }
-        this._isHighlighted = false;
-        this.css({
-            "outline": "none",
-        });
-        return this;
-    },
-    isHighlighted: function() {
-        return this._isHighlighted;
     },
 });
 

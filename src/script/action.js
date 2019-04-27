@@ -220,7 +220,7 @@ export function reportUserError(text) {
 export function selectPlayer(player) {
     deselectPlayer();
     selectedPlayer = player;
-    selectedPlayer.highlight();
+    selectedPlayer.markSelected();
 }
 
 export function removeMovementSquares() {
@@ -230,8 +230,8 @@ export function removeMovementSquares() {
 }
 
 export function deselectPlayer() {
-    if (selectedPlayer && selectedPlayer.isHighlighted()) {
-        selectedPlayer.unhighlight();
+    if (selectedPlayer) {
+        selectedPlayer.unmark();
         selectedPlayer = null;
         // TODO: Probably the menu table should instead define the state we
         // transition to on CLEAR_MENU?
