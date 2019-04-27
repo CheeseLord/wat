@@ -6,7 +6,6 @@ import {
     MapGrid,
     HL_RADIUS,
     SPRITE_DUR_PER_FRAME,
-    Z_HIGHLIGHT,
     Z_GROUND,
     Z_CHARACTER,
 } from  "./consts.js";
@@ -121,20 +120,12 @@ Crafty.c("Character", {
         if (this.has("Color")) {
             return this.color(this._highlightedColor);
         } else {
-            // Add a "border" around this.
-            this._highlightEntity = Crafty.e("Highlight")
-                    .color("#ff9f00")
-                    .attr({
-                        x: this.x - HL_RADIUS,
-                        y: this.y - HL_RADIUS,
-                        z: Z_HIGHLIGHT,
-                        w: this.w + 2 * HL_RADIUS,
-                        h: this.h + 2 * HL_RADIUS,
-                    });
-            // Make the "border" follow us when we move.
-            // TODO: This rapidly makes it clear that the border is just a
-            // solid square behind us. Can we make it more of an actual border?
-            this.attach(this._highlightEntity);
+            // Add a border around this. (Note: in CSS, an outline seems to be
+            // basically the same as a border except it doesn't offset the
+            // element.)
+            this.css({
+                "outline": "solid " + (HL_RADIUS) + "px #ff9f00",
+            });
         }
         return this;
     },
@@ -146,7 +137,9 @@ Crafty.c("Character", {
         if (this.has("Color")) {
             return this.color(this._defaultColor);
         } else {
-            this._highlightEntity.destroy();
+            this.css({
+                "outline": "none",
+            });
         }
         return this;
     },
