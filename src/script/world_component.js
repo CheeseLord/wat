@@ -124,22 +124,9 @@ Crafty.c("Highlightable", {
 });
 
 Crafty.c("Character", {
-    // TODO: Remove Keyboard? It's not used anymore, right?
-    required: "Highlightable, SpaceFillingObject, Keyboard, Mouse",
+    required: "Highlightable, SpaceFillingObject, Mouse",
 
     init: function() {
-        // Insert grumpy cat "no" image here.
-        // this.bind("KeyDown", function(e) {
-        //     if (e.key === Crafty.keys.LEFT_ARROW) {
-        //         this.moveBy({x: -1, y:  0});
-        //     } else if (e.key === Crafty.keys.RIGHT_ARROW) {
-        //         this.moveBy({x:  1, y:  0});
-        //     } else if (e.key === Crafty.keys.UP_ARROW) {
-        //         this.moveBy({x:  0, y: -1});
-        //     } else if (e.key === Crafty.keys.DOWN_ARROW) {
-        //         this.moveBy({x:  0, y:  1});
-        //     }
-        // });
         this.team = -1;
         this.attr({z: Z_CHARACTER});
     },
