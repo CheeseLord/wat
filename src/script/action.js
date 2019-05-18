@@ -59,6 +59,7 @@ function doSelectPlayer(evt, x, y) {
             return;
         }
         selectPlayer(evt.target);
+        // TODO: Also setFocusOn? Or even call out to startCharacter?
         doMenu("topMenu");
     }
 }
@@ -223,16 +224,21 @@ export function startTeam(team) {
             readyCharacters.push(this);
         }
     });
+
+    if (readyCharacters.length > 0) {
+        startCharacter(readyCharacters[0]);
+    }
 }
 
 function startCharacter(character) {
     setFocusOn(character);
+    // TODO: Should we select them, too?
 }
 
 export function endCharacter(character) {
     deselectPlayer();
 
-    // The character is no longer ready.
+    // Unready the current character.
     character.markUnready();
     let index = readyCharacters.indexOf(character);
     if (index === -1) {
@@ -241,13 +247,13 @@ export function endCharacter(character) {
     } else {
         readyCharacters.splice(index, 1);
     }
-    if (readyCharacters.length === 0) {
-        endTeam();
-    }
-    // TODO: Also do this in endTeam, but not redundantly. Can we have a custom
-    // event for like "it's a new player's turn" and do it when that fires?
+
     if (readyCharacters.length > 0) {
+        // There are still more characters to move.
         startCharacter(readyCharacters[0]);
+    } else {
+        // This was the last character on the team; end the team's turn.
+        endTeam();
     }
 }
 
@@ -265,11 +271,14 @@ export function endTeam() {
     // teams.
     do {
         team = (team + 1) % NUM_TEAMS;
+        // TODO: Maybe just have startTeam return success or failure? Or maybe
+        // put this loop in startTeam?
         startTeam(team);
         maxTries--;
     } while (readyCharacters.length === 0 && maxTries > 0);
 
     if (readyCharacters.length === 0) {
+        // assert(maxTries === 0);
         // Eventually, this should probably be detected and result in something
         // actually happening in-game. (Maybe a game-over screen since your
         // whole team is dead?)

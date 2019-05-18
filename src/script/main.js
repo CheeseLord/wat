@@ -43,7 +43,7 @@ export function doTheThing() {
             },
         },
         function() {
-            let player1 = Crafty.e("SpriteCharacter")
+            Crafty.e("SpriteCharacter")
                     .setPos({x: 5, y: 3})
                     .setTeam(0)
                     .setAnimation(0, 4);
@@ -54,27 +54,17 @@ export function doTheThing() {
                     .setAnimation(1, 4);
 
             Crafty.e("SpriteCharacter")
-                    .setPos({x: 7, y: 5})
+                    .setPos({x: 5, y: 5})
                     .setTeam(1)
                     .setAnimation(2, 4);
 
             Crafty.e("SpriteCharacter")
-                    .setPos({x: 5, y: 5})
+                    .setPos({x: 7, y: 5})
                     .setTeam(1)
                     .setAnimation(3, 4);
 
             startTeam(0);
             // assert(readyCharacters.length > 0);
-
-            // Animate centering the viewport over the player, taking 1500ms to
-            // do it.
-            Crafty.viewport.clampToEntities = false;
-            // TODO: We need our own function for this that adds in the right
-            // offset, so there isn't a sudden jump. The library implementation
-            // is Crafty/viewport.js#L324-L335.
-            Crafty.viewport.centerOn(player1, 1500);
-            // TODO: Handle this using the usual start-of-turn code, rather
-            // than having a special case here.
         }
     );
 
