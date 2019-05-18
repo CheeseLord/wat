@@ -135,9 +135,19 @@ function doSwap(evt, x, y) {
     let clickPos  = evt.target.getPos();
     evt.target.animateTo(selectPos, ANIM_DUR_MOVE);
     selectedPlayer.animateTo(clickPos, ANIM_DUR_MOVE);
-    selectedPlayer.one("TweenEnd", function() {
-        endCharacter(selectedPlayer);
-    });
+
+    // Wait until _both_ selectedPlayer and evt.target have finished animating.
+    // Even though their durations are the same, empirically they don't always
+    // finish at exactly the same time.
+    let numLeft  = 2;
+    let f = function() {
+        numLeft -= 1;
+        if (numLeft === 0) {
+            endCharacter(selectedPlayer);
+        }
+    };
+    selectedPlayer.one("TweenEnd", f);
+    evt.target.one("TweenEnd", f);
 }
 
 function doAttack(evt, x, y) {
