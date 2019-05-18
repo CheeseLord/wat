@@ -210,6 +210,74 @@ export function worldClickHandler(evt) {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+// "Milestones" in turn order
+
+export function startTeam(team) {
+    Crafty.log(`Starting turn for team ${team}.`);
+
+    currentTeam = team;
+    readyCharacters = [];
+    Crafty("Character").each(function() {
+        if (this.team === team) {
+            this.markReady();
+            readyCharacters.push(this);
+        }
+    });
+}
+
+function startCharacter(character) {
+    setFocusOn(character);
+}
+
+export function endCharacter(character) {
+    deselectPlayer();
+
+    // The character is no longer ready.
+    character.markUnready();
+    let index = readyCharacters.indexOf(character);
+    if (index === -1) {
+        // TODO: We should never get here, but handle it better anyway.
+        return;
+    } else {
+        readyCharacters.splice(index, 1);
+    }
+    if (readyCharacters.length === 0) {
+        endTeam();
+    }
+    // TODO: Also do this in endTeam, but not redundantly. Can we have a custom
+    // event for like "it's a new player's turn" and do it when that fires?
+    if (readyCharacters.length > 0) {
+        startCharacter(readyCharacters[0]);
+    }
+}
+
+export function endTeam() {
+    Crafty.log(`Reached end of turn for team ${currentTeam}.`);
+
+    Crafty("Highlightable").each(function() {
+        this.markUnready();
+    });
+
+    let team = currentTeam;
+    let maxTries = NUM_TEAMS;
+    // If the next team has no one on it to act, skip over them. Repeat until
+    // we find a team that has someone ready to act, or until we've tried all
+    // teams.
+    do {
+        team = (team + 1) % NUM_TEAMS;
+        startTeam(team);
+        maxTries--;
+    } while (readyCharacters.length === 0 && maxTries > 0);
+
+    if (readyCharacters.length === 0) {
+        // Eventually, this should probably be detected and result in something
+        // actually happening in-game. (Maybe a game-over screen since your
+        // whole team is dead?)
+        Crafty.error("There's no one left to act.");
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Menu-related action helpers (and some misc?)
 
 export function reportUserError(text) {
@@ -239,32 +307,6 @@ export function deselectPlayer() {
     }
 }
 
-export function endCharacter(character) {
-    deselectPlayer();
-
-    // The character is no longer ready.
-    character.markUnready();
-    let index = readyCharacters.indexOf(character);
-    if (index === -1) {
-        // TODO: We should never get here, but handle it better anyway.
-        return;
-    } else {
-        readyCharacters.splice(index, 1);
-    }
-    if (readyCharacters.length === 0) {
-        endTeam();
-    }
-    // TODO: Also do this in endTeam, but not redundantly. Can we have a custom
-    // event for like "it's a new player's turn" and do it when that fires?
-    if (readyCharacters.length > 0) {
-        startCharacter(readyCharacters[0]);
-    }
-}
-
-function startCharacter(character) {
-    setFocusOn(character);
-}
-
 function setFocusOn(character) {
     Crafty.viewport.clampToEntities = false;
     centerCameraOn(character, ANIM_DUR_CENTER_TURN);
@@ -285,45 +327,6 @@ function centerCameraOn(target, time) {
     var newY = y + midY - centY;
 
     Crafty.viewport.pan(newX, newY, time);
-}
-
-export function endTeam() {
-    Crafty.log(`Reached end of turn for team ${currentTeam}.`);
-
-    Crafty("Highlightable").each(function() {
-        this.markUnready();
-    });
-
-    let team = currentTeam;
-    let maxTries = NUM_TEAMS;
-    // If the next team has no one on it to act, skip over them. Repeat until
-    // we find a team that has someone ready to act, or until we've tried all
-    // teams.
-    do {
-        team = (team + 1) % NUM_TEAMS;
-        startTeam(team);
-        maxTries--;
-    } while (readyCharacters.length === 0 && maxTries > 0);
-
-    if (readyCharacters.length === 0) {
-        // Eventually, this should probably be detected and result in something
-        // actually happening in-game. (Maybe a game-over screen since your
-        // whole team is dead?)
-        Crafty.error("There's no one left to act.");
-    }
-}
-
-export function startTeam(team) {
-    Crafty.log(`Starting turn for team ${team}.`);
-
-    currentTeam = team;
-    readyCharacters = [];
-    Crafty("Character").each(function() {
-        if (this.team === team) {
-            this.markReady();
-            readyCharacters.push(this);
-        }
-    });
 }
 
 function createMovementSquare(x, y) {
