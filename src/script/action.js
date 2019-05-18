@@ -263,9 +263,6 @@ export function characterActed(character) {
 
 function setFocusOn(character) {
     Crafty.viewport.clampToEntities = false;
-    Crafty.one("CameraAnimationDone", function() {
-        Crafty.viewport.follow(character, MENU_WIDTH / 2, 0);
-    });
     centerCameraOn(character, ANIM_DUR_CENTER_TURN);
 }
 
