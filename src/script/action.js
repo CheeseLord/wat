@@ -100,7 +100,7 @@ function doMove(evt, x, y) {
     removeMovementSquares();
     selectedPlayer.animateTo({x: x, y: y}, ANIM_DUR_MOVE);
     selectedPlayer.one("TweenEnd", function() {
-        characterActed(selectedPlayer);
+        endCharacter(selectedPlayer);
     });
 }
 
@@ -135,7 +135,7 @@ function doSwap(evt, x, y) {
     evt.target.animateTo(selectPos, ANIM_DUR_MOVE);
     selectedPlayer.animateTo(clickPos, ANIM_DUR_MOVE);
     selectedPlayer.one("TweenEnd", function() {
-        characterActed(selectedPlayer);
+        endCharacter(selectedPlayer);
     });
 }
 
@@ -174,7 +174,7 @@ function doAttack(evt, x, y) {
         selectedPlayer.one("TweenEnd", function() {
             target.destroy();
             setGlobalState(StateEnum.DEFAULT);
-            characterActed(selectedPlayer);
+            endCharacter(selectedPlayer);
         });
     });
 }
@@ -239,7 +239,7 @@ export function deselectPlayer() {
     }
 }
 
-export function characterActed(character) {
+export function endCharacter(character) {
     deselectPlayer();
 
     // The character is no longer ready.
@@ -252,13 +252,17 @@ export function characterActed(character) {
         readyCharacters.splice(index, 1);
     }
     if (readyCharacters.length === 0) {
-        endTurn();
+        endTeam();
     }
-    // TODO: Also do this in endTurn, but not redundantly. Can we have a custom
+    // TODO: Also do this in endTeam, but not redundantly. Can we have a custom
     // event for like "it's a new player's turn" and do it when that fires?
     if (readyCharacters.length > 0) {
-        setFocusOn(readyCharacters[0]);
+        startCharacter(readyCharacters[0]);
     }
+}
+
+function startCharacter(character) {
+    setFocusOn(character);
 }
 
 function setFocusOn(character) {
@@ -283,7 +287,7 @@ function centerCameraOn(target, time) {
     Crafty.viewport.pan(newX, newY, time);
 }
 
-export function endTurn() {
+export function endTeam() {
     Crafty.log(`Reached end of turn for team ${currentTeam}.`);
 
     Crafty("Highlightable").each(function() {
@@ -297,7 +301,7 @@ export function endTurn() {
     // teams.
     do {
         team = (team + 1) % NUM_TEAMS;
-        newTurn(team);
+        startTeam(team);
         maxTries--;
     } while (readyCharacters.length === 0 && maxTries > 0);
 
@@ -309,7 +313,7 @@ export function endTurn() {
     }
 }
 
-export function newTurn(team) {
+export function startTeam(team) {
     Crafty.log(`Starting turn for team ${team}.`);
 
     currentTeam = team;

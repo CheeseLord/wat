@@ -12,7 +12,7 @@ import {
 import "./button.js";
 import "./world_component.js";
 import {
-    newTurn,
+    startTeam,
     worldClickHandler,
 } from "./action.js";
 
@@ -63,7 +63,7 @@ export function doTheThing() {
                     .setTeam(1)
                     .setAnimation(3, 4);
 
-            newTurn(0);
+            startTeam(0);
             // assert(readyCharacters.length > 0);
 
             // Animate centering the viewport over the player, taking 1500ms to

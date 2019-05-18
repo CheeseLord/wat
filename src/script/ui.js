@@ -6,13 +6,13 @@ import {StateEnum} from "./consts.js";
 
 import {
     selectedPlayer,
-    characterActed,
+    endCharacter,
     setGlobalState,
     createMovementGrid,
     deselectPlayer,
     removeMovementSquares,
     specialAttack,
-    endTurn,
+    endTeam,
 } from  "./action.js";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ var menuTable = {
             ["Attack",      "attack",     doNothing],
             ["End Turn",    CLEAR_MENU,   () => {
                 deselectPlayer();
-                endTurn();
+                endTeam();
             }],
             ["Cancel",      CLEAR_MENU,   () => { deselectPlayer(); }],
         ],
@@ -69,7 +69,7 @@ var menuTable = {
             ["Special Attack", CLEAR_MENU,
                 () => {
                     specialAttack(selectedPlayer);
-                    characterActed(selectedPlayer);
+                    endCharacter(selectedPlayer);
                 }],
             ["Back",           PARENT_MENU,   doNothing],
         ],
