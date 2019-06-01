@@ -11,71 +11,66 @@ import {
     Z_SCENERY,
 } from  "./consts.js";
 
+import {
+    gridPosToGraphics,
+} from "./util.js";
+
 ///////////////////////////////////////////////////////////////////////////////
 // Component definitions
 
-// Component for anything that occupies a grid space.
+// Component for anything that is located in a grid space.
+// Don't inherit from GridObject directly; use StaticObject or DynamicObject!
 Crafty.c("GridObject", {
-    required: "2D, DOM, Tween",
+    required: "2D, DOM",
 
     init: function() {
         this.attr({w: MapGrid.tile.width, h: MapGrid.tile.height});
-        // Put us at (0, 0) by default just to ensure that _tileX and _tileY
-        // are not undefined. Hopefully the caller will immediately move us to
-        // a real position.
-        this.setPos({x: 0, y: 0});
     },
 
-    // Get and set the position in map-grid tiles (not pixels).
+    // Initially set the position in map-grid tiles (not pixels). Don't call
+    // this after the object has been initialized! gridPos is something like
+    // {x: ..., y: ...}
+    initPos: function(gridPos) {
+        this.attr({_tileX: gridPos.x, _tileY: gridPos.y});
+        this.attr(gridPosToGraphics(gridPos));
+        return this;
+    },
+
+    // Get current position in map-grid tiles.
     getPos: function() {
         return {x: this._tileX, y: this._tileY};
-    },
-    setPos: function(newPos) {
-        // newPos is {x: newX, y: newY}
-        this.attr({
-            _tileX: newPos.x,
-            _tileY: newPos.y,
-            // TODO: Refactor all the places that use width + hspace and
-            // height + vspace. Maybe just add (computed) constants for those?
-            x:      newPos.x * (MapGrid.tile.width  + MapGrid.tile.hspace),
-            y:      newPos.y * (MapGrid.tile.height + MapGrid.tile.vspace),
-        });
-        // So that "setter" attributes can be chained together.
-        return this;
-    },
-    moveBy: function(deltaPos) {
-        // deltaPos is {x: deltaX, y: deltaY}
-        var oldPos = this.getPos();
-        this.setPos({
-            x: oldPos.x + deltaPos.x,
-            y: oldPos.y + deltaPos.y,
-        });
-        return this;
-    },
-    // TODO: Don't duplicate so much code between this and setPos.
-    animateTo: function(newPos, duration) {
-        // newPos is {x: newX, y: newY}
-        this.attr({
-            _tileX: newPos.x,
-            _tileY: newPos.y,
-        });
-        this.tween({
-            x: newPos.x * (MapGrid.tile.width  + MapGrid.tile.hspace),
-            y: newPos.y * (MapGrid.tile.height + MapGrid.tile.vspace),
-        }, duration);
-        // So that "setter" attributes can be chained together.
-        return this;
     },
 });
 
 // Anything that takes up space, in the sense that you can't have two of them
 // on the same tile. Provides no new functionality, but the component is
 // checked in movement code.
+// TODO: Use a real bit.
 Crafty.c("SpaceFillingObject", {
     required: "GridObject",
 });
 
+// Component for things that never change state in any way.
+Crafty.c("StaticObject", {
+    required: "GridObject",
+});
+
+// Component for things that might change state.
+Crafty.c("DynamicObject", {
+    required: "GridObject, Tween",
+
+    // Move the object to a new position, animating it smoothly. gridPos is in
+    // map-grid tiles, in the form {x: ..., y: ...}
+    animateTo: function(gridPos, duration) {
+        // TODO: Wait to update _tile{X,Y} until after the animation completes?
+        this.attr({_tileX: gridPos.x, _tileY: gridPos.y});
+        this.tween(gridPosToGraphics(gridPos), duration);
+        return this;
+    },
+});
+
 Crafty.c("Highlightable", {
+    // TODO enforce that subclasses use DynamicObject or StaticObject.
     required: "GridObject",
 
     init: function() {
@@ -125,7 +120,7 @@ Crafty.c("Highlightable", {
 });
 
 Crafty.c("Character", {
-    required: "Highlightable, SpaceFillingObject, Mouse",
+    required: "DynamicObject, Highlightable, SpaceFillingObject, Mouse",
 
     init: function() {
         this.team = -1;
@@ -165,7 +160,7 @@ Crafty.c("SpriteCharacter", {
 });
 
 Crafty.c("Ground", {
-    required: "GridObject, Color, Mouse",
+    required: "StaticObject, Color, Mouse",
 
     init: function() {
         this.color("#3f773f");
@@ -174,7 +169,7 @@ Crafty.c("Ground", {
 });
 
 Crafty.c("Tree", {
-    required: "SpaceFillingObject, Color",
+    required: "StaticObject, SpaceFillingObject, Color",
 
     init: function() {
         this.color("#3f2f27");

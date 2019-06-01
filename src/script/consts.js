@@ -42,6 +42,7 @@ export const HL_RADIUS = 2;
 export const MapGrid = {
     width:  25,
     height: 17,
+    // TODO: "grid" vs. "tile"
     tile:   {
         // Dimensions of a tile
         width:  32,

@@ -34,7 +34,7 @@ export var readyCharacters = [];
 export var currentTeam = 0;
 
 Crafty.c("MovementSquare", {
-    required: "GridObject, Color",
+    required: "DynamicObject, Color",
 
     init: function() {
         this.color("#00ff00", 0.25);
@@ -364,7 +364,7 @@ function createMovementSquare(x, y) {
     if (occupied || !hasGround) {
         return;
     }
-    Crafty.e("MovementSquare").setPos({x: x, y: y});
+    Crafty.e("MovementSquare").initPos({x: x, y: y});
 }
 
 export function createMovementGrid(player) {

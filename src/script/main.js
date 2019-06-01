@@ -44,22 +44,22 @@ export function doTheThing() {
         },
         function() {
             Crafty.e("SpriteCharacter")
-                    .setPos({x: 5, y: 3})
+                    .initPos({x: 5, y: 3})
                     .setTeam(0)
                     .setAnimation(0, 4);
 
             Crafty.e("SpriteCharacter")
-                    .setPos({x: 7, y: 3})
+                    .initPos({x: 7, y: 3})
                     .setTeam(0)
                     .setAnimation(1, 4);
 
             Crafty.e("SpriteCharacter")
-                    .setPos({x: 5, y: 5})
+                    .initPos({x: 5, y: 5})
                     .setTeam(1)
                     .setAnimation(2, 4);
 
             Crafty.e("SpriteCharacter")
-                    .setPos({x: 7, y: 5})
+                    .initPos({x: 7, y: 5})
                     .setTeam(1)
                     .setAnimation(3, 4);
 
@@ -69,23 +69,23 @@ export function doTheThing() {
     );
 
     // Static enemies
-    Crafty.e("Enemy").setPos({x: 11, y:  3});
-    Crafty.e("Enemy").setPos({x: 19, y: 11});
-    Crafty.e("Enemy").setPos({x:  8, y: 11});
-    Crafty.e("Enemy").setPos({x: 11, y: 12});
-    Crafty.e("Enemy").setPos({x: 14, y:  9});
-    Crafty.e("Enemy").setPos({x: 21, y:  5});
-    Crafty.e("Enemy").setPos({x: 17, y: 13});
-    Crafty.e("Enemy").setPos({x:  2, y: 13});
-    Crafty.e("Enemy").setPos({x:  2, y:  9});
+    Crafty.e("Enemy").initPos({x: 11, y:  3});
+    Crafty.e("Enemy").initPos({x: 19, y: 11});
+    Crafty.e("Enemy").initPos({x:  8, y: 11});
+    Crafty.e("Enemy").initPos({x: 11, y: 12});
+    Crafty.e("Enemy").initPos({x: 14, y:  9});
+    Crafty.e("Enemy").initPos({x: 21, y:  5});
+    Crafty.e("Enemy").initPos({x: 17, y: 13});
+    Crafty.e("Enemy").initPos({x:  2, y: 13});
+    Crafty.e("Enemy").initPos({x:  2, y:  9});
 
     // The ground
     for (let y = 0; y < 20; y++) {
         for (let x = 0; x < 30; x++) {
             if (x === 6 && y === 7) {
-                Crafty.e("Tree").setPos({x: x, y: y});
+                Crafty.e("Tree").initPos({x: x, y: y});
             } else {
-                Crafty.e("Ground").setPos({x: x, y: y});
+                Crafty.e("Ground").initPos({x: x, y: y});
             }
         }
     }
