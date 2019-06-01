@@ -82,7 +82,11 @@ export function doTheThing() {
     // The ground
     for (let y = 0; y < 20; y++) {
         for (let x = 0; x < 30; x++) {
-            Crafty.e("Ground").setPos({x: x, y: y});
+            if (x === 6 && y === 7) {
+                Crafty.e("Tree").setPos({x: x, y: y});
+            } else {
+                Crafty.e("Ground").setPos({x: x, y: y});
+            }
         }
     }
 

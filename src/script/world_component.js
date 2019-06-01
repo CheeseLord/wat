@@ -6,8 +6,9 @@ import {
     MapGrid,
     HL_RADIUS,
     SPRITE_DUR_PER_FRAME,
-    Z_GROUND,
     Z_CHARACTER,
+    Z_GROUND,
+    Z_SCENERY,
 } from  "./consts.js";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -169,6 +170,15 @@ Crafty.c("Ground", {
     init: function() {
         this.color("#3f773f");
         this.attr({z: Z_GROUND});
+    },
+});
+
+Crafty.c("Tree", {
+    required: "SpaceFillingObject, Color",
+
+    init: function() {
+        this.color("#3f2f27");
+        this.attr({z: Z_SCENERY});
     },
 });
 
