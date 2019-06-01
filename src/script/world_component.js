@@ -181,7 +181,3 @@ Crafty.c("Tree", {
         this.attr({z: Z_SCENERY});
     },
 });
-
-Crafty.c("Highlight", {
-    required: "2D, DOM, Tween, Color",
-});
