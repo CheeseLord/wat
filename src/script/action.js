@@ -33,6 +33,14 @@ export function setGlobalState(newState) { globalState = newState; }
 export var readyCharacters = [];
 export var currentTeam = 0;
 
+// A map of the level, consisting of only the StaticObjects. This is a 2D
+// array, indexed [x][y]. Each element is an object with fields:
+//     isBlocked = true if the square is blocked by a StaticObject, so can
+//         never be moved into.
+//     parent    = null (used by pathfinding)
+// Must be initialized whenever a new level is loaded.
+export var staticMap = [];
+
 // TODO change MovementSquare to not be a DynamicObject in its own right, but
 // instead be a highlight on the existing object. Right now they're the one
 // weird exception to the DynamicObject component -- everything else represents
@@ -353,41 +361,87 @@ function centerCameraOn(target, time) {
     Crafty.viewport.pan(newX, newY, time);
 }
 
-function createMovementSquare(x, y) {
-    let blocked  = false;
-    let inBounds = false;
-    Crafty("GridObject").each(function() {
-        if (this.getPos().x === x && this.getPos().y === y) {
-            inBounds = true;
-            if (this.blocksMovement) {
-                blocked = true;
+export function createMovementGrid(player) {
+    let playerPos  = player.getPos();
+    let dynamicMap = getDynamicMap();
+    createMovementGridPaths(playerPos, dynamicMap, MOVE_RANGE);
+    for (let x = 0; x < dynamicMap.length; x++) {
+        for (let y = 0; y < dynamicMap[x].length; y++) {
+            if (dynamicMap[x][y].parent !== null) {
+                // TODO show the actual path somehow.
+                Crafty.e("MovementSquare").initPos({x: x, y: y});
             }
         }
-    });
-    if (blocked || !inBounds) {
-        return;
-    }
-    Crafty.e("MovementSquare").initPos({x: x, y: y});
-}
-
-export function createMovementGrid(player) {
-    var playerPos = player.getPos();
-    var x = playerPos.x;
-    var y = playerPos.y;
-    var maxDistance = MOVE_RANGE;
-    for (var i = 1; i <= maxDistance; i++) {
-        for (var j = 1; j + i <= maxDistance; j++) {
-            createMovementSquare(x + i, y + j);
-            createMovementSquare(x + i, y - j);
-            createMovementSquare(x - i, y + j);
-            createMovementSquare(x - i, y - j);
-        }
-        createMovementSquare(x + i, y);
-        createMovementSquare(x - i, y);
-        createMovementSquare(x, y + i);
-        createMovementSquare(x, y - i);
     }
 };
+
+////////////////////////////////////////
+// TODO move this stuff somewhere else.
+
+function createMovementGridPaths(pos, grid, distance) {
+    // Placeholder
+}
+
+function getDynamicMap() {
+    let dynamicMap = [];
+    // Clone the staticMap.
+    for (let x = 0; x < staticMap.length; x++) {
+        dynamicMap.push([]);
+        for (let y = 0; y < staticMap[x].length; y++) {
+            dynamicMap[x].push({
+                isBlocked: staticMap[x][y].isBlocked,
+                parent:    staticMap[x][y].parent,
+            });
+        }
+    }
+
+    Crafty("GridObject").each(function() {
+        if (this.blocksMovement) {
+            // TODO bounds check?
+            dynamicMap[this.getPos().x][this.getPos().y].isBlocked = true;
+        }
+    });
+
+    return dynamicMap;
+}
+
+export function buildStaticMap() {
+    // First compute the bounds, because apparently those aren't recorded
+    // anywhere.
+    let maxX = 0;
+    let maxY = 0;
+    Crafty("StaticObject").each(function() {
+        let pos = this.getPos();
+        if (pos.x > maxX) {
+            maxX = pos.x;
+        }
+        if (pos.y > maxY) {
+            maxY = pos.y;
+        }
+    });
+
+    // Create arrays of the appropriate lengths.
+    staticMap = [];
+    for (let x = 0; x < maxX; x++) {
+        staticMap.push([]);
+        for (let y = 0; y < maxY; y++) {
+            staticMap[x].push({
+                isBlocked: false,
+                parent:    null,
+            });
+        }
+    }
+
+    // Fill in the isBlocked values for StaticObjects.
+    Crafty("StaticObject").each(function() {
+        if (this.blocksMovement) {
+            staticMap[this.getPos().x][this.getPos().y].isBlocked = true;
+        }
+    });
+}
+
+// End "TODO move this stuff somewhere else"
+////////////////////////////////////////
 
 export function specialAttack(player) {
     Crafty("Character").each(function() {

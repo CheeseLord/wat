@@ -12,6 +12,7 @@ import {
 import "./button.js";
 import "./world_component.js";
 import {
+    buildStaticMap,
     startTeam,
     worldClickHandler,
 } from "./action.js";
@@ -89,6 +90,8 @@ export function doTheThing() {
             }
         }
     }
+
+    buildStaticMap();
 
     Crafty.createLayer("UILayer", "DOM", {
         // Ignore viewscreen transforms
