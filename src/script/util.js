@@ -43,7 +43,10 @@ export function createMovementGridPaths(startPos, theMap, distance) {
         if (dist === 0) {
             continue;
         }
-        for (var nextPos in getNeighbors(theMap, pos)) {
+        let neighbors = getNeighbors(theMap, pos);
+        // Sigh. JavaScript foreach loops.
+        for (let i = 0; i < neighbors.length; i++) {
+            let nextPos = neighbors[i];
             if (nextPos in visited) {
                 continue;
             }
@@ -60,16 +63,16 @@ function getNeighbors(theMap, pos) {
     var y = pos.y;
     var neighbors = [];
     if (x !== 0 && !theMap[x - 1][y].isBlocked) {
-        neighbors.push(theMap[x - 1][y]);
+        neighbors.push({x: x - 1, y: y});
     };
     if (x !== theMap.length - 1 && !theMap[x + 1][y].isBlocked) {
-        neighbors.push(theMap[x + 1][y]);
+        neighbors.push({x: x + 1, y: y});
     };
     if (y !== 0 && !theMap[x][y - 1].isBlocked) {
-        neighbors.push(theMap[x][y - 1]);
+        neighbors.push({x: x, y: y - 1});
     };
     if (y !== theMap[x].length - 1 && !theMap[x][y + 1].isBlocked) {
-        neighbors.push(theMap[x][y + 1]);
+        neighbors.push({x: x, y: y + 1});
     };
     return neighbors;
 }
