@@ -33,7 +33,6 @@ export function gridPosToGraphics(gridPos) {
 
 // BFS to create movement grid
 export function createMovementGridPaths(startPos, theMap, distance) {
-    var visited = {};
     var queue = [];
     queue.push({"pos": startPos, "dist": distance});
     while (queue.length > 0) {
@@ -47,10 +46,9 @@ export function createMovementGridPaths(startPos, theMap, distance) {
         // Sigh. JavaScript foreach loops.
         for (let i = 0; i < neighbors.length; i++) {
             let nextPos = neighbors[i];
-            if (nextPos in visited) {
+            if (theMap[nextPos.x][nextPos.y].parent !== null) {
                 continue;
-            }
-            visited[nextPos] = true;
+            };
             theMap[nextPos.x][nextPos.y].parent = pos;
             queue.push({"pos": nextPos, "dist": dist - 1});
         }
