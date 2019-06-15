@@ -32,7 +32,7 @@ export function gridPosToGraphics(gridPos) {
 
 
 // BFS to create movement grid
-export function createMovementGridPaths(startPos, grid, distance) {
+export function createMovementGridPaths(startPos, theMap, distance) {
     var visited = {};
     var queue = [];
     queue.push({"pos": startPos, "dist": distance});
@@ -43,33 +43,33 @@ export function createMovementGridPaths(startPos, grid, distance) {
         if (dist === 0) {
             continue;
         }
-        for (var nextPos in getNeighbors(grid, pos)) {
+        for (var nextPos in getNeighbors(theMap, pos)) {
             if (nextPos in visited) {
                 continue;
             }
             visited[nextPos] = true;
-            grid[nextPos.x][nextPos.y].parent = pos;
+            theMap[nextPos.x][nextPos.y].parent = pos;
             queue.push({"pos": nextPos, "dist": dist - 1});
         }
     };
-    return grid;
+    return theMap;
 }
 
-function getNeighbors(grid, pos) {
+function getNeighbors(theMap, pos) {
     var x = pos.x;
     var y = pos.y;
     var neighbors = [];
-    if (x !== 0 && !grid[x - 1][y].isBlocked) {
-        neighbors.push(grid[x - 1][y]);
+    if (x !== 0 && !theMap[x - 1][y].isBlocked) {
+        neighbors.push(theMap[x - 1][y]);
     };
-    if (x !== grid.length - 1 && !grid[x + 1][y].isBlocked) {
-        neighbors.push(grid[x + 1][y]);
+    if (x !== theMap.length - 1 && !theMap[x + 1][y].isBlocked) {
+        neighbors.push(theMap[x + 1][y]);
     };
-    if (y !== 0 && !grid[x][y - 1].isBlocked) {
-        neighbors.push(grid[x][y - 1]);
+    if (y !== 0 && !theMap[x][y - 1].isBlocked) {
+        neighbors.push(theMap[x][y - 1]);
     };
-    if (y !== grid[x].length - 1 && !grid[x][y + 1].isBlocked) {
-        neighbors.push(grid[x][y + 1]);
+    if (y !== theMap[x].length - 1 && !theMap[x][y + 1].isBlocked) {
+        neighbors.push(theMap[x][y + 1]);
     };
     return neighbors;
 }
