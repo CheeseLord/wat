@@ -40,6 +40,9 @@ export function createMovementGridPaths(startPos, grid, distance) {
         var posAndDist = queue.shift();
         var pos = posAndDist["pos"];
         var dist = posAndDist["dist"];
+        if (dist === 0) {
+            continue;
+        }
         for (var nextPos in getNeighbors(grid, pos)) {
             if (nextPos in visited) {
                 continue;
