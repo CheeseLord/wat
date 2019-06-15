@@ -49,7 +49,7 @@ export function createMovementGridPaths(startPos, grid, distance) {
             }
             visited[nextPos] = true;
             grid[nextPos.x][nextPos.y].parent = pos;
-            queue.push({"pos": nextPos, "dist": dist});
+            queue.push({"pos": nextPos, "dist": dist - 1});
         }
     };
     return grid;
