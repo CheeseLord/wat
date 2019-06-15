@@ -30,3 +30,43 @@ export function gridPosToGraphics(gridPos) {
 
 // TODO: graphicsPosToGrid?
 
+
+// BFS to create movement grid
+export function createMovementGridPaths(startPos, grid, distance) {
+    var visited = {};
+    var queue = [];
+    queue.push({"pos": startPos, "dist": distance});
+    while (queue.length > 0) {
+        var posAndDist = queue.shift();
+        var pos = posAndDist["pos"];
+        var dist = posAndDist["dist"];
+        for (var nextPos in getNeighbors(grid, pos)) {
+            if (nextPos in visited) {
+                continue;
+            }
+            visited[nextPos] = true;
+            grid[nextPos.x][nextPos.y].parent = pos;
+            queue.push({"pos": nextPos, "dist": dist});
+        }
+    };
+    return grid;
+}
+
+function getNeighbors(grid, pos) {
+    var x = pos.x;
+    var y = pos.y;
+    var neighbors = [];
+    if (x !== 0 && !grid[x - 1][y].isBlocked) {
+        neighbors.push(grid[x - 1][y]);
+    };
+    if (x !== grid.length - 1 && !grid[x + 1][y].isBlocked) {
+        neighbors.push(grid[x + 1][y]);
+    };
+    if (y !== 0 && !grid[x][y - 1].isBlocked) {
+        neighbors.push(grid[x][y - 1]);
+    };
+    if (y !== grid[x].length - 1 && !grid[x][y + 1].isBlocked) {
+        neighbors.push(grid[x][y + 1]);
+    };
+    return neighbors;
+}
