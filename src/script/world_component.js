@@ -25,6 +25,7 @@ Crafty.c("GridObject", {
 
     init: function() {
         this.attr({w: MapGrid.tile.width, h: MapGrid.tile.height});
+        this.attr({blocksMovement: false});
     },
 
     // Initially set the position in map-grid tiles (not pixels). Don't call
@@ -42,14 +43,6 @@ Crafty.c("GridObject", {
     },
 });
 
-// Anything that takes up space, in the sense that you can't have two of them
-// on the same tile. Provides no new functionality, but the component is
-// checked in movement code.
-// TODO: Use a real bit.
-Crafty.c("SpaceFillingObject", {
-    required: "GridObject",
-});
-
 // Component for things that never change state in any way.
 Crafty.c("StaticObject", {
     required: "GridObject",
@@ -58,6 +51,10 @@ Crafty.c("StaticObject", {
 // Component for things that might change state.
 Crafty.c("DynamicObject", {
     required: "GridObject, Tween",
+
+    init: function() {
+        this.attr({blocksMovement: true});
+    },
 
     // Move the object to a new position, animating it smoothly. gridPos is in
     // map-grid tiles, in the form {x: ..., y: ...}
@@ -120,11 +117,12 @@ Crafty.c("Highlightable", {
 });
 
 Crafty.c("Character", {
-    required: "DynamicObject, Highlightable, SpaceFillingObject, Mouse",
+    required: "DynamicObject, Highlightable, Mouse",
 
     init: function() {
         this.team = -1;
         this.attr({z: Z_CHARACTER});
+        // inherit blocksMovement=true from DynamicObject
     },
 
     setTeam: function(team) {
@@ -169,10 +167,11 @@ Crafty.c("Ground", {
 });
 
 Crafty.c("Tree", {
-    required: "StaticObject, SpaceFillingObject, Color",
+    required: "StaticObject, Color",
 
     init: function() {
         this.color("#3f2f27");
         this.attr({z: Z_SCENERY});
+        this.attr({blocksMovement: true});
     },
 });

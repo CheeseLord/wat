@@ -33,12 +33,17 @@ export function setGlobalState(newState) { globalState = newState; }
 export var readyCharacters = [];
 export var currentTeam = 0;
 
+// TODO change MovementSquare to not be a DynamicObject in its own right, but
+// instead be a highlight on the existing object. Right now they're the one
+// weird exception to the DynamicObject component -- everything else represents
+// real objects in the world, but MovementSquares are a purely UI construct.
 Crafty.c("MovementSquare", {
     required: "DynamicObject, Color",
 
     init: function() {
         this.color("#00ff00", 0.25);
         this.attr({z: Z_MOVE_SQUARE});
+        this.attr({blocksMovement: false});
     },
 });
 
@@ -84,7 +89,7 @@ function doMove(evt, x, y) {
         return;
     }
 
-    if (evt.target && evt.target.has("SpaceFillingObject")) {
+    if (evt.target && evt.target.blocksMovement) {
         reportUserError("Can't move there; something's in the way.");
         return;
     } else if (getDistance({x: x, y: y}, selectedPlayer.getPos()) >
@@ -349,19 +354,17 @@ function centerCameraOn(target, time) {
 }
 
 function createMovementSquare(x, y) {
-    let occupied  = false;
-    let hasGround = false;
-    Crafty("SpaceFillingObject").each(function() {
+    let blocked  = false;
+    let inBounds = false;
+    Crafty("GridObject").each(function() {
         if (this.getPos().x === x && this.getPos().y === y) {
-            occupied = true;
+            inBounds = true;
+            if (this.blocksMovement) {
+                blocked = true;
+            }
         }
     });
-    Crafty("Ground").each(function() {
-        if (this.getPos().x === x && this.getPos().y === y) {
-            hasGround = true;
-        }
-    });
-    if (occupied || !hasGround) {
+    if (blocked || !inBounds) {
         return;
     }
     Crafty.e("MovementSquare").initPos({x: x, y: y});
