@@ -14,6 +14,7 @@ import {
     Z_MOVE_SQUARE,
 } from "./consts.js";
 import {
+    createMovementGridPaths,
     getDistance,
     isAdjacent,
     midpoint,
@@ -377,10 +378,6 @@ export function createMovementGrid(player) {
 
 ////////////////////////////////////////
 // TODO move this stuff somewhere else.
-
-function createMovementGridPaths(pos, grid, distance) {
-    // Placeholder
-}
 
 function getDynamicMap() {
     let dynamicMap = [];
