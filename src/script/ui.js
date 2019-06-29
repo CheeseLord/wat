@@ -25,7 +25,6 @@ const PARENT_MENU = {};
 //     "back" button. Does not include the current menu.
 // currMenuName - the name of the currently-displayed menu, or null if there is
 //     no menu displayed.
-// FIXME: Swap Places > Back > Swap Places > Back -- still have Back button.
 export var menuStack    = [];
 export var currMenuName = null;
 
@@ -108,6 +107,7 @@ function transitionToMenu(menuName, isTop) {
         } else {
             menuName = menuStack.pop();
             applyMenuByName(menuName);
+            currMenuName = menuName;
         }
     } else {
         applyMenuByName(menuName);
