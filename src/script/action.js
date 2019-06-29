@@ -393,7 +393,7 @@ function getDynamicMap() {
         }
     }
 
-    Crafty("GridObject").each(function() {
+    Crafty("DynamicObject").each(function() {
         if (this.blocksMovement) {
             // TODO bounds check?
             dynamicMap[this.getPos().x][this.getPos().y].isBlocked = true;
