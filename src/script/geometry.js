@@ -131,6 +131,7 @@ function getDynamicMap() {
 function computePathsOnMap(startPos, theMap, distance) {
     var queue = [];
     queue.push({"pos": startPos, "dist": distance});
+    theMap[startPos.x][startPos.y].parent = startPos;
     while (queue.length > 0) {
         var posAndDist = queue.shift();
         var pos = posAndDist["pos"];
