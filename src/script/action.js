@@ -17,7 +17,7 @@ import {
     createMovementGridPaths,
     isAdjacent,
     midpoint,
-} from "./util.js";
+} from "./geometry.js";
 import {doMenu} from "./ui.js";
 
 export var selectedPlayer;

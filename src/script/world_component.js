@@ -13,7 +13,7 @@ import {
 
 import {
     gridPosToGraphics,
-} from "./util.js";
+} from "./geometry.js";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Component definitions
