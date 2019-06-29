@@ -25,11 +25,9 @@ const PARENT_MENU = {};
 //     "back" button. Does not include the current menu.
 // currMenuName - the name of the currently-displayed menu, or null if there is
 //     no menu displayed.
-// FIXME: Currently it's possible to get this logic stuck in a loop. Something
-// like: go to attack -> basic attack, then back a couple times? Need to figure
-// out exactly how this happens.
-var menuStack    = [];
-var currMenuName = null;
+// FIXME: Swap Places > Back > Swap Places > Back -- still have Back button.
+export var menuStack    = [];
+export var currMenuName = null;
 
 function doNothing() {}
 
@@ -102,18 +100,25 @@ export function doMenu(menuName) {
 function transitionToMenu(menuName, isTop) {
     if (menuName === CLEAR_MENU) {
         Crafty.s("ButtonMenu").clearMenu();
-        return;
     } else if (menuName === PARENT_MENU) {
         // Pop menu
         if (menuStack.length === 0) {
             Crafty.s("ButtonMenu").clearMenu();
             currMenuName = null;
-            return;
         } else {
             menuName = menuStack.pop();
+            applyMenuByName(menuName);
         }
+    } else {
+        applyMenuByName(menuName);
+        if (currMenuName && !isTop) {
+            menuStack.push(currMenuName);
+        }
+        currMenuName = menuName;
     }
+}
 
+function applyMenuByName(menuName) {
     let menuDesc = menuTable[menuName];
     if (!menuDesc) {
         Crafty.error("No such menu: " + menuName);
@@ -163,10 +168,5 @@ function transitionToMenu(menuName, isTop) {
 
     Crafty.log("Enter menu: " + menuName);
     onEntry();
-    if (currMenuName && !isTop) {
-        // Push menu
-        menuStack.push(currMenuName);
-    }
     Crafty.s("ButtonMenu").setTopLevelMenu(title, buttonList);
-    currMenuName = menuName;
 }
