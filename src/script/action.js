@@ -108,12 +108,13 @@ function doMove(evt, x, y) {
 
     Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
     setGlobalState(StateEnum.DEFAULT);
-    removeMovementSquares();
     let path = getPath(theMap, selectedPlayer.getPos(), destPos);
+    highlightPath(path);
     function animate(i) {
         selectedPlayer.animateTo(path[i], ANIM_DUR_STEP);
         selectedPlayer.one("TweenEnd", function() {
             if (i === path.length - 1) {
+                removeMovementSquares();
                 endCharacter(selectedPlayer);
             } else {
                 animate(i + 1);
@@ -121,6 +122,17 @@ function doMove(evt, x, y) {
         });
     };
     animate(1);
+}
+
+function highlightPath(path) {
+    for (var i = 0; i < path.length; i++) {
+        Crafty("MovementSquare").each(function() {
+            if (this.getPos().x === path[i].x &&
+                    this.getPos().y === path[i].y) {
+                this.color("#0022ff", 0.25);
+            }
+        });
+    };
 }
 
 function doSwap(evt, x, y) {
