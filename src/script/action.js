@@ -110,12 +110,17 @@ function doMove(evt, x, y) {
     setGlobalState(StateEnum.DEFAULT);
     removeMovementSquares();
     let path = getPath(theMap, selectedPlayer.getPos(), destPos);
-    for (let i = 1; i < path.length; i++) {
+    function animate(i) {
         selectedPlayer.animateTo(path[i], ANIM_DUR_STEP);
-    }
-    selectedPlayer.one("TweenEnd", function() {
-        endCharacter(selectedPlayer);
-    });
+        selectedPlayer.one("TweenEnd", function() {
+            if (i === path.length - 1) {
+                endCharacter(selectedPlayer);
+            } else {
+                animate(i + 1);
+            }
+        });
+    };
+    animate(1);
 }
 
 function doSwap(evt, x, y) {
