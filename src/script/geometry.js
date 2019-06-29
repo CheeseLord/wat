@@ -92,6 +92,16 @@ export function findPaths(startPos, maxDistance) {
     return dynamicMap;
 }
 
+// Check if it is possible to get from the origin position of theMap to
+// destPos.
+export function isReachable(theMap, destPos) {
+    let x = destPos.x;
+    let y = destPos.y;
+    return (theMap[x][y].parent !== null);
+}
+
+// Internal helpers
+
 // Compute a Map for the current state of the level, but don't do pathfinding.
 function getDynamicMap() {
     let dynamicMap = [];

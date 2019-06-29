@@ -16,6 +16,7 @@ import {
 import {
     findPaths,
     isAdjacent,
+    isReachable,
     midpoint,
 } from "./geometry.js";
 import {doMenu} from "./ui.js";
@@ -90,11 +91,12 @@ function doMove(evt, x, y) {
     }
 
     let theMap = findPaths(selectedPlayer.getPos(), MOVE_RANGE);
+    let destPos = {x: x, y: y};
 
     if (evt.target && evt.target.blocksMovement) {
         reportUserError("Can't move there; something's in the way.");
         return;
-    } else if (theMap[x][y].parent === null) {
+    } else if (!isReachable(theMap, destPos)) {
         reportUserError("You can't move that far.");
         return;
     } else if (!(evt.target && evt.target.has("Ground"))) {
@@ -105,7 +107,7 @@ function doMove(evt, x, y) {
     Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
     setGlobalState(StateEnum.DEFAULT);
     removeMovementSquares();
-    selectedPlayer.animateTo({x: x, y: y}, ANIM_DUR_MOVE);
+    selectedPlayer.animateTo(destPos, ANIM_DUR_MOVE);
     selectedPlayer.one("TweenEnd", function() {
         endCharacter(selectedPlayer);
     });
@@ -359,9 +361,10 @@ export function createMovementGrid(player) {
     let theMap = findPaths(playerPos, MOVE_RANGE);
     for (let x = 0; x < theMap.length; x++) {
         for (let y = 0; y < theMap[x].length; y++) {
-            if (theMap[x][y].parent !== null) {
+            let pos = {x: x, y: y};
+            if (isReachable(theMap, pos)) {
                 // TODO show the actual path somehow.
-                Crafty.e("MovementSquare").initPos({x: x, y: y});
+                Crafty.e("MovementSquare").initPos(pos);
             }
         }
     }
