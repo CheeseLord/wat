@@ -6,6 +6,7 @@ import {
     ANIM_DUR_CENTER_TURN,
     ANIM_DUR_HALF_ATTACK,
     ANIM_DUR_MOVE,
+    ANIM_DUR_STEP,
     MapGrid,
     MOVE_RANGE,
     NUM_TEAMS,
@@ -15,6 +16,7 @@ import {
 } from "./consts.js";
 import {
     findPaths,
+    getPath,
     isAdjacent,
     isReachable,
     midpoint,
@@ -107,7 +109,10 @@ function doMove(evt, x, y) {
     Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
     setGlobalState(StateEnum.DEFAULT);
     removeMovementSquares();
-    selectedPlayer.animateTo(destPos, ANIM_DUR_MOVE);
+    let path = getPath(theMap, selectedPlayer.getPos(), destPos);
+    for (let i = 1; i < path.length; i++) {
+        selectedPlayer.animateTo(path[i], ANIM_DUR_STEP);
+    }
     selectedPlayer.one("TweenEnd", function() {
         endCharacter(selectedPlayer);
     });

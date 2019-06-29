@@ -92,6 +92,17 @@ export function findPaths(startPos, maxDistance) {
     return dynamicMap;
 }
 
+// Get the list of cells along a path.
+export function getPath(theMap, startPos, endPos) {
+    let cells = [];
+    while (!(endPos.x === startPos.x && endPos.y === startPos.y)) {
+        cells.push(endPos);
+        endPos = theMap[endPos.x][endPos.y].parent;
+    }
+    cells.push(startPos);
+    return cells.reverse();
+}
+
 // Check if it is possible to get from the origin position of theMap to
 // destPos.
 export function isReachable(theMap, destPos) {
