@@ -168,5 +168,5 @@ function applyMenuByName(menuName) {
 
     Crafty.log("Enter menu: " + menuName);
     onEntry();
-    Crafty.s("ButtonMenu").setTopLevelMenu(title, buttonList);
+    Crafty.s("ButtonMenu").setMenu(title, buttonList);
 }
