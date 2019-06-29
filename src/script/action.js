@@ -14,7 +14,7 @@ import {
     Z_MOVE_SQUARE,
 } from "./consts.js";
 import {
-    createMovementGridPaths,
+    findPaths,
     isAdjacent,
     midpoint,
 } from "./geometry.js";
@@ -32,14 +32,6 @@ export function setGlobalState(newState) { globalState = newState; }
 
 export var readyCharacters = [];
 export var currentTeam = 0;
-
-// A map of the level, consisting of only the StaticObjects. This is a 2D
-// array, indexed [x][y]. Each element is an object with fields:
-//     isBlocked = true if the square is blocked by a StaticObject, so can
-//         never be moved into.
-//     parent    = null (used by pathfinding)
-// Must be initialized whenever a new level is loaded.
-export var staticMap = [];
 
 // TODO change MovementSquare to not be a DynamicObject in its own right, but
 // instead be a highlight on the existing object. Right now they're the one
@@ -97,13 +89,12 @@ function doMove(evt, x, y) {
         return;
     }
 
-    let dynamicMap = getDynamicMap();
-    createMovementGridPaths(selectedPlayer.getPos(), dynamicMap, MOVE_RANGE);
+    let theMap = findPaths(selectedPlayer.getPos(), MOVE_RANGE);
 
     if (evt.target && evt.target.blocksMovement) {
         reportUserError("Can't move there; something's in the way.");
         return;
-    } else if (dynamicMap[x][y].parent === null) {
+    } else if (theMap[x][y].parent === null) {
         reportUserError("You can't move that far.");
         return;
     } else if (!(evt.target && evt.target.has("Ground"))) {
@@ -364,82 +355,17 @@ function centerCameraOn(target, time) {
 }
 
 export function createMovementGrid(player) {
-    let playerPos  = player.getPos();
-    let dynamicMap = getDynamicMap();
-    createMovementGridPaths(playerPos, dynamicMap, MOVE_RANGE);
-    for (let x = 0; x < dynamicMap.length; x++) {
-        for (let y = 0; y < dynamicMap[x].length; y++) {
-            if (dynamicMap[x][y].parent !== null) {
+    let playerPos = player.getPos();
+    let theMap = findPaths(playerPos, MOVE_RANGE);
+    for (let x = 0; x < theMap.length; x++) {
+        for (let y = 0; y < theMap[x].length; y++) {
+            if (theMap[x][y].parent !== null) {
                 // TODO show the actual path somehow.
                 Crafty.e("MovementSquare").initPos({x: x, y: y});
             }
         }
     }
 };
-
-////////////////////////////////////////
-// TODO move this stuff somewhere else.
-
-function getDynamicMap() {
-    let dynamicMap = [];
-    // Clone the staticMap.
-    for (let x = 0; x < staticMap.length; x++) {
-        dynamicMap.push([]);
-        for (let y = 0; y < staticMap[x].length; y++) {
-            dynamicMap[x].push({
-                isBlocked: staticMap[x][y].isBlocked,
-                parent:    staticMap[x][y].parent,
-            });
-        }
-    }
-
-    Crafty("DynamicObject").each(function() {
-        if (this.blocksMovement) {
-            // TODO bounds check?
-            dynamicMap[this.getPos().x][this.getPos().y].isBlocked = true;
-        }
-    });
-
-    return dynamicMap;
-}
-
-export function buildStaticMap() {
-    // First compute the bounds, because apparently those aren't recorded
-    // anywhere.
-    let maxX = 0;
-    let maxY = 0;
-    Crafty("StaticObject").each(function() {
-        let pos = this.getPos();
-        if (pos.x > maxX) {
-            maxX = pos.x;
-        }
-        if (pos.y > maxY) {
-            maxY = pos.y;
-        }
-    });
-
-    // Create arrays of the appropriate lengths.
-    staticMap = [];
-    for (let x = 0; x < maxX; x++) {
-        staticMap.push([]);
-        for (let y = 0; y < maxY; y++) {
-            staticMap[x].push({
-                isBlocked: false,
-                parent:    null,
-            });
-        }
-    }
-
-    // Fill in the isBlocked values for StaticObjects.
-    Crafty("StaticObject").each(function() {
-        if (this.blocksMovement) {
-            staticMap[this.getPos().x][this.getPos().y].isBlocked = true;
-        }
-    });
-}
-
-// End "TODO move this stuff somewhere else"
-////////////////////////////////////////
 
 export function specialAttack(player) {
     Crafty("Character").each(function() {

@@ -12,10 +12,12 @@ import {
 import "./button.js";
 import "./world_component.js";
 import {
-    buildStaticMap,
     startTeam,
     worldClickHandler,
 } from "./action.js";
+import {
+    updateMapForNewLevel,
+} from "./geometry.js";
 
 
 export function doTheThing() {
@@ -91,7 +93,7 @@ export function doTheThing() {
         }
     }
 
-    buildStaticMap();
+    updateMapForNewLevel();
 
     Crafty.createLayer("UILayer", "DOM", {
         // Ignore viewscreen transforms
