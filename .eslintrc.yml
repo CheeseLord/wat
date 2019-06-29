@@ -62,3 +62,6 @@ rules:
           VariableDeclarator: true
           AssignmentExpression: true
           BlockStatement: true
+    import/no-unresolved:
+      - error
+      - always
