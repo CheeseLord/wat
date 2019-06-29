@@ -15,7 +15,6 @@ import {
 } from "./consts.js";
 import {
     createMovementGridPaths,
-    getDistance,
     isAdjacent,
     midpoint,
 } from "./util.js";
@@ -98,11 +97,13 @@ function doMove(evt, x, y) {
         return;
     }
 
+    let dynamicMap = getDynamicMap();
+    createMovementGridPaths(selectedPlayer.getPos(), dynamicMap, MOVE_RANGE);
+
     if (evt.target && evt.target.blocksMovement) {
         reportUserError("Can't move there; something's in the way.");
         return;
-    } else if (getDistance({x: x, y: y}, selectedPlayer.getPos()) >
-            MOVE_RANGE) {
+    } else if (dynamicMap[x][y].parent === null) {
         reportUserError("You can't move that far.");
         return;
     } else if (!(evt.target && evt.target.has("Ground"))) {
