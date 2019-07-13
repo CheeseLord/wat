@@ -95,9 +95,9 @@ Crafty.c("GridObject", {
             case Highlight.AVAILABLE_CHAR:    borderColor = "#ff7f00"; break;
 
             case Highlight.ANIM_PATH_END:     borderColor = "#0000ff"; break;
-            case Highlight.ANIM_PATH_MIDDLE:  borderColor = "#00007f"; break;
+            case Highlight.ANIM_PATH_MIDDLE:  borderColor = "#4f4f7f"; break;
             case Highlight.HOVER_PATH_END:    borderColor = "#00ff00"; break;
-            case Highlight.HOVER_PATH_MIDDLE: borderColor = "#007f00"; break;
+            case Highlight.HOVER_PATH_MIDDLE: borderColor = "#4f7f4f"; break;
 
             case Highlight.ATTACKABLE:        borderColor = "#ff0000"; break;
             case Highlight.INTERACTABLE:      borderColor = "#ff00ff"; break;

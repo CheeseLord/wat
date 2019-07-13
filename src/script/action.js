@@ -115,7 +115,11 @@ function highlightPath(path) {
         Crafty("Ground").each(function() {
             if (this.getPos().x === path[i].x &&
                     this.getPos().y === path[i].y) {
-                this.enableHighlight(Highlight.ANIM_PATH_MIDDLE);
+                if (i === path.length - 1) {
+                    this.enableHighlight(Highlight.ANIM_PATH_END);
+                } else {
+                    this.enableHighlight(Highlight.ANIM_PATH_MIDDLE);
+                }
             }
         });
     };
