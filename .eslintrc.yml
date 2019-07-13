@@ -10,6 +10,7 @@ rules:
       - error
       - 4
       - MemberExpression: 2
+        SwitchCase: 1
         ignoredNodes:
           - ForOfStatement
           - ForInStatement
@@ -65,3 +66,4 @@ rules:
     import/no-unresolved:
       - error
       - always
+
