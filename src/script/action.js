@@ -7,6 +7,7 @@ import {
     ANIM_DUR_HALF_ATTACK,
     ANIM_DUR_MOVE,
     ANIM_DUR_STEP,
+    Highlight,
     MapGrid,
     MOVE_RANGE,
     NUM_TEAMS,
@@ -260,7 +261,7 @@ export function startTeam(team) {
     readyCharacters = [];
     Crafty("Character").each(function() {
         if (this.team === team) {
-            this.markReady();
+            this.enableHighlight(Highlight.AVAILABLE_CHAR);
             readyCharacters.push(this);
         }
     });
@@ -279,7 +280,7 @@ export function endCharacter(character) {
     deselectPlayer();
 
     // Unready the current character.
-    character.markUnready();
+    character.disableHighlight(Highlight.AVAILABLE_CHAR);
     let index = readyCharacters.indexOf(character);
     if (index === -1) {
         // TODO: We should never get here, but handle it better anyway.
@@ -300,8 +301,10 @@ export function endCharacter(character) {
 export function endTeam() {
     Crafty.log(`Reached end of turn for team ${currentTeam}.`);
 
-    Crafty("Highlightable").each(function() {
-        this.markUnready();
+    Crafty("GridObject").each(function() {
+        // TODO: Instead clear all highlights in endCharacter, then re-mark the
+        // available ones as AVAILABLE_CHAR.
+        this.disableHighlight(Highlight.AVAILABLE_CHAR);
     });
 
     let team = currentTeam;
@@ -337,7 +340,7 @@ export function reportUserError(text) {
 export function selectPlayer(player) {
     deselectPlayer();
     selectedPlayer = player;
-    selectedPlayer.markSelected();
+    selectedPlayer.enableHighlight(Highlight.SELECTED_CHAR);
 }
 
 export function removeMovementSquares() {
@@ -348,7 +351,7 @@ export function removeMovementSquares() {
 
 export function deselectPlayer() {
     if (selectedPlayer) {
-        selectedPlayer.markUnselected();
+        selectedPlayer.disableHighlight(Highlight.SELECTED_CHAR);
         selectedPlayer = null;
         // TODO: Probably the menu table should instead define the state we
         // transition to on CLEAR_MENU?

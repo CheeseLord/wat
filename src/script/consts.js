@@ -33,6 +33,24 @@ export const StateEnum = Object.freeze({
     PLAYER_ATTACK:   {},
 });
 
+// List of highlighting types. Several of these can be set on a single object,
+// in which case the lowest-valued one is the one that will be displayed.
+export const Highlight = Object.freeze({
+    SELECTED_CHAR:     0, // Character currently selected
+    AVAILABLE_CHAR:    1, // Character that can be selected this turn
+
+    ATTACKABLE:        2, // Enemy that can be attacked this turn
+    INTERACTABLE:      3, // Object that can be interacted with this turn
+    REACHABLE:         4, // Space that can be reached this turn
+
+    ANIM_PATH_END:     5, // Destination square of animated path
+    ANIM_PATH_MIDDLE:  6, // Intermediate square of animated path
+    HOVER_PATH_END:    7, // Destination square of hovered-over path
+    HOVER_PATH_MIDDLE: 8, // Intermediate square of hovered-over path
+
+    NUM_VALS:          9, // For sizing arrays of flag values
+});
+
 // TODO: Maybe separate horiz. and vert.? Should probably in general be
 // MapGrid.tile.[hv]space/2, or something like that.
 export const HL_RADIUS = 2;

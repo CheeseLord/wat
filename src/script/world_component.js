@@ -3,6 +3,7 @@
 "use strict";
 
 import {
+    Highlight,
     MapGrid,
     HL_RADIUS,
     SPRITE_DUR_PER_FRAME,
@@ -26,6 +27,9 @@ Crafty.c("GridObject", {
     init: function() {
         this.attr({w: MapGrid.tile.width, h: MapGrid.tile.height});
         this.attr({blocksMovement: false});
+
+        // Highlighting
+        this._highlights = new Array(Highlight.NUM_VALS).fill(false);
     },
 
     // Initially set the position in map-grid tiles (not pixels). Don't call
@@ -40,6 +44,81 @@ Crafty.c("GridObject", {
     // Get current position in map-grid tiles.
     getPos: function() {
         return {x: this._tileX, y: this._tileY};
+    },
+
+    ////////////////////////////////////////
+    // Highlighting stuff
+
+    enableHighlight: function(hlType) {
+        return this._setHighlightFlag(hlType, true);
+    },
+    disableHighlight: function(hlType) {
+        return this._setHighlightFlag(hlType, false);
+    },
+    clearAllHighlights: function() {
+        this._highlights.fill(false);
+        return this._redraw();
+    },
+
+    // Set or clear one of the highlight flags
+    _setHighlightFlag: function(hlType, val) {
+        if (0 <= hlType && hlType < Highlight.NUM_VALS) {
+            this._highlights[hlType] = val;
+            return this._redraw();
+        } else {
+            Crafty.error(`Unrecognized highlight type: ${hlType}.`);
+            return this;
+        }
+    },
+    _redraw: function() {
+        // Find the first highlight flag which is set.
+        let displayHlType = 0;
+        for (; displayHlType < Highlight.NUM_VALS; displayHlType++) {
+            if (this._highlights[displayHlType]) {
+                break;
+            }
+        }
+
+        if (displayHlType >= Highlight.NUM_VALS) {
+            // No highlight flags set.
+            return this._clearBorder();
+        }
+
+        // Map each highlight flag to a border color.
+        // TODO: Something better.
+        // Note: old scheme was:
+        //     AVAILABLE_CHAR: #1f3f9f
+        //     SELECTED_CHAR:  #ff9f00
+        let borderColor = null;
+        switch (displayHlType) {
+        case Highlight.SELECTED_CHAR:     borderColor = "#ffff00"; break;
+        case Highlight.AVAILABLE_CHAR:    borderColor = "#ff7f00"; break;
+
+        case Highlight.ATTACKABLE:        borderColor = "#ff0000"; break;
+        case Highlight.INTERACTABLE:      borderColor = "#ff00ff"; break;
+        case Highlight.REACHABLE:         borderColor = "#00ffff"; break;
+
+        case Highlight.ANIM_PATH_END:     borderColor = "#0000ff"; break;
+        case Highlight.ANIM_PATH_MIDDLE:  borderColor = "#00007f"; break;
+        case Highlight.HOVER_PATH_END:    borderColor = "#00ff00"; break;
+        case Highlight.HOVER_PATH_MIDDLE: borderColor = "#007f00"; break;
+
+        default:
+            Crafty.error(`Missing case for highlight type: ${displayHlType}.`);
+            return this;
+        }
+
+        return this._setBorder(borderColor);
+    },
+    _setBorder: function(color) {
+        return this.css({
+            "outline": "solid " + (HL_RADIUS) + "px " + color,
+        });
+    },
+    _clearBorder: function() {
+        return this.css({
+            "outline": "none",
+        });
     },
 });
 
@@ -66,58 +145,8 @@ Crafty.c("DynamicObject", {
     },
 });
 
-Crafty.c("Highlightable", {
-    // TODO enforce that subclasses use DynamicObject or StaticObject.
-    required: "GridObject",
-
-    init: function() {
-        this._isReady    = false;
-        this._isSelected = false;
-    },
-
-    _setBorder: function(color) {
-        return this.css({
-            "outline": "solid " + (HL_RADIUS) + "px " + color,
-        });
-    },
-    _clearBorder: function() {
-        return this.css({
-            "outline": "none",
-        });
-    },
-    _redraw: function() {
-        if (this._isSelected) {
-            return this._setBorder("#ff9f00");
-        } else if (this._isReady) {
-            return this._setBorder("#1f3f9f");
-        } else {
-            return this._clearBorder();
-        }
-    },
-
-    markSelected: function() {
-        this._isSelected = true;
-        return this._redraw();
-    },
-    markUnselected: function() {
-        this._isSelected = false;
-        return this._redraw();
-    },
-    // Note: if you don't like this name, at least don't change it to simply
-    // "ready()". That name is already taken, so reusing it will cause things
-    // to break horribly.
-    markReady: function() {
-        this._isReady = true;
-        return this._redraw();
-    },
-    markUnready: function() {
-        this._isReady = false;
-        return this._redraw();
-    },
-});
-
 Crafty.c("Character", {
-    required: "DynamicObject, Highlightable, Mouse",
+    required: "DynamicObject, Mouse",
 
     init: function() {
         this.team = -1;
