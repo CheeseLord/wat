@@ -115,7 +115,7 @@ function highlightPath(path) {
         Crafty("Ground").each(function() {
             if (this.getPos().x === path[i].x &&
                     this.getPos().y === path[i].y) {
-                this.enableHighlight(Highlight.HOVER_PATH_MIDDLE);
+                this.enableHighlight(Highlight.ANIM_PATH_MIDDLE);
             }
         });
     };
@@ -330,9 +330,11 @@ export function selectPlayer(player) {
 
 export function removeMovementHighlight() {
     Crafty("GridObject").each(function() {
+        // TODO: Clear all highlights at end of turn, recreate the ones we
+        // need. Do we need to clear these highlights any other time?
         this.disableHighlight(Highlight.REACHABLE);
-        this.disableHighlight(Highlight.HOVER_PATH_MIDDLE);
-        this.disableHighlight(Highlight.HOVER_PATH_END);
+        this.disableHighlight(Highlight.ANIM_PATH_MIDDLE);
+        this.disableHighlight(Highlight.ANIM_PATH_END);
     });
 }
 

@@ -94,14 +94,14 @@ Crafty.c("GridObject", {
             case Highlight.SELECTED_CHAR:     borderColor = "#ffff00"; break;
             case Highlight.AVAILABLE_CHAR:    borderColor = "#ff7f00"; break;
 
-            case Highlight.ATTACKABLE:        borderColor = "#ff0000"; break;
-            case Highlight.INTERACTABLE:      borderColor = "#ff00ff"; break;
-            case Highlight.REACHABLE:         borderColor = "#00ffff"; break;
-
             case Highlight.ANIM_PATH_END:     borderColor = "#0000ff"; break;
             case Highlight.ANIM_PATH_MIDDLE:  borderColor = "#00007f"; break;
             case Highlight.HOVER_PATH_END:    borderColor = "#00ff00"; break;
             case Highlight.HOVER_PATH_MIDDLE: borderColor = "#007f00"; break;
+
+            case Highlight.ATTACKABLE:        borderColor = "#ff0000"; break;
+            case Highlight.INTERACTABLE:      borderColor = "#ff00ff"; break;
+            case Highlight.REACHABLE:         borderColor = "#00ffff"; break;
 
             default:
                 Crafty.error("Missing case for highlight type: " +
