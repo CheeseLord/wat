@@ -10,7 +10,7 @@ import {
     setGlobalState,
     createMovementGrid,
     deselectPlayer,
-    removeMovementSquares,
+    removeMovementHighlight,
     specialAttack,
     endTeam,
 } from  "./action.js";
@@ -51,7 +51,7 @@ var menuTable = {
         title:   "Moving",
         state:   StateEnum.PLAYER_MOVE,
         onEntry: () => { createMovementGrid(selectedPlayer); },
-        onExit:  () => { removeMovementSquares(); },
+        onExit:  () => { removeMovementHighlight(); },
         buttons: [
             // Text  New Menu     Action
             ["Back", PARENT_MENU, doNothing],

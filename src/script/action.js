@@ -13,7 +13,6 @@ import {
     NUM_TEAMS,
     MENU_WIDTH,
     StateEnum,
-    Z_MOVE_SQUARE,
 } from "./consts.js";
 import {
     findPaths,
@@ -36,20 +35,6 @@ export function setGlobalState(newState) { globalState = newState; }
 
 export var readyCharacters = [];
 export var currentTeam = 0;
-
-// TODO change MovementSquare to not be a DynamicObject in its own right, but
-// instead be a highlight on the existing object. Right now they're the one
-// weird exception to the DynamicObject component -- everything else represents
-// real objects in the world, but MovementSquares are a purely UI construct.
-Crafty.c("MovementSquare", {
-    required: "DynamicObject, Color",
-
-    init: function() {
-        this.color("#00ff00", 0.25);
-        this.attr({z: Z_MOVE_SQUARE});
-        this.attr({blocksMovement: false});
-    },
-});
 
 ///////////////////////////////////////////////////////////////////////////////
 // Action handlers
@@ -115,7 +100,7 @@ function doMove(evt, x, y) {
         selectedPlayer.animateTo(path[i], ANIM_DUR_STEP);
         selectedPlayer.one("TweenEnd", function() {
             if (i === path.length - 1) {
-                removeMovementSquares();
+                removeMovementHighlight();
                 endCharacter(selectedPlayer);
             } else {
                 animate(i + 1);
@@ -127,10 +112,10 @@ function doMove(evt, x, y) {
 
 function highlightPath(path) {
     for (var i = 0; i < path.length; i++) {
-        Crafty("MovementSquare").each(function() {
+        Crafty("Ground").each(function() {
             if (this.getPos().x === path[i].x &&
                     this.getPos().y === path[i].y) {
-                this.color("#0022ff", 0.25);
+                this.enableHighlight(Highlight.HOVER_PATH_MIDDLE);
             }
         });
     };
@@ -343,9 +328,11 @@ export function selectPlayer(player) {
     selectedPlayer.enableHighlight(Highlight.SELECTED_CHAR);
 }
 
-export function removeMovementSquares() {
-    Crafty("MovementSquare").each(function() {
-        this.destroy();
+export function removeMovementHighlight() {
+    Crafty("GridObject").each(function() {
+        this.disableHighlight(Highlight.REACHABLE);
+        this.disableHighlight(Highlight.HOVER_PATH_MIDDLE);
+        this.disableHighlight(Highlight.HOVER_PATH_END);
     });
 }
 
@@ -384,15 +371,11 @@ function centerCameraOn(target, time) {
 export function createMovementGrid(player) {
     let playerPos = player.getPos();
     let theMap = findPaths(playerPos, MOVE_RANGE);
-    for (let x = 0; x < theMap.length; x++) {
-        for (let y = 0; y < theMap[x].length; y++) {
-            let pos = {x: x, y: y};
-            if (isReachable(theMap, pos)) {
-                // TODO show the actual path somehow.
-                Crafty.e("MovementSquare").initPos(pos);
-            }
+    Crafty("GridObject").each(function() {
+        if (isReachable(theMap, this.getPos())) {
+            this.enableHighlight(Highlight.REACHABLE);
         }
-    }
+    });
 };
 
 export function specialAttack(player) {

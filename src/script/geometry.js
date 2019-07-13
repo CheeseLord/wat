@@ -67,9 +67,9 @@ export function updateMapForNewLevel() {
 
     // Create arrays of the appropriate lengths.
     staticMap = [];
-    for (let x = 0; x < maxX; x++) {
+    for (let x = 0; x <= maxX; x++) {
         staticMap.push([]);
-        for (let y = 0; y < maxY; y++) {
+        for (let y = 0; y <= maxY; y++) {
             staticMap[x].push({
                 isBlocked: false,
                 parent:    null,
