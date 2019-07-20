@@ -93,11 +93,16 @@ export function findPaths(startPos, maxDistance) {
 }
 
 // Get the list of cells along a path.
+// TODO: Why take in startPos? theMap already knows the paths from startPos to
+// everywhere...
 export function getPath(theMap, startPos, endPos) {
     let cells = [];
     while (!(endPos.x === startPos.x && endPos.y === startPos.y)) {
         cells.push(endPos);
         endPos = theMap[endPos.x][endPos.y].parent;
+        if (endPos === null) {
+            return null; // No path
+        }
     }
     cells.push(startPos);
     return cells.reverse();

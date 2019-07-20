@@ -6,15 +6,24 @@ import {
     Highlight,
     MapGrid,
     HL_RADIUS,
+    MOVE_RANGE,
     SPRITE_DUR_PER_FRAME,
+    StateEnum,
     Z_CHARACTER,
     Z_GROUND,
     Z_SCENERY,
 } from  "./consts.js";
 
 import {
+    findPaths,
+    getPath,
     gridPosToGraphics,
 } from "./geometry.js";
+
+import {
+    getGlobalState,
+    selectedPlayer,
+} from "./action.js";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Component definitions
@@ -30,6 +39,11 @@ Crafty.c("GridObject", {
 
         // Highlighting
         this._highlights = new Array(Highlight.NUM_VALS).fill(false);
+    },
+
+    events: {
+        "MouseOver": function() { hoverHighlightObj(this); },
+        "MouseOut":  function() { clearHoverHighlights();  },
     },
 
     // Initially set the position in map-grid tiles (not pixels). Don't call
@@ -96,11 +110,12 @@ Crafty.c("GridObject", {
 
             case Highlight.ANIM_PATH_END:     borderColor = "#0000ff"; break;
             case Highlight.ANIM_PATH_MIDDLE:  borderColor = "#4f4f7f"; break;
-            case Highlight.HOVER_PATH_END:    borderColor = "#00ff00"; break;
-            case Highlight.HOVER_PATH_MIDDLE: borderColor = "#4f7f4f"; break;
+            case Highlight.HOVER_PATH_END:    borderColor = "#ff00ff"; break;
+            case Highlight.HOVER_PATH_MIDDLE: borderColor = "#7f4f7f"; break;
 
             case Highlight.ATTACKABLE:        borderColor = "#ff0000"; break;
-            case Highlight.INTERACTABLE:      borderColor = "#ff00ff"; break;
+            case Highlight.INTERACTABLE:      borderColor = "#00ff00"; break;
+                // TODO: Green looks bad with green ground
             case Highlight.REACHABLE:         borderColor = "#00ffff"; break;
 
             default:
@@ -205,3 +220,45 @@ Crafty.c("Tree", {
         this.attr({blocksMovement: true});
     },
 });
+
+///////////////////////////////////////////////////////////////////////////////
+// TODO find a better place to put these functions
+
+function hoverHighlightObj(obj) {
+    // TODO: Also do hover highlighting for StateEnum.PLAYER_SELECTED once we
+    // do REACHABLE highlighting on selection (as opposed to only after
+    // clicking the move button).
+    if (getGlobalState() !== StateEnum.PLAYER_MOVE) {
+        return;
+    }
+
+    let theMap  = findPaths(selectedPlayer.getPos(), MOVE_RANGE);
+    let destPos = obj.getPos();
+    let path    = getPath(theMap, selectedPlayer.getPos(), destPos);
+
+    if (path === null) {
+        return; // No path
+    }
+
+    for (let i = 0; i < path.length; i++) {
+        // TODO: Why is this Crafty("Ground")? What if we later add other
+        // passable components? Can't we just do it over all GridObjects?
+        Crafty("Ground").each(function() {
+            if (this.getPos().x === path[i].x &&
+                    this.getPos().y === path[i].y) {
+                if (i === path.length - 1) {
+                    this.enableHighlight(Highlight.HOVER_PATH_END);
+                } else {
+                    this.enableHighlight(Highlight.HOVER_PATH_MIDDLE);
+                }
+            }
+        });
+    };
+}
+
+function clearHoverHighlights() {
+    Crafty("GridObject").each(function() {
+        this.disableHighlight(Highlight.HOVER_PATH_END);
+        this.disableHighlight(Highlight.HOVER_PATH_MIDDLE);
+    });
+}
