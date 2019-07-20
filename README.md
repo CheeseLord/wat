@@ -10,7 +10,7 @@ To play the game online,
 
 To run a local server and play the game on your own machine:
 
-* Make sure you have Python installed
-* Run `run_server.sh` from the root of the repository
-* Connect to http://localhost:8000/
+* Make sure you have bash and Python (2?) installed.
+* Run `./bin/run_server.sh`.
+* Connect to http://localhost:8000/.
 
