@@ -21,6 +21,9 @@ import {
     isReachable,
     midpoint,
 } from "./geometry.js";
+import {
+    clearAllHighlights,
+} from "./world_component.js";
 import {doMenu} from "./ui.js";
 
 export var selectedPlayer;
@@ -100,7 +103,6 @@ function doMove(evt, x, y) {
         selectedPlayer.animateTo(path[i], ANIM_DUR_STEP);
         selectedPlayer.one("TweenEnd", function() {
             if (i === path.length - 1) {
-                removeMovementHighlight();
                 endCharacter(selectedPlayer);
             } else {
                 animate(i + 1);
@@ -250,7 +252,6 @@ export function startTeam(team) {
     readyCharacters = [];
     Crafty("Character").each(function() {
         if (this.team === team) {
-            this.enableHighlight(Highlight.AVAILABLE_CHAR);
             readyCharacters.push(this);
         }
     });
@@ -261,6 +262,9 @@ export function startTeam(team) {
 }
 
 function startCharacter(character) {
+    for (let i = 0; i < readyCharacters.length; i++) {
+        readyCharacters[i].enableHighlight(Highlight.AVAILABLE_CHAR);
+    }
     setFocusOn(character);
     // TODO: Should we select them, too?
 }
@@ -269,7 +273,6 @@ export function endCharacter(character) {
     deselectPlayer();
 
     // Unready the current character.
-    character.disableHighlight(Highlight.AVAILABLE_CHAR);
     let index = readyCharacters.indexOf(character);
     if (index === -1) {
         // TODO: We should never get here, but handle it better anyway.
@@ -277,6 +280,8 @@ export function endCharacter(character) {
     } else {
         readyCharacters.splice(index, 1);
     }
+
+    clearAllHighlights();
 
     if (readyCharacters.length > 0) {
         // There are still more characters to move.
@@ -289,12 +294,6 @@ export function endCharacter(character) {
 
 export function endTeam() {
     Crafty.log(`Reached end of turn for team ${currentTeam}.`);
-
-    Crafty("GridObject").each(function() {
-        // TODO: Instead clear all highlights in endCharacter, then re-mark the
-        // available ones as AVAILABLE_CHAR.
-        this.disableHighlight(Highlight.AVAILABLE_CHAR);
-    });
 
     let team = currentTeam;
     let maxTries = NUM_TEAMS;
@@ -330,16 +329,6 @@ export function selectPlayer(player) {
     deselectPlayer();
     selectedPlayer = player;
     selectedPlayer.enableHighlight(Highlight.SELECTED_CHAR);
-}
-
-export function removeMovementHighlight() {
-    Crafty("GridObject").each(function() {
-        // TODO: Clear all highlights at end of turn, recreate the ones we
-        // need. Do we need to clear these highlights any other time?
-        this.disableHighlight(Highlight.REACHABLE);
-        this.disableHighlight(Highlight.ANIM_PATH_MIDDLE);
-        this.disableHighlight(Highlight.ANIM_PATH_END);
-    });
 }
 
 export function deselectPlayer() {

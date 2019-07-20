@@ -69,7 +69,7 @@ Crafty.c("GridObject", {
     disableHighlight: function(hlType) {
         return this._setHighlightFlag(hlType, false);
     },
-    clearAllHighlights: function() {
+    clearHighlights: function() {
         this._highlights.fill(false);
         return this._redraw();
     },
@@ -137,6 +137,12 @@ Crafty.c("GridObject", {
         });
     },
 });
+
+export function clearAllHighlights() {
+    Crafty("GridObject").each(function() {
+        this.clearHighlights();
+    });
+}
 
 // Component for things that never change state in any way.
 Crafty.c("StaticObject", {
