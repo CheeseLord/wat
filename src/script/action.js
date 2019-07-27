@@ -295,6 +295,10 @@ export function endCharacter(character) {
 export function endTeam() {
     Crafty.log(`Reached end of turn for team ${currentTeam}.`);
 
+    // Do this redundantly here, even though we also do it in endCharacter, so
+    // that highlights get cleared when you click "End Turn".
+    clearAllHighlights();
+
     let team = currentTeam;
     let maxTries = NUM_TEAMS;
     // If the next team has no one on it to act, skip over them. Repeat until
