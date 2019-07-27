@@ -138,6 +138,11 @@ Crafty.c("GridObject", {
     },
 });
 
+export function clearHighlightType(hlType) {
+    Crafty("GridObject").each(function() {
+        this.disableHighlight(hlType);
+    });
+}
 export function clearAllHighlights() {
     Crafty("GridObject").each(function() {
         this.clearHighlights();

@@ -8,7 +8,6 @@ import {
     selectedPlayer,
     endCharacter,
     setGlobalState,
-    createMovementGrid,
     deselectPlayer,
     specialAttack,
     endTeam,
@@ -49,7 +48,6 @@ var menuTable = {
     move: {
         title:   "Moving",
         state:   StateEnum.PLAYER_MOVE,
-        onEntry: () => { createMovementGrid(selectedPlayer); },
         buttons: [
             // Text  New Menu     Action
             ["Back", PARENT_MENU, doNothing],

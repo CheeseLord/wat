@@ -23,6 +23,7 @@ import {
 } from "./geometry.js";
 import {
     clearAllHighlights,
+    clearHighlightType,
 } from "./world_component.js";
 import {doMenu} from "./ui.js";
 
@@ -262,9 +263,13 @@ export function startTeam(team) {
 }
 
 function startCharacter(character) {
+    clearAllHighlights();
     for (let i = 0; i < readyCharacters.length; i++) {
         readyCharacters[i].enableHighlight(Highlight.AVAILABLE_CHAR);
     }
+    // TODO: Why does startCharacter not call selectPlayer? Who calls it
+    // instead?
+    // (TODO: Also, rename selectPlayer to selectCharacter.)
     setFocusOn(character);
     // TODO: Should we select them, too?
 }
@@ -281,8 +286,6 @@ export function endCharacter(character) {
         readyCharacters.splice(index, 1);
     }
 
-    clearAllHighlights();
-
     if (readyCharacters.length > 0) {
         // There are still more characters to move.
         startCharacter(readyCharacters[0]);
@@ -294,10 +297,6 @@ export function endCharacter(character) {
 
 export function endTeam() {
     Crafty.log(`Reached end of turn for team ${currentTeam}.`);
-
-    // Do this redundantly here, even though we also do it in endCharacter, so
-    // that highlights get cleared when you click "End Turn".
-    clearAllHighlights();
 
     let team = currentTeam;
     let maxTries = NUM_TEAMS;
@@ -333,6 +332,7 @@ export function selectPlayer(player) {
     deselectPlayer();
     selectedPlayer = player;
     selectedPlayer.enableHighlight(Highlight.SELECTED_CHAR);
+    createMovementGrid(player);
 }
 
 export function deselectPlayer() {
@@ -343,6 +343,10 @@ export function deselectPlayer() {
         // transition to on CLEAR_MENU?
         setGlobalState(StateEnum.DEFAULT);
     }
+    // Clear movement grid.
+    clearHighlightType(Highlight.REACHABLE);
+    clearHighlightType(Highlight.ATTACKABLE);
+    clearHighlightType(Highlight.INTERACTABLE);
 }
 
 function setFocusOn(character) {
@@ -367,7 +371,7 @@ function centerCameraOn(target, time) {
     Crafty.viewport.pan(newX, newY, time);
 }
 
-export function createMovementGrid(player) {
+function createMovementGrid(player) {
     let playerPos = player.getPos();
     let theMap = findPaths(playerPos, MOVE_RANGE);
     Crafty("GridObject").each(function() {
