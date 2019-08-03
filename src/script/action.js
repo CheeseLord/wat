@@ -159,6 +159,9 @@ export function doAttack(evt, x, y) {
     }
 
     Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
+
+    Crafty.log(`${selectedPlayer.name_} attacked ${evt.target.name_}`);
+
     setGlobalState(StateEnum.ANIMATING);
     // Close over a copy of evt.target so we can destroy it at the end of the
     // animation. Empirically if we simply close over evt, sometimes its
