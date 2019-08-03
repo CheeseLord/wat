@@ -21,7 +21,7 @@ import {
     isReachable,
     midpoint,
 } from "./geometry.js";
-import {doMenu} from "./ui.js";
+import {doMenu} from "./menu.js";
 
 export var selectedPlayer;
 
