@@ -8,7 +8,6 @@ import {
     ANIM_DUR_MOVE,
     ANIM_DUR_STEP,
     Highlight,
-    MapGrid,
     MOVE_RANGE,
     NUM_TEAMS,
     MENU_WIDTH,
@@ -21,7 +20,6 @@ import {
     isReachable,
     midpoint,
 } from "./geometry.js";
-import {doMenu} from "./menu.js";
 
 export var selectedPlayer;
 
@@ -35,41 +33,13 @@ export function setGlobalState(newState) { globalState = newState; }
 
 export var readyCharacters = [];
 export var currentTeam = 0;
+export function getReadyCharacters() { return readyCharacters; }
+export function getCurrentTeam() { return currentTeam; }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Action handlers
 
-function doSelectPlayer(evt, x, y) {
-    // assert(getGlobalState() === StateEnum.DEFAULT ||
-    //        getGlobalState() === StateEnum.PLAYER_SELECTED);
-
-    if (evt.target && evt.target.has("Character")) {
-        if (evt.target.team !== currentTeam) {
-            reportUserError("Character is on another team");
-            return;
-        }
-        if (readyCharacters.indexOf(evt.target) === -1) {
-            reportUserError("Character has already acted");
-            return;
-        }
-        selectPlayer(evt.target);
-        // TODO: Also setFocusOn? Or even call out to startCharacter?
-        doMenu("topMenu");
-    }
-}
-
-// Automagically choose the right action for the player to do (corresponds to
-// state "PLAYER_SELECTED").
-function doAutoPlayerAction(evt, x, y) {
-    // assert(getGlobalState() === StateEnum.PLAYER_SELECTED);
-    if (evt.target && evt.target.has("Character")) {
-        doSelectPlayer(evt, x, y);
-    } else {
-        doMove(evt, x, y);
-    }
-}
-
-function doMove(evt, x, y) {
+export function doMove(evt, x, y) {
     // assert(getGlobalState() === StateEnum.PLAYER_MOVE ||
     //        getGlobalState() === StateEnum.PLAYER_SELECTED);
     if (!selectedPlayer) {
@@ -124,7 +94,7 @@ function highlightPath(path) {
     };
 }
 
-function doSwap(evt, x, y) {
+export function doSwap(evt, x, y) {
     // assert(getGlobalState() === StateEnum.PLAYER_SWAP);
     if (!selectedPlayer) {
         // assert(false); -- Don't think this can happen?
@@ -169,7 +139,7 @@ function doSwap(evt, x, y) {
     evt.target.one("TweenEnd", f);
 }
 
-function doAttack(evt, x, y) {
+export function doAttack(evt, x, y) {
     // assert(getGlobalState() === StateEnum.PLAYER_ATTACK);
     if (!selectedPlayer) {
         // assert(false); -- Don't think this can happen?
@@ -208,36 +178,6 @@ function doAttack(evt, x, y) {
         });
     });
 }
-
-///////////////////////////////////////////////////////////////////////
-
-// Generic handler for clicks on the world view.
-export function worldClickHandler(evt) {
-    // TODO: Can't we just use evt.target.getPos()? If there's no target, we
-    // sholdn't be doing anything anyway...
-    let x = Math.floor(evt.realX / (MapGrid.tile.width + MapGrid.tile.hspace));
-    let y = Math.floor(evt.realY /
-            (MapGrid.tile.height + MapGrid.tile.vspace));
-    if (evt.mouseButton === Crafty.mouseButtons.LEFT) {
-        Crafty.log(`You clicked at: (${x}, ${y})`);
-        if (getGlobalState() === StateEnum.DEFAULT) {
-            doSelectPlayer(evt, x, y);
-        } else if (getGlobalState() === StateEnum.PLAYER_SELECTED) {
-            doAutoPlayerAction(evt, x, y);
-        } else if (getGlobalState() === StateEnum.PLAYER_MOVE) {
-            doMove(evt, x, y);
-        } else if (getGlobalState() === StateEnum.PLAYER_SWAP) {
-            doSwap(evt, x, y);
-        } else if (getGlobalState() === StateEnum.PLAYER_ATTACK) {
-            doAttack(evt, x, y);
-        } else {
-            Crafty.error("Unknown state value.");
-            // assert(false);
-        }
-    } else if (evt.mouseButton === Crafty.mouseButtons.RIGHT) {
-        Crafty.log("AAAAAAAAAA");
-    }
-};
 
 ///////////////////////////////////////////////////////////////////////////////
 // "Milestones" in turn order

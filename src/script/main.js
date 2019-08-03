@@ -12,8 +12,10 @@ import {
 import "./button.js";
 import "./world_component.js";
 import {
-    startTeam,
     worldClickHandler,
+} from "./ui.js";
+import {
+    startTeam,
 } from "./action.js";
 import {
     updateMapForNewLevel,
