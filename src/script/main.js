@@ -89,8 +89,8 @@ export function doTheThing() {
     Crafty.e("Enemy").initPos({x:  2, y:  9});
 
     // The ground
-    for (let y = 0; y < 20; y++) {
-        for (let x = 0; x < 30; x++) {
+    for (let y = 0; y < MapGrid.height; y++) {
+        for (let x = 0; x < MapGrid.width; x++) {
             if (x === 6 && y === 7) {
                 Crafty.e("Tree").initPos({x: x, y: y});
             } else {

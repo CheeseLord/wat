@@ -29,6 +29,10 @@ export function worldClickHandler(evt) {
     let x = Math.floor(evt.realX / (MapGrid.tile.width + MapGrid.tile.hspace));
     let y = Math.floor(evt.realY /
             (MapGrid.tile.height + MapGrid.tile.vspace));
+    if (x < 0 || x >= MapGrid.width || y < 0 || y >= MapGrid.height) {
+        Crafty.log(`Ignoring click (${x}, ${y}) because it's out of bounds.`);
+        return;
+    }
     if (evt.mouseButton === Crafty.mouseButtons.LEFT) {
         Crafty.log(`You clicked at: (${x}, ${y})`);
         if (getGlobalState() === StateEnum.DEFAULT) {
