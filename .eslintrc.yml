@@ -66,4 +66,6 @@ rules:
     import/no-unresolved:
       - error
       - always
+    import/no-cycle:
+      - error
 
