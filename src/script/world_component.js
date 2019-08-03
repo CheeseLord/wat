@@ -31,7 +31,7 @@ import {
 // Component for anything that is located in a grid space.
 // Don't inherit from GridObject directly; use StaticObject or DynamicObject!
 Crafty.c("GridObject", {
-    required: "2D, DOM",
+    required: "2D, DOM, Mouse",
 
     init: function() {
         this.attr({w: MapGrid.tile.width, h: MapGrid.tile.height});
@@ -162,7 +162,7 @@ Crafty.c("DynamicObject", {
 });
 
 Crafty.c("Character", {
-    required: "DynamicObject, Mouse",
+    required: "DynamicObject",
 
     init: function() {
         this.team = -1;
@@ -203,7 +203,7 @@ Crafty.c("SpriteCharacter", {
 });
 
 Crafty.c("Ground", {
-    required: "StaticObject, Color, Mouse",
+    required: "StaticObject, Color",
 
     init: function() {
         this.color("#3f773f");
