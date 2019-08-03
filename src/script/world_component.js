@@ -138,17 +138,6 @@ Crafty.c("GridObject", {
     },
 });
 
-export function clearHighlightType(hlType) {
-    Crafty("GridObject").each(function() {
-        this.disableHighlight(hlType);
-    });
-}
-export function clearAllHighlights() {
-    Crafty("GridObject").each(function() {
-        this.clearHighlights();
-    });
-}
-
 // Component for things that never change state in any way.
 Crafty.c("StaticObject", {
     required: "GridObject",

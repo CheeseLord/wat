@@ -21,10 +21,6 @@ import {
     isReachable,
     midpoint,
 } from "./geometry.js";
-import {
-    clearAllHighlights,
-    clearHighlightType,
-} from "./world_component.js";
 import {doMenu} from "./ui.js";
 
 export var selectedPlayer;
@@ -347,6 +343,17 @@ export function deselectPlayer() {
     clearHighlightType(Highlight.REACHABLE);
     clearHighlightType(Highlight.ATTACKABLE);
     clearHighlightType(Highlight.INTERACTABLE);
+}
+
+function clearHighlightType(hlType) {
+    Crafty("GridObject").each(function() {
+        this.disableHighlight(hlType);
+    });
+}
+function clearAllHighlights() {
+    Crafty("GridObject").each(function() {
+        this.clearHighlights();
+    });
 }
 
 function setFocusOn(character) {
