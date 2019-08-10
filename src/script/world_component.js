@@ -212,19 +212,17 @@ Crafty.c("Enemy", {
 });
 
 Crafty.c("Ground", {
-    required: "StaticObject, Color",
+    required: "StaticObject, ground_anim",
 
     init: function() {
-        this.color("#3f773f");
         this.attr({z: Z_GROUND});
     },
 });
 
 Crafty.c("Tree", {
-    required: "StaticObject, Color",
+    required: "StaticObject, tree_anim",
 
     init: function() {
-        this.color("#3f2f27");
         this.attr({z: Z_SCENERY});
         this.attr({blocksMovement: true});
     },

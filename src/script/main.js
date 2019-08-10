@@ -53,6 +53,20 @@ export function doTheThing() {
                         enemy_anim_start: [0, 0],
                     },
                 },
+                "ground.png": {
+                    tile:     32,
+                    tileh:    32,
+                    map:      {
+                        ground_anim: [0, 0],
+                    },
+                },
+                "tree.png": {
+                    tile:     32,
+                    tileh:    32,
+                    map:      {
+                        tree_anim: [0, 0],
+                    },
+                },
             },
         },
         function() {
@@ -101,9 +115,8 @@ export function doTheThing() {
         for (let x = 0; x < MapGrid.width; x++) {
             if (x === 6 && y === 7) {
                 Crafty.e("Tree").initPos({x: x, y: y});
-            } else {
-                Crafty.e("Ground").initPos({x: x, y: y});
             }
+            Crafty.e("Ground").initPos({x: x, y: y});
         }
     }
 
