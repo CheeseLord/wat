@@ -182,20 +182,8 @@ Crafty.c("Character", {
     },
 });
 
-// Note: don't check for this directly. This is just a convenience alias for
-// Characters on an "other" team that don't move.
-Crafty.c("Enemy", {
-    required: "Character, Color",
-
-    init: function() {
-        this.color("#7f0000");
-        // Enemies don't move for now.
-        this.setTeam(-1);
-    },
-});
-
 Crafty.c("SpriteCharacter", {
-    required: "Character, anim_start, SpriteAnimation",
+    required: "Character, SpriteAnimation",
 
     setAnimation: function(row, count) {
         let frames = [];
@@ -205,6 +193,21 @@ Crafty.c("SpriteCharacter", {
         this.reel("my_animation", count * SPRITE_DUR_PER_FRAME, frames);
         this.animate("my_animation", -1);
         return this;
+    },
+});
+
+// Note: don't check for this directly. This is just a convenience alias for
+// Characters on an "other" team that don't move.
+Crafty.c("Enemy", {
+    // TODO: Specify enemy_anim_start when creating these, not in the class
+    // itself. (And then probably also do the setAnimation call there as well.)
+    required: "SpriteCharacter, enemy_anim_start",
+
+    init: function() {
+        // For now, all Enemies have the same animation.
+        this.setAnimation(0, 4);
+        // Enemies don't move for now.
+        this.setTeam(-1);
     },
 });
 

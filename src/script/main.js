@@ -45,28 +45,36 @@ export function doTheThing() {
                         anim_start: [0, 0],
                     },
                 },
+                "enemy.png": {
+                    tile:     32,
+                    tileh:    32,
+                    paddingX: 1,
+                    map:      {
+                        enemy_anim_start: [0, 0],
+                    },
+                },
             },
         },
         function() {
-            Crafty.e("SpriteCharacter")
+            Crafty.e("SpriteCharacter, anim_start")
                     .initPos({x: 5, y: 3})
                     .setName_("Not Greg")
                     .setTeam(0)
                     .setAnimation(0, 4);
 
-            Crafty.e("SpriteCharacter")
+            Crafty.e("SpriteCharacter, anim_start")
                     .initPos({x: 7, y: 3})
                     .setName_("Also Not Greg")
                     .setTeam(0)
                     .setAnimation(1, 4);
 
-            Crafty.e("SpriteCharacter")
+            Crafty.e("SpriteCharacter, anim_start")
                     .initPos({x: 5, y: 5})
                     .setName_("Not Joel")
                     .setTeam(1)
                     .setAnimation(2, 4);
 
-            Crafty.e("SpriteCharacter")
+            Crafty.e("SpriteCharacter, anim_start")
                     .initPos({x: 7, y: 5})
                     .setName_("Samson")
                     .setTeam(1)
