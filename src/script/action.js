@@ -20,6 +20,12 @@ import {
     isReachable,
     midpoint,
 } from "./geometry.js";
+import {
+    doAnimate,
+    parallelAnimations,
+    seriesAnimations,
+    tweenAnimation,
+} from "./animation.js";
 
 export var selectedPlayer;
 
@@ -66,17 +72,15 @@ export function doMove(evt, x, y) {
     setGlobalState(StateEnum.DEFAULT);
     let path = getPath(theMap, selectedPlayer.getPos(), destPos);
     highlightPath(path);
-    function animate(i) {
-        selectedPlayer.animateTo(path[i], ANIM_DUR_STEP);
-        selectedPlayer.one("TweenEnd", function() {
-            if (i === path.length - 1) {
-                endCharacter(selectedPlayer);
-            } else {
-                animate(i + 1);
-            }
-        });
-    };
-    animate(1);
+    let anims = [];
+    for (let i = 1; i < path.length; i++) {
+        anims.push(tweenAnimation(selectedPlayer, function() {
+            selectedPlayer.animateTo(path[i], ANIM_DUR_STEP);
+        }));
+    }
+    doAnimate(seriesAnimations(anims), function() {
+        endCharacter(selectedPlayer);
+    });
 }
 
 function highlightPath(path) {
@@ -122,21 +126,18 @@ export function doSwap(evt, x, y) {
 
     let selectPos = selectedPlayer.getPos();
     let clickPos  = evt.target.getPos();
-    evt.target.animateTo(selectPos, ANIM_DUR_MOVE);
-    selectedPlayer.animateTo(clickPos, ANIM_DUR_MOVE);
-
-    // Wait until _both_ selectedPlayer and evt.target have finished animating.
-    // Even though their durations are the same, empirically they don't always
-    // finish at exactly the same time.
-    let numLeft  = 2;
-    let f = function() {
-        numLeft -= 1;
-        if (numLeft === 0) {
-            endCharacter(selectedPlayer);
-        }
-    };
-    selectedPlayer.one("TweenEnd", f);
-    evt.target.one("TweenEnd", f);
+    // TODO: I don't know what's the right way to indent this, but this is not
+    // it. Can we reconfigure the linter?
+    doAnimate(parallelAnimations([
+        tweenAnimation(selectedPlayer, function() {
+            selectedPlayer.animateTo(clickPos, ANIM_DUR_MOVE);
+        }),
+        tweenAnimation(evt.target, function() {
+            evt.target.animateTo(selectPos, ANIM_DUR_MOVE);
+        }),
+    ]),
+    function() { endCharacter(selectedPlayer); }
+    );
 }
 
 export function doAttack(evt, x, y) {
@@ -170,15 +171,21 @@ export function doAttack(evt, x, y) {
     let target  = evt.target;
     let currPos = selectedPlayer.getPos();
     let halfPos = midpoint(currPos, evt.target.getPos());
-    selectedPlayer.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
-    selectedPlayer.one("TweenEnd", function() {
-        // TODO: Better way to chain these together?
-        selectedPlayer.animateTo(currPos, ANIM_DUR_HALF_ATTACK);
-        selectedPlayer.one("TweenEnd", function() {
-            target.destroy();
-            setGlobalState(StateEnum.DEFAULT);
-            endCharacter(selectedPlayer);
-        });
+
+    // TODO: I don't know what's the right way to indent this, but this is not
+    // it. Can we reconfigure the linter?
+    doAnimate(seriesAnimations([
+        tweenAnimation(selectedPlayer, function() {
+            selectedPlayer.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
+        }),
+        tweenAnimation(selectedPlayer, function() {
+            selectedPlayer.animateTo(currPos, ANIM_DUR_HALF_ATTACK);
+        }),
+    ]),
+    function() {
+        target.destroy();
+        setGlobalState(StateEnum.DEFAULT);
+        endCharacter(selectedPlayer);
     });
 }
 
