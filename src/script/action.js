@@ -126,17 +126,16 @@ export function doSwap(evt, x, y) {
 
     let selectPos = selectedPlayer.getPos();
     let clickPos  = evt.target.getPos();
-    // TODO: I don't know what's the right way to indent this, but this is not
-    // it. Can we reconfigure the linter?
-    doAnimate(parallelAnimations([
-        tweenAnimation(selectedPlayer, function() {
-            selectedPlayer.animateTo(clickPos, ANIM_DUR_MOVE);
-        }),
-        tweenAnimation(evt.target, function() {
-            evt.target.animateTo(selectPos, ANIM_DUR_MOVE);
-        }),
-    ]),
-    function() { endCharacter(selectedPlayer); }
+    doAnimate(
+        parallelAnimations([
+            tweenAnimation(selectedPlayer, function() {
+                selectedPlayer.animateTo(clickPos, ANIM_DUR_MOVE);
+            }),
+            tweenAnimation(evt.target, function() {
+                evt.target.animateTo(selectPos, ANIM_DUR_MOVE);
+            }),
+        ]),
+        function() { endCharacter(selectedPlayer); }
     );
 }
 
@@ -172,21 +171,21 @@ export function doAttack(evt, x, y) {
     let currPos = selectedPlayer.getPos();
     let halfPos = midpoint(currPos, evt.target.getPos());
 
-    // TODO: I don't know what's the right way to indent this, but this is not
-    // it. Can we reconfigure the linter?
-    doAnimate(seriesAnimations([
-        tweenAnimation(selectedPlayer, function() {
-            selectedPlayer.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
-        }),
-        tweenAnimation(selectedPlayer, function() {
-            selectedPlayer.animateTo(currPos, ANIM_DUR_HALF_ATTACK);
-        }),
-    ]),
-    function() {
-        target.destroy();
-        setGlobalState(StateEnum.DEFAULT);
-        endCharacter(selectedPlayer);
-    });
+    doAnimate(
+        seriesAnimations([
+            tweenAnimation(selectedPlayer, function() {
+                selectedPlayer.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
+            }),
+            tweenAnimation(selectedPlayer, function() {
+                selectedPlayer.animateTo(currPos, ANIM_DUR_HALF_ATTACK);
+            }),
+        ]),
+        function() {
+            target.destroy();
+            setGlobalState(StateEnum.DEFAULT);
+            endCharacter(selectedPlayer);
+        }
+    );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
