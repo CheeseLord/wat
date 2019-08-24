@@ -27,12 +27,12 @@ import {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-const HighlightType = Object.freeze({
+const HighlightStrategy = Object.freeze({
     BORDER:  {},
     OVERLAY: {},
 });
 
-const hlType = HighlightType.OVERLAY;
+const HL_STRAT = HighlightStrategy.OVERLAY;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Component definitions
@@ -102,7 +102,7 @@ Crafty.c("GridObject", {
         }
     },
     _redraw: function() {
-        if (hlType === HighlightType.BORDER) {
+        if (HL_STRAT === HighlightStrategy.BORDER) {
             // In this case, there is never an overlay. Always apply the
             // background color, since otherwise we need two separate sprites
             // for the two strategies.
@@ -130,7 +130,7 @@ Crafty.c("GridObject", {
         //     AVAILABLE_CHAR: #1f3f9f
         //     SELECTED_CHAR:  #ff9f00
         let hlColor = null;
-        if (hlType === HighlightType.BORDER) {
+        if (HL_STRAT === HighlightStrategy.BORDER) {
             switch (displayHlType) {
                 case Highlight.SELECTED_CHAR:     hlColor = "#ffff00"; break;
                 case Highlight.AVAILABLE_CHAR:    hlColor = "#ff7f00"; break;
@@ -150,7 +150,7 @@ Crafty.c("GridObject", {
                         `${displayHlType}.`);
                     return this;
             }
-        } else if (hlType === HighlightType.OVERLAY) {
+        } else if (HL_STRAT === HighlightStrategy.OVERLAY) {
             switch (displayHlType) {
                 // TODO proper rgba handling
                 case Highlight.SELECTED_CHAR:     hlColor = "#ffff0088"; break;
@@ -172,37 +172,37 @@ Crafty.c("GridObject", {
                     return this;
             }
         } else {
-            Crafty.log("Error: unknown HighlightType.");
+            Crafty.log("Error: unknown HighlightStrategy.");
             return this;
         }
 
         return this._setBorder(hlColor);
     },
     _setBorder: function(color) {
-        if (hlType === HighlightType.BORDER) {
+        if (HL_STRAT === HighlightStrategy.BORDER) {
             return this.css({
                 "outline": "solid " + (HL_RADIUS) + "px " + color,
             });
-        } else if (hlType === HighlightType.OVERLAY) {
+        } else if (HL_STRAT === HighlightStrategy.OVERLAY) {
             return this.css({
                 "background-color":   color,
             });
         } else {
-            Crafty.log("Error: unknown HighlightType.");
+            Crafty.log("Error: unknown HighlightStrategy.");
             return this;
         }
     },
     _clearBorder: function() {
-        if (hlType === HighlightType.BORDER) {
+        if (HL_STRAT === HighlightStrategy.BORDER) {
             return this.css({
                 "outline": "none",
             });
-        } else if (hlType === HighlightType.OVERLAY) {
+        } else if (HL_STRAT === HighlightStrategy.OVERLAY) {
             return this.css({
                 "background-color":   this._baseBgColor,
             });
         } else {
-            Crafty.log("Error: unknown HighlightType.");
+            Crafty.log("Error: unknown HighlightStrategy.");
             return this;
         }
     },

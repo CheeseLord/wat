@@ -68,4 +68,7 @@ rules:
       - always
     import/no-cycle:
       - error
+    no-shadow:
+      - error
+      - hoist: all
 
