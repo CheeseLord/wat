@@ -32,7 +32,7 @@ const HighlightStrategy = Object.freeze({
     OVERLAY: {},
 });
 
-const HL_STRAT = HighlightStrategy.BORDER;
+const HL_STRAT = HighlightStrategy.OVERLAY;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Component definitions
@@ -150,8 +150,8 @@ Crafty.c("GridObject", {
         } else if (HL_STRAT === HighlightStrategy.OVERLAY) {
             switch (displayHlType) {
                 // TODO proper rgba handling
-                case Highlight.SELECTED_CHAR:     hlColor = "#ffff0088"; break;
-                case Highlight.AVAILABLE_CHAR:    hlColor = "#ff7f0088"; break;
+                case Highlight.SELECTED_CHAR:     hlColor = "#ffff00bb"; break;
+                case Highlight.AVAILABLE_CHAR:    hlColor = "#ffff0066"; break;
 
                 case Highlight.ANIM_PATH_END:     hlColor = "#0000ff88"; break;
                 case Highlight.ANIM_PATH_MIDDLE:  hlColor = "#4f4f7f88"; break;
@@ -161,7 +161,7 @@ Crafty.c("GridObject", {
                 case Highlight.ATTACKABLE:        hlColor = "#ff000088"; break;
                 case Highlight.INTERACTABLE:      hlColor = "#00ff0088"; break;
                     // TODO: Green looks bad with green ground
-                case Highlight.REACHABLE:         hlColor = "#00ffff88"; break;
+                case Highlight.REACHABLE:         hlColor = "#9f6900ff"; break;
 
                 default:
                     Crafty.error("Missing case for highlight type: " +
