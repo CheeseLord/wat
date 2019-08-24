@@ -5,7 +5,7 @@
 import {
     Highlight,
     MapGrid,
-    // HL_RADIUS,
+    HL_RADIUS,
     MOVE_RANGE,
     SPRITE_DUR_PER_FRAME,
     StateEnum,
@@ -24,6 +24,15 @@ import {
     getGlobalState,
     selectedPlayer,
 } from "./action.js";
+
+///////////////////////////////////////////////////////////////////////////////
+
+const HighlightType = Object.freeze({
+    BORDER:  {},
+    OVERLAY: {},
+});
+
+const hlType = HighlightType.OVERLAY;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Component definitions
@@ -93,6 +102,15 @@ Crafty.c("GridObject", {
         }
     },
     _redraw: function() {
+        if (hlType === HighlightType.BORDER) {
+            // In this case, there is never an overlay. Always apply the
+            // background color, since otherwise we need two separate sprites
+            // for the two strategies.
+            this.css({
+                "background-color": this._baseBgColor,
+            });
+        }
+
         // Find the first highlight flag which is set.
         let displayHlType = 0;
         for (; displayHlType < Highlight.NUM_VALS; displayHlType++) {
@@ -111,39 +129,82 @@ Crafty.c("GridObject", {
         // Note: old scheme was:
         //     AVAILABLE_CHAR: #1f3f9f
         //     SELECTED_CHAR:  #ff9f00
-        let borderColor = null;
-        switch (displayHlType) {
-            // TODO proper rgba handling
-            case Highlight.SELECTED_CHAR:     borderColor = "#ffff0088"; break;
-            case Highlight.AVAILABLE_CHAR:    borderColor = "#ff7f0088"; break;
+        let hlColor = null;
+        if (hlType === HighlightType.BORDER) {
+            switch (displayHlType) {
+                case Highlight.SELECTED_CHAR:     hlColor = "#ffff00"; break;
+                case Highlight.AVAILABLE_CHAR:    hlColor = "#ff7f00"; break;
 
-            case Highlight.ANIM_PATH_END:     borderColor = "#0000ff88"; break;
-            case Highlight.ANIM_PATH_MIDDLE:  borderColor = "#4f4f7f88"; break;
-            case Highlight.HOVER_PATH_END:    borderColor = "#ff00ff88"; break;
-            case Highlight.HOVER_PATH_MIDDLE: borderColor = "#7f4f7f88"; break;
+                case Highlight.ANIM_PATH_END:     hlColor = "#0000ff"; break;
+                case Highlight.ANIM_PATH_MIDDLE:  hlColor = "#4f4f7f"; break;
+                case Highlight.HOVER_PATH_END:    hlColor = "#ff00ff"; break;
+                case Highlight.HOVER_PATH_MIDDLE: hlColor = "#7f4f7f"; break;
 
-            case Highlight.ATTACKABLE:        borderColor = "#ff000088"; break;
-            case Highlight.INTERACTABLE:      borderColor = "#00ff0088"; break;
-                // TODO: Green looks bad with green ground
-            case Highlight.REACHABLE:         borderColor = "#00ffff88"; break;
+                case Highlight.ATTACKABLE:        hlColor = "#ff0000"; break;
+                case Highlight.INTERACTABLE:      hlColor = "#00ff00"; break;
+                    // TODO: Green looks bad with green ground
+                case Highlight.REACHABLE:         hlColor = "#00ffff"; break;
 
-            default:
-                Crafty.error("Missing case for highlight type: " +
-                    `${displayHlType}.`);
-                return this;
+                default:
+                    Crafty.error("Missing case for highlight type: " +
+                        `${displayHlType}.`);
+                    return this;
+            }
+        } else if (hlType === HighlightType.OVERLAY) {
+            switch (displayHlType) {
+                // TODO proper rgba handling
+                case Highlight.SELECTED_CHAR:     hlColor = "#ffff0088"; break;
+                case Highlight.AVAILABLE_CHAR:    hlColor = "#ff7f0088"; break;
+
+                case Highlight.ANIM_PATH_END:     hlColor = "#0000ff88"; break;
+                case Highlight.ANIM_PATH_MIDDLE:  hlColor = "#4f4f7f88"; break;
+                case Highlight.HOVER_PATH_END:    hlColor = "#ff00ff88"; break;
+                case Highlight.HOVER_PATH_MIDDLE: hlColor = "#7f4f7f88"; break;
+
+                case Highlight.ATTACKABLE:        hlColor = "#ff000088"; break;
+                case Highlight.INTERACTABLE:      hlColor = "#00ff0088"; break;
+                    // TODO: Green looks bad with green ground
+                case Highlight.REACHABLE:         hlColor = "#00ffff88"; break;
+
+                default:
+                    Crafty.error("Missing case for highlight type: " +
+                            `${displayHlType}.`);
+                    return this;
+            }
+        } else {
+            Crafty.log("Error: unknown HighlightType.");
+            return this;
         }
 
-        return this._setBorder(borderColor);
+        return this._setBorder(hlColor);
     },
     _setBorder: function(color) {
-        return this.css({
-            "background-color":   color,
-        });
+        if (hlType === HighlightType.BORDER) {
+            return this.css({
+                "outline": "solid " + (HL_RADIUS) + "px " + color,
+            });
+        } else if (hlType === HighlightType.OVERLAY) {
+            return this.css({
+                "background-color":   color,
+            });
+        } else {
+            Crafty.log("Error: unknown HighlightType.");
+            return this;
+        }
     },
     _clearBorder: function() {
-        return this.css({
-            "background-color":   this._baseBgColor,
-        });
+        if (hlType === HighlightType.BORDER) {
+            return this.css({
+                "outline": "none",
+            });
+        } else if (hlType === HighlightType.OVERLAY) {
+            return this.css({
+                "background-color":   this._baseBgColor,
+            });
+        } else {
+            Crafty.log("Error: unknown HighlightType.");
+            return this;
+        }
     },
 });
 
@@ -235,7 +296,7 @@ Crafty.c("Enemy", {
 });
 
 Crafty.c("Ground", {
-    required: "StaticObject, ground_anim, Color",
+    required: "StaticObject, ground_anim",
 
     init: function() {
         this.baseBgColor("#764e00");
