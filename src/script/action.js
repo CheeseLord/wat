@@ -7,6 +7,8 @@ import {
     ANIM_DUR_HALF_ATTACK,
     ANIM_DUR_MOVE,
     ANIM_DUR_STEP,
+    ATTACK_DAMAGE,
+    SPECIAL_ATTACK_DAMAGE,
     Highlight,
     MOVE_RANGE,
     NUM_TEAMS,
@@ -181,7 +183,7 @@ export function doAttack(evt, x, y) {
             }),
         ]),
         function() {
-            target.destroy();
+            target.takeDamage(ATTACK_DAMAGE);
             setGlobalState(StateEnum.DEFAULT);
             endCharacter(selectedPlayer);
         }
@@ -341,7 +343,7 @@ export function specialAttack(player) {
     Crafty("Character").each(function() {
         if (this.team !== player.team &&
                 isAdjacent(player.getPos(), this.getPos())) {
-            this.destroy();
+            this.takeDamage(SPECIAL_ATTACK_DAMAGE);
         }
     });
 }

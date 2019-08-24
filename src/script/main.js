@@ -73,24 +73,28 @@ export function doTheThing() {
             Crafty.e("SpriteCharacter, anim_start")
                     .initPos({x: 5, y: 3})
                     .setName_("Not Greg")
+                    .setHealth(2)
                     .setTeam(0)
                     .setAnimation(0, 4);
 
             Crafty.e("SpriteCharacter, anim_start")
                     .initPos({x: 7, y: 3})
                     .setName_("Also Not Greg")
+                    .setHealth(2)
                     .setTeam(0)
                     .setAnimation(1, 4);
 
             Crafty.e("SpriteCharacter, anim_start")
                     .initPos({x: 5, y: 5})
                     .setName_("Not Joel")
+                    .setHealth(2)
                     .setTeam(1)
                     .setAnimation(2, 4);
 
             Crafty.e("SpriteCharacter, anim_start")
                     .initPos({x: 7, y: 5})
                     .setName_("Samson")
+                    .setHealth(2)
                     .setTeam(1)
                     .setAnimation(3, 4);
 

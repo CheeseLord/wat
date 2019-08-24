@@ -20,6 +20,9 @@ export const ANIM_DUR_MOVE        = 200;
 export const ANIM_DUR_STEP        = 100;
 export const ANIM_DUR_HALF_ATTACK = 100;
 
+export const ATTACK_DAMAGE = 2;
+export const SPECIAL_ATTACK_DAMAGE = 1;
+
 // Based on one of the comments on:
 //     https://stackoverflow.com/a/5040502
 // Always use === for checking equality, otherwise always true

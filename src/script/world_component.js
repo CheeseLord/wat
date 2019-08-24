@@ -166,6 +166,7 @@ Crafty.c("Character", {
 
     init: function() {
         this.name_ = "Steve";
+        this.health = 1;
         this.team = -1;
         this.attr({z: Z_CHARACTER});
         // inherit blocksMovement=true from DynamicObject
@@ -176,8 +177,21 @@ Crafty.c("Character", {
         return this;
     },
 
+    setHealth: function(health) {
+        this.health = health;
+        return this;
+    },
+
     setTeam: function(team) {
         this.team = team;
+        return this;
+    },
+
+    takeDamage: function(damage) {
+        this.health -= damage;
+        if (this.health <= 0) {
+            this.destroy();
+        }
         return this;
     },
 });
