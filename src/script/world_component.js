@@ -32,7 +32,7 @@ const HighlightStrategy = Object.freeze({
     OVERLAY: {},
 });
 
-const HL_STRAT = HighlightStrategy.OVERLAY;
+const HL_STRAT = HighlightStrategy.BORDER;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Component definitions
@@ -121,14 +121,11 @@ Crafty.c("GridObject", {
 
         if (displayHlType >= Highlight.NUM_VALS) {
             // No highlight flags set.
-            return this._clearBorder();
+            return this._clearHighlight();
         }
 
         // Map each highlight flag to a border color.
-        // TODO: Something better.
-        // Note: old scheme was:
-        //     AVAILABLE_CHAR: #1f3f9f
-        //     SELECTED_CHAR:  #ff9f00
+        // TODO: Better colors.
         let hlColor = null;
         if (HL_STRAT === HighlightStrategy.BORDER) {
             switch (displayHlType) {
@@ -176,30 +173,30 @@ Crafty.c("GridObject", {
             return this;
         }
 
-        return this._setBorder(hlColor);
+        return this._setHighlight(hlColor);
     },
-    _setBorder: function(color) {
+    _setHighlight: function(color) {
         if (HL_STRAT === HighlightStrategy.BORDER) {
             return this.css({
                 "outline": "solid " + (HL_RADIUS) + "px " + color,
             });
         } else if (HL_STRAT === HighlightStrategy.OVERLAY) {
             return this.css({
-                "background-color":   color,
+                "background-color": color,
             });
         } else {
             Crafty.log("Error: unknown HighlightStrategy.");
             return this;
         }
     },
-    _clearBorder: function() {
+    _clearHighlight: function() {
         if (HL_STRAT === HighlightStrategy.BORDER) {
             return this.css({
                 "outline": "none",
             });
         } else if (HL_STRAT === HighlightStrategy.OVERLAY) {
             return this.css({
-                "background-color":   this._baseBgColor,
+                "background-color": this._baseBgColor,
             });
         } else {
             Crafty.log("Error: unknown HighlightStrategy.");
