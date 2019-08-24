@@ -39,6 +39,8 @@ Crafty.c("GridObject", {
 
         // Highlighting
         this._highlights = new Array(Highlight.NUM_VALS).fill(false);
+
+        this._baseBgColor = null;
     },
 
     events: {
@@ -62,6 +64,12 @@ Crafty.c("GridObject", {
 
     ////////////////////////////////////////
     // Highlighting stuff
+
+    baseBgColor: function(color) {
+        this._baseBgColor = color;
+        this._redraw();
+        return this;
+    },
 
     enableHighlight: function(hlType) {
         return this._setHighlightFlag(hlType, true);
@@ -134,7 +142,7 @@ Crafty.c("GridObject", {
     },
     _clearBorder: function() {
         return this.css({
-            "outline": "none",
+            "background-color":   this._baseBgColor,
         });
     },
 });
@@ -230,9 +238,7 @@ Crafty.c("Ground", {
     required: "StaticObject, ground_anim, Color",
 
     init: function() {
-        this.css({
-            "background-color": "#764e00",
-        });
+        this.baseBgColor("#764e00");
         this.attr({z: Z_GROUND});
     },
 });
