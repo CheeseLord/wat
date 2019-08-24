@@ -5,7 +5,7 @@
 import {
     Highlight,
     MapGrid,
-    HL_RADIUS,
+    // HL_RADIUS,
     MOVE_RANGE,
     SPRITE_DUR_PER_FRAME,
     StateEnum,
@@ -105,18 +105,19 @@ Crafty.c("GridObject", {
         //     SELECTED_CHAR:  #ff9f00
         let borderColor = null;
         switch (displayHlType) {
-            case Highlight.SELECTED_CHAR:     borderColor = "#ffff00"; break;
-            case Highlight.AVAILABLE_CHAR:    borderColor = "#ff7f00"; break;
+            // TODO proper rgba handling
+            case Highlight.SELECTED_CHAR:     borderColor = "#ffff0088"; break;
+            case Highlight.AVAILABLE_CHAR:    borderColor = "#ff7f0088"; break;
 
-            case Highlight.ANIM_PATH_END:     borderColor = "#0000ff"; break;
-            case Highlight.ANIM_PATH_MIDDLE:  borderColor = "#4f4f7f"; break;
-            case Highlight.HOVER_PATH_END:    borderColor = "#ff00ff"; break;
-            case Highlight.HOVER_PATH_MIDDLE: borderColor = "#7f4f7f"; break;
+            case Highlight.ANIM_PATH_END:     borderColor = "#0000ff88"; break;
+            case Highlight.ANIM_PATH_MIDDLE:  borderColor = "#4f4f7f88"; break;
+            case Highlight.HOVER_PATH_END:    borderColor = "#ff00ff88"; break;
+            case Highlight.HOVER_PATH_MIDDLE: borderColor = "#7f4f7f88"; break;
 
-            case Highlight.ATTACKABLE:        borderColor = "#ff0000"; break;
-            case Highlight.INTERACTABLE:      borderColor = "#00ff00"; break;
+            case Highlight.ATTACKABLE:        borderColor = "#ff000088"; break;
+            case Highlight.INTERACTABLE:      borderColor = "#00ff0088"; break;
                 // TODO: Green looks bad with green ground
-            case Highlight.REACHABLE:         borderColor = "#00ffff"; break;
+            case Highlight.REACHABLE:         borderColor = "#00ffff88"; break;
 
             default:
                 Crafty.error("Missing case for highlight type: " +
@@ -128,7 +129,7 @@ Crafty.c("GridObject", {
     },
     _setBorder: function(color) {
         return this.css({
-            "outline": "solid " + (HL_RADIUS) + "px " + color,
+            "background-color":   color,
         });
     },
     _clearBorder: function() {
@@ -212,9 +213,12 @@ Crafty.c("Enemy", {
 });
 
 Crafty.c("Ground", {
-    required: "StaticObject, ground_anim",
+    required: "StaticObject, ground_anim, Color",
 
     init: function() {
+        this.css({
+            "background-color": "#764e00",
+        });
         this.attr({z: Z_GROUND});
     },
 });
