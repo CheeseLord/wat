@@ -335,6 +335,15 @@ function createMovementGrid(player) {
     Crafty("GridObject").each(function() {
         if (isReachable(theMap, this.getPos())) {
             this.enableHighlight(Highlight.REACHABLE);
+        } else {
+            // FIXME Hack: highlight Enemies as attackable and Trees as
+            // interactable. Neither one is accurate; I just want to see the
+            // highlight colors in action.
+            if (this.has("Enemy")) {
+                this.enableHighlight(Highlight.ATTACKABLE);
+            } else if (this.has("Tree")) {
+                this.enableHighlight(Highlight.INTERACTABLE);
+            }
         }
     });
 };
