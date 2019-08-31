@@ -6,11 +6,6 @@ import {
     MapGrid,
 } from  "./consts.js";
 
-export function getDistance(pos1, pos2) {
-    // Taxicab/L1 distance.
-    return Math.abs(pos2.x - pos1.x) + Math.abs(pos2.y - pos1.y);
-}
-
 // Note: This function is NOT equivalent to getDistance(pos1, pos2) <= 1,
 // because it allows diagonals.
 // TODO: Should we just use L-infinity for distance so it's more consistent
@@ -173,17 +168,27 @@ function getNeighbors(theMap, pos) {
     var x = pos.x;
     var y = pos.y;
     var neighbors = [];
-    if (x !== 0 && !theMap[x - 1][y].isBlocked) {
-        neighbors.push({x: x - 1, y: y});
-    };
-    if (x !== theMap.length - 1 && !theMap[x + 1][y].isBlocked) {
-        neighbors.push({x: x + 1, y: y});
-    };
-    if (y !== 0 && !theMap[x][y - 1].isBlocked) {
-        neighbors.push({x: x, y: y - 1});
-    };
-    if (y !== theMap[x].length - 1 && !theMap[x][y + 1].isBlocked) {
-        neighbors.push({x: x, y: y + 1});
-    };
+
+    var xNeighbors = [x];
+    var yNeighbors = [y];
+    if (x !== 0)                 { xNeighbors.push(x - 1); }
+    if (x !== theMap.length - 1) { xNeighbors.push(x + 1); }
+    if (y !== 0)                 { yNeighbors.push(y - 1); }
+    if (y !== theMap.length - 1) { yNeighbors.push(y + 1); }
+
+    for (let i = 0; i < xNeighbors.length; i++) {
+        let x_ = xNeighbors[i];
+        for (let j = 0; j < yNeighbors.length; j++) {
+            let y_ = yNeighbors[j];
+
+            if (x_ === x && y_ === y) { continue; }
+
+            if (!theMap[x_][y_].isBlocked) {
+                neighbors.push({x: x_, y: y_});
+            }
+        }
+    }
+
     return neighbors;
 }
+
