@@ -10,7 +10,7 @@ import {
     doMenu,
 } from "./menu.js";
 import {
-    doAttack,
+    doMoveAttack,
     doInteract,
     doMove,
     doSwap,
@@ -45,7 +45,7 @@ export function worldClickHandler(evt) {
         } else if (getGlobalState() === StateEnum.PLAYER_SWAP) {
             doSwap(evt, x, y);
         } else if (getGlobalState() === StateEnum.PLAYER_ATTACK) {
-            doAttack(evt, x, y);
+            doMoveAttack(evt, x, y);
         } else if (getGlobalState() === StateEnum.PLAYER_INTERACT) {
             doInteract(evt, x, y);
         } else {

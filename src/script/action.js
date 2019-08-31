@@ -215,6 +215,73 @@ export function doInteract(evt, x, y) {
     endCharacter(selectedPlayer);
 }
 
+export function doMoveAttack(evt, x, y) {
+    // assert(getGlobalState() === StateEnum.PLAYER_ATTACK);
+    if (!selectedPlayer) {
+        // assert(false); -- Don't think this can happen?
+        return;
+    } else if (evt.target === null) {
+        reportUserError("No enemy there.");
+        return;
+    } else if (isAdjacent({x: x, y: y}, selectedPlayer.getPos())) {
+        doAttack(evt, x, y);
+        return;
+    } else if (!evt.target.has("Character")) {
+        reportUserError("Can't attack non-character.");
+        return;
+    } else if (evt.target.team === currentTeam) {
+        reportUserError("Can't attack friendly unit.");
+        return;
+    }
+    let theMap = findPaths(selectedPlayer.getPos(), MOVE_RANGE);
+    let destPos = {x: x, y: y};
+    let path = getPath(theMap, selectedPlayer.getPos(), destPos);
+    let moveToPos = path[path.length - 2];
+    if (!isReachable(theMap, moveToPos)) {
+        reportUserError("Target not reachable.");
+        return;
+    }
+
+    Crafty.log(`${selectedPlayer.name_} moved to ` +
+        `(${moveToPos.x}, ${moveToPos.y})`);
+    Crafty.log(`${selectedPlayer.name_} attacked ${evt.target.name_}`);
+
+    Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
+    setGlobalState(StateEnum.ANIMATING);
+    highlightPath(path);
+
+    // Close over a copy of evt.target so we can destroy it at the end of the
+    // animation. Empirically if we simply close over evt, sometimes its
+    // .target gets set to null by the time we want to destroy it, which was
+    // causing the destroy() call to fail.
+    let target  = evt.target;
+    let halfPos = midpoint(moveToPos, evt.target.getPos());
+
+    let moveAnims = [];
+    for (let i = 1; i < path.length - 1; i++) {
+        moveAnims.push(tweenAnimation(selectedPlayer, function() {
+            selectedPlayer.animateTo(path[i], ANIM_DUR_STEP);
+        }));
+    }
+    doAnimate(
+        seriesAnimations(
+            moveAnims.concat([
+                tweenAnimation(selectedPlayer, function() {
+                    selectedPlayer.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
+                }),
+                tweenAnimation(selectedPlayer, function() {
+                    selectedPlayer.animateTo(moveToPos, ANIM_DUR_HALF_ATTACK);
+                }),
+            ])
+        ),
+        function() {
+            target.takeDamage(ATTACK_DAMAGE);
+            setGlobalState(StateEnum.DEFAULT);
+            endCharacter(selectedPlayer);
+        }
+    );
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // "Milestones" in turn order
 
@@ -381,3 +448,4 @@ export function specialAttack(player) {
         }
     });
 }
+
