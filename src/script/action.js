@@ -70,9 +70,8 @@ export function doMove(evt, x, y) {
         return;
     }
 
-    Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
-    setGlobalState(StateEnum.DEFAULT);
     let path = getPath(theMap, selectedPlayer.getPos(), destPos);
+    setGlobalState(StateEnum.ANIMATING);
     highlightPath(path);
     let anims = [];
     for (let i = 1; i < path.length; i++) {
@@ -81,6 +80,8 @@ export function doMove(evt, x, y) {
         }));
     }
     doAnimate(seriesAnimations(anims), function() {
+        Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
+        setGlobalState(StateEnum.DEFAULT);
         endCharacter(selectedPlayer);
     });
 }
@@ -232,6 +233,7 @@ export function doInteract(evt, x, y) {
         path.pop();
 
         // TODO: Refactor with doMove.
+        setGlobalState(StateEnum.ANIMATING);
         highlightPath(path);
         let anims = [];
         for (let i = 1; i < path.length; i++) {
