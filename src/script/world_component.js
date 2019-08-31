@@ -310,6 +310,15 @@ Crafty.c("Tree", {
     },
 });
 
+Crafty.c("Lever", {
+    required: "DynamicObject, unpulled_lever",
+
+    init: function() {
+        this.attr({z: Z_SCENERY});
+        this.attr({blocksMovement: true});
+    },
+});
+
 ///////////////////////////////////////////////////////////////////////////////
 // TODO find a better place to put these functions
 

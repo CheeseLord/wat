@@ -336,12 +336,12 @@ function createMovementGrid(player) {
         if (isReachable(theMap, this.getPos())) {
             this.enableHighlight(Highlight.REACHABLE);
         } else {
-            // FIXME Hack: highlight Enemies as attackable and Trees as
+            // FIXME Hack: highlight Enemies as attackable and Levers as
             // interactable. Neither one is accurate; I just want to see the
             // highlight colors in action.
             if (this.has("Enemy")) {
                 this.enableHighlight(Highlight.ATTACKABLE);
-            } else if (this.has("Tree")) {
+            } else if (this.has("Lever")) {
                 this.enableHighlight(Highlight.INTERACTABLE);
             }
         }

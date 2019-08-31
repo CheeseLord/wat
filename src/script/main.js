@@ -67,6 +67,14 @@ export function doTheThing() {
                         tree_anim: [0, 0],
                     },
                 },
+                "lever.png": {
+                    tile:     32,
+                    tileh:    32,
+                    map:      {
+                        unpulled_lever: [0, 0],
+                        pulled_lever:   [1, 0],
+                    },
+                },
             },
         },
         function() {
@@ -119,6 +127,8 @@ export function doTheThing() {
         for (let x = 0; x < MapGrid.width; x++) {
             if (x === 6 && y === 7) {
                 Crafty.e("Tree").initPos({x: x, y: y});
+            } else if (x === 9 && y === 6) {
+                Crafty.e("Lever").initPos({x: x, y: y});
             }
             Crafty.e("Ground").initPos({x: x, y: y});
         }
