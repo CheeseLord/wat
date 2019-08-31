@@ -24,6 +24,9 @@ export function tweenAnimation(endObj, startFunc) {
 }
 
 export function nopAnimation() {
+    // Note: we could also just use seriesAnimations([]). But not
+    // parallelAnimations([]), at least not as it's currently implemented.
+    // TODO: Maybe fix that?
     return {
         type: AnimType.NOTHING,
     };

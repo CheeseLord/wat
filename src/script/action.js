@@ -204,45 +204,37 @@ export function doInteract(evt, x, y) {
         return;
     }
 
+    // Do a move-and-interact.
+    // TODO: Wait, we really don't already have a map?
+    let theMap = findPaths(selectedPlayer.getPos(), MOVE_RANGE);
+    let destPos = {x: x, y: y};
+    let path = getPath(theMap, selectedPlayer.getPos(), destPos);
+    if (path === null) {
+        reportUserError("Can't reach that to interact with it.");
+        return;
+    }
+    // assert(path.length > 1);
+    path.pop();
+
+    // TODO: Refactor with doMove.
+    setGlobalState(StateEnum.ANIMATING);
+    highlightPath(path);
+    let anims = [];
+    for (let i = 1; i < path.length; i++) {
+        anims.push(tweenAnimation(selectedPlayer, function() {
+            selectedPlayer.animateTo(path[i], ANIM_DUR_STEP);
+        }));
+    }
     // Need to close over evt.target rather than evt.
     let target = evt.target;
-    let finishInteract = function() {
-        Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
+    // TODO some sort of animation for the interaction itself?
+    doAnimate(seriesAnimations(anims), function() {
         target.interact(selectedPlayer);
 
-        // TODO some sort of animation?
-
+        Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
         setGlobalState(StateEnum.DEFAULT);
         endCharacter(selectedPlayer);
-    };
-
-    if (isAdjacent({x: x, y: y}, selectedPlayer.getPos())) {
-        // Already adjacent, just interact now.
-        finishInteract();
-    } else {
-        // Do a move-and-interact.
-        // TODO: Wait, we really don't already have a map?
-        let theMap = findPaths(selectedPlayer.getPos(), MOVE_RANGE);
-        let destPos = {x: x, y: y};
-        let path = getPath(theMap, selectedPlayer.getPos(), destPos);
-        if (path === null) {
-            reportUserError("Can't reach that to interact with it.");
-            return;
-        }
-        // assert(path.length > 1);
-        path.pop();
-
-        // TODO: Refactor with doMove.
-        setGlobalState(StateEnum.ANIMATING);
-        highlightPath(path);
-        let anims = [];
-        for (let i = 1; i < path.length; i++) {
-            anims.push(tweenAnimation(selectedPlayer, function() {
-                selectedPlayer.animateTo(path[i], ANIM_DUR_STEP);
-            }));
-        }
-        doAnimate(seriesAnimations(anims), finishInteract);
-    }
+    });
 }
 
 export function doMoveAttack(evt, x, y) {
