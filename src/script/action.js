@@ -198,21 +198,49 @@ export function doInteract(evt, x, y) {
     } else if (evt.target === null) {
         reportUserError("Nothing there to interact with.");
         return;
-    } else if (!isAdjacent({x: x, y: y}, selectedPlayer.getPos())) {
-        reportUserError("Target not adjacent.");
-        return;
     } else if (!evt.target.has("Interactable")) {
         reportUserError("Can't interact with that.");
         return;
     }
 
-    Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
-    evt.target.interact(selectedPlayer);
+    // Need to close over evt.target rather than evt.
+    let target = evt.target;
+    let finishInteract = function() {
+        Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
+        target.interact(selectedPlayer);
 
-    // TODO some sort of animation?
+        // TODO some sort of animation?
 
-    setGlobalState(StateEnum.DEFAULT);
-    endCharacter(selectedPlayer);
+        setGlobalState(StateEnum.DEFAULT);
+        endCharacter(selectedPlayer);
+    };
+
+    if (isAdjacent({x: x, y: y}, selectedPlayer.getPos())) {
+        // Already adjacent, just interact now.
+        finishInteract();
+    } else {
+        // Do a move-and-interact.
+        // TODO: Wait, we really don't already have a map?
+        let theMap = findPaths(selectedPlayer.getPos(), MOVE_RANGE);
+        let destPos = {x: x, y: y};
+        let path = getPath(theMap, selectedPlayer.getPos(), destPos);
+        if (path === null) {
+            reportUserError("Can't reach that to interact with it.");
+            return;
+        }
+        // assert(path.length > 1);
+        path.pop();
+
+        // TODO: Refactor with doMove.
+        highlightPath(path);
+        let anims = [];
+        for (let i = 1; i < path.length; i++) {
+            anims.push(tweenAnimation(selectedPlayer, function() {
+                selectedPlayer.animateTo(path[i], ANIM_DUR_STEP);
+            }));
+        }
+        doAnimate(seriesAnimations(anims), finishInteract);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
