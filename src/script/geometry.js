@@ -108,6 +108,9 @@ export function getPath(theMap, startPos, endPos) {
 export function isReachable(theMap, destPos) {
     let x = destPos.x;
     let y = destPos.y;
+    if (theMap[x][y].isBlocked) {
+        return false;
+    }
     return (theMap[x][y].parent !== null);
 }
 
@@ -158,7 +161,9 @@ function computePathsOnMap(startPos, theMap, distance) {
                 continue;
             };
             theMap[nextPos.x][nextPos.y].parent = pos;
-            queue.push({"pos": nextPos, "dist": dist - 1});
+            if (!theMap[nextPos.x][nextPos.y].isBlocked) {
+                queue.push({"pos": nextPos, "dist": dist - 1});
+            }
         }
     };
     return theMap;
@@ -181,9 +186,7 @@ function getNeighbors(theMap, pos) {
         for (let j = 0; j < yNeighbors.length; j++) {
             let y_ = yNeighbors[j];
 
-            if (x_ === x && y_ === y) { continue; }
-
-            if (!theMap[x_][y_].isBlocked) {
+            if (x_ !== x || y_ !== y) {
                 neighbors.push({x: x_, y: y_});
             }
         }
