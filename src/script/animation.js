@@ -3,6 +3,7 @@
 "use strict";
 
 const AnimType = Object.freeze({
+    NOTHING:  {},
     SINGLE:   {},
     SERIES:   {},
     PARALLEL: {},
@@ -20,6 +21,12 @@ export function animation(endObj, endEventName, startFunc) {
 // Helper since in practice endEventName always seems to be "TweenEnd".
 export function tweenAnimation(endObj, startFunc) {
     return animation(endObj, "TweenEnd", startFunc);
+}
+
+export function nopAnimation() {
+    return {
+        type: AnimType.NOTHING,
+    };
 }
 
 // Combinators
@@ -42,6 +49,8 @@ export function doAnimate(animDesc, callback) {
     if (animDesc.type === AnimType.SINGLE) {
         animDesc.func();
         animDesc.obj.one(animDesc.evt, callback);
+    } else if (animDesc.type === AnimType.NOTHING) {
+        callback();
     } else if (animDesc.type === AnimType.SERIES) {
         let f = function(i) {
             if (i < animDesc.contents.length) {
