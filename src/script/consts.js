@@ -33,6 +33,7 @@ export const StateEnum = Object.freeze({
     PLAYER_MOVE:     {},
     PLAYER_SWAP:     {},
     PLAYER_ATTACK:   {},
+    PLAYER_INTERACT: {},
 });
 
 // List of highlighting types. Several of these can be set on a single object,

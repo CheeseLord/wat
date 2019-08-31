@@ -11,6 +11,7 @@ import {
 } from "./menu.js";
 import {
     doAttack,
+    doInteract,
     doMove,
     doSwap,
     getCurrentTeam,
@@ -45,6 +46,8 @@ export function worldClickHandler(evt) {
             doSwap(evt, x, y);
         } else if (getGlobalState() === StateEnum.PLAYER_ATTACK) {
             doAttack(evt, x, y);
+        } else if (getGlobalState() === StateEnum.PLAYER_INTERACT) {
+            doInteract(evt, x, y);
         } else {
             Crafty.error("Unknown state value.");
             // assert(false);

@@ -190,6 +190,31 @@ export function doAttack(evt, x, y) {
     );
 }
 
+export function doInteract(evt, x, y) {
+    // assert(getGlobalState() === StateEnum.PLAYER_INTERACT);
+    if (!selectedPlayer) {
+        // assert(false); -- Don't think this can happen?
+        return;
+    } else if (evt.target === null) {
+        reportUserError("Nothing there to interact with.");
+        return;
+    } else if (!isAdjacent({x: x, y: y}, selectedPlayer.getPos())) {
+        reportUserError("Target not adjacent.");
+        return;
+    } else if (!evt.target.has("Interactable")) {
+        reportUserError("Can't interact with that.");
+        return;
+    }
+
+    Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
+    evt.target.interact(selectedPlayer);
+
+    // TODO some sort of animation?
+
+    setGlobalState(StateEnum.DEFAULT);
+    endCharacter(selectedPlayer);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // "Milestones" in turn order
 

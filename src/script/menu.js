@@ -37,6 +37,7 @@ var menuTable = {
             ["Move",        "move",       doNothing],
             ["Swap places", "swapPlaces", doNothing],
             ["Attack",      "attack",     doNothing],
+            ["Interact",    "interact",   doNothing],
             ["End Turn",    CLEAR_MENU,   () => {
                 deselectPlayer();
                 endTeam();
@@ -57,6 +58,15 @@ var menuTable = {
     swapPlaces: {
         title:   "Swap Places",
         state:   StateEnum.PLAYER_SWAP,
+        buttons: [
+            // Text  New Menu     Action
+            ["Back", PARENT_MENU, doNothing],
+        ],
+    },
+
+    interact: {
+        title:   "Interact",
+        state:   StateEnum.PLAYER_INTERACT,
         buttons: [
             // Text  New Menu     Action
             ["Back", PARENT_MENU, doNothing],
