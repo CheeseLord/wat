@@ -25,6 +25,13 @@ import {
 
 // Generic handler for clicks on the world view.
 export function worldClickHandler(evt) {
+    if (getGlobalState() === StateEnum.ANIMATING) {
+        // Never try to handle a click if we're in the middle of an animation.
+        // That's just asking for the game to wind up in an inconsistent state
+        // where things get weirdly messed up.
+        return;
+    }
+
     // TODO: Can't we just use evt.target.getPos()? If there's no target, we
     // sholdn't be doing anything anyway...
     let x = Math.floor(evt.realX / (MapGrid.tile.width + MapGrid.tile.hspace));
