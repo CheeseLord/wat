@@ -452,9 +452,9 @@ export function updateAutoActions(character) {
         } else if (canAttack(character, this)) {
             this.autoAction = AutoActionEnum.ATTACK;
         } else if (!this.blocksMovement) {
-            this.autoAction = AutoActionEnum.NONE;
-        } else {
             this.autoAction = AutoActionEnum.MOVE;
+        } else {
+            this.autoAction = AutoActionEnum.NONE;
         }
     });
 }
