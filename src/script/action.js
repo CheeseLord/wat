@@ -6,6 +6,7 @@ import {
     ANIM_DUR_CENTER_TURN,
     ANIM_DUR_HALF_ATTACK,
     ANIM_DUR_MOVE,
+    ANIM_DUR_PAUSE_BW_MOV_ATK,
     ANIM_DUR_STEP,
     ATTACK_DAMAGE,
     SPECIAL_ATTACK_DAMAGE,
@@ -25,6 +26,7 @@ import {
 import {
     doAnimate,
     parallelAnimations,
+    pauseAnimation,
     seriesAnimations,
     tweenAnimation,
 } from "./animation.js";
@@ -288,6 +290,7 @@ export function doMoveAttack(evt, x, y) {
     doAnimate(
         seriesAnimations(
             moveAnims.concat([
+                pauseAnimation(ANIM_DUR_PAUSE_BW_MOV_ATK),
                 tweenAnimation(selectedPlayer, function() {
                     selectedPlayer.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
                 }),

@@ -3,8 +3,9 @@
 "use strict";
 
 const AnimType = Object.freeze({
-    NOTHING:  {},
     SINGLE:   {},
+    NOTHING:  {},
+    PAUSE:    {},
     SERIES:   {},
     PARALLEL: {},
 });
@@ -23,12 +24,20 @@ export function tweenAnimation(endObj, startFunc) {
     return animation(endObj, "TweenEnd", startFunc);
 }
 
+// Special cases
 export function nopAnimation() {
     // Note: we could also just use seriesAnimations([]). But not
     // parallelAnimations([]), at least not as it's currently implemented.
     // TODO: Maybe fix that?
     return {
         type: AnimType.NOTHING,
+    };
+}
+
+export function pauseAnimation(duration) {
+    return {
+        type:     AnimType.PAUSE,
+        duration: duration,
     };
 }
 
@@ -54,6 +63,8 @@ export function doAnimate(animDesc, callback) {
         animDesc.obj.one(animDesc.evt, callback);
     } else if (animDesc.type === AnimType.NOTHING) {
         callback();
+    } else if (animDesc.type === AnimType.PAUSE) {
+        setTimeout(callback, animDesc.duration);
     } else if (animDesc.type === AnimType.SERIES) {
         let f = function(i) {
             if (i < animDesc.contents.length) {

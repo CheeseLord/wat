@@ -13,12 +13,13 @@ export const Z_SCENERY     = 20; // Walls, doodads
 export const Z_CHARACTER   = 30; // Things that move around
 export const Z_UI          = 50; // UI layer - above all world stuff
 
-export const SPRITE_DUR_PER_FRAME = 250;
-export const ANIM_DUR_SCROLL      = 50;
-export const ANIM_DUR_CENTER_TURN = 200;
-export const ANIM_DUR_MOVE        = 200;
-export const ANIM_DUR_STEP        = 100;
-export const ANIM_DUR_HALF_ATTACK = 100;
+export const SPRITE_DUR_PER_FRAME      = 250;
+export const ANIM_DUR_SCROLL           = 50;
+export const ANIM_DUR_CENTER_TURN      = 200;
+export const ANIM_DUR_MOVE             = 200;
+export const ANIM_DUR_STEP             = 100;
+export const ANIM_DUR_HALF_ATTACK      = 100;
+export const ANIM_DUR_PAUSE_BW_MOV_ATK = 80;
 
 export const ATTACK_DAMAGE = 2;
 export const SPECIAL_ATTACK_DAMAGE = 1;
