@@ -9,6 +9,7 @@ import {
     ANIM_DUR_PAUSE_BW_MOV_ATK,
     ANIM_DUR_STEP,
     ATTACK_DAMAGE,
+    AutoActionEnum,
     SPECIAL_ATTACK_DAMAGE,
     Highlight,
     MOVE_RANGE,
@@ -360,6 +361,8 @@ export function selectPlayer(player) {
 }
 
 export function deselectPlayer() {
+    clearAutoActions();
+
     if (selectedPlayer) {
         selectedPlayer.disableHighlight(Highlight.SELECTED_CHAR);
         selectedPlayer = null;
@@ -431,6 +434,34 @@ export function specialAttack(player) {
                 isAdjacent(player.getPos(), this.getPos())) {
             this.takeDamage(SPECIAL_ATTACK_DAMAGE);
         }
+    });
+}
+
+export function canAttack(character, target) {
+    return target.has("Character") && target.team !== character.team;
+}
+
+export function canInteract(character, target) {
+    return target.has("Interactable");
+}
+
+export function updateAutoActions(character) {
+    Crafty("GridObject").each(function() {
+        if (canInteract(character, this)) {
+            this.autoAction = AutoActionEnum.INTERACT;
+        } else if (canAttack(character, this)) {
+            this.autoAction = AutoActionEnum.ATTACK;
+        } else if (!this.blocksMovement) {
+            this.autoAction = AutoActionEnum.NONE;
+        } else {
+            this.autoAction = AutoActionEnum.MOVE;
+        }
+    });
+}
+
+export function clearAutoActions() {
+    Crafty("GridObject").each(function() {
+        this.autoAction = AutoActionEnum.NONE;
     });
 }
 

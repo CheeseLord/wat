@@ -19,6 +19,7 @@ import {
     getReadyCharacters,
     reportUserError,
     selectPlayer,
+    updateAutoActions,
 } from "./action.js";
 
 ///////////////////////////////////////////////////////////////////////
@@ -80,6 +81,7 @@ function doSelectPlayer(evt, x, y) {
     //        getGlobalState() === StateEnum.PLAYER_SELECTED);
 
     if (evt.target && evt.target.has("Character")) {
+        updateAutoActions(evt.target);
         if (evt.target.team !== getCurrentTeam()) {
             reportUserError("Character is on another team");
             return;

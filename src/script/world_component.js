@@ -3,6 +3,7 @@
 "use strict";
 
 import {
+    AutoActionEnum,
     Highlight,
     MapGrid,
     HL_RADIUS,
@@ -46,9 +47,10 @@ Crafty.c("GridObject", {
         this.attr({w: MapGrid.tile.width, h: MapGrid.tile.height});
         this.attr({blocksMovement: false});
 
+        this.autoAction = AutoActionEnum.NONE;
+
         // Highlighting
         this._highlights = new Array(Highlight.NUM_VALS).fill(false);
-
         this._baseBgColor = null;
     },
 
