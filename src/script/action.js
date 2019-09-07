@@ -357,6 +357,7 @@ export function selectPlayer(player) {
     deselectPlayer();
     selectedPlayer = player;
     selectedPlayer.enableHighlight(Highlight.SELECTED_CHAR);
+    updateAutoActions(player);
     createMovementGrid(player);
 }
 

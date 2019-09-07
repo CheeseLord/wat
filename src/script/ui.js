@@ -3,6 +3,7 @@
 "use strict";
 
 import {
+    AutoActionEnum,
     MapGrid,
     StateEnum,
 } from "./consts.js";
@@ -19,7 +20,6 @@ import {
     getReadyCharacters,
     reportUserError,
     selectPlayer,
-    updateAutoActions,
 } from "./action.js";
 
 ///////////////////////////////////////////////////////////////////////
@@ -69,7 +69,28 @@ export function worldClickHandler(evt) {
 // state "PLAYER_SELECTED").
 function doAutoPlayerAction(evt, x, y) {
     if (!doSelectPlayer(evt, x, y)) {
-        doMove(evt, x, y);
+        if (!(evt.target && evt.target.has("GridObject"))) {
+            reportUserError("There's nothing there!");
+            return;
+        }
+        Crafty.log(evt.target.autoAction);
+        switch (evt.target.autoAction) {
+            case AutoActionEnum.MOVE:
+                doMove(evt, x, y);
+                break;
+            case AutoActionEnum.ATTACK:
+                doAttack(evt, x, y);
+                break;
+            case AutoActionEnum.INTERACT:
+                doInteract(evt, x, y);
+                break;
+            case AutoActionEnum.NONE:
+                reportUserError("No auto-action defined for that target.");
+                break;
+            default:
+                // assert(false);
+                break;
+        }
     }
 }
 
@@ -89,7 +110,6 @@ function doSelectPlayer(evt, x, y) {
         return false;
     }
 
-    updateAutoActions(evt.target);
     selectPlayer(evt.target);
     // TODO: Also setFocusOn? Or even call out to startCharacter?
     doMenu("topMenu");
