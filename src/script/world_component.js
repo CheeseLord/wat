@@ -19,6 +19,7 @@ import {
     findPaths,
     getPath,
     gridPosToGraphics,
+    isReachable,
 } from "./geometry.js";
 
 import {
@@ -350,8 +351,11 @@ function hoverHighlightObj(obj) {
     let destPos = obj.getPos();
     let path    = getPath(theMap, selectedPlayer.getPos(), destPos);
 
-    if (path === null) {
+    if (!isReachable(theMap, destPos)) {
         return; // No path
+    } else if (path === null) {
+        // assert(false);
+        return;
     }
 
     for (let i = 0; i < path.length; i++) {
