@@ -144,55 +144,6 @@ export function doSwap(evt, x, y) {
     );
 }
 
-export function doAttack(evt, x, y) {
-    // assert(getGlobalState() === StateEnum.PLAYER_ATTACK);
-    if (!selectedPlayer) {
-        // assert(false); -- Don't think this can happen?
-        return;
-    } else if (evt.target === null) {
-        reportUserError("No enemy there.");
-        return;
-    } else if (!isAdjacent({x: x, y: y}, selectedPlayer.getPos())) {
-        reportUserError("Target not adjacent.");
-        return;
-    } else if (!evt.target.has("Character")) {
-        reportUserError("Can't attack non-character.");
-        return;
-    } else if (evt.target.team === currentTeam) {
-        reportUserError("Can't attack friendly unit.");
-        return;
-    }
-
-    Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
-
-    Crafty.log(`${selectedPlayer.name_} attacked ${evt.target.name_}`);
-
-    setGlobalState(StateEnum.ANIMATING);
-    // Close over a copy of evt.target so we can destroy it at the end of the
-    // animation. Empirically if we simply close over evt, sometimes its
-    // .target gets set to null by the time we want to destroy it, which was
-    // causing the destroy() call to fail.
-    let target  = evt.target;
-    let currPos = selectedPlayer.getPos();
-    let halfPos = midpoint(currPos, evt.target.getPos());
-
-    doAnimate(
-        seriesAnimations([
-            tweenAnimation(selectedPlayer, function() {
-                selectedPlayer.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
-            }),
-            tweenAnimation(selectedPlayer, function() {
-                selectedPlayer.animateTo(currPos, ANIM_DUR_HALF_ATTACK);
-            }),
-        ]),
-        function() {
-            target.takeDamage(ATTACK_DAMAGE);
-            setGlobalState(StateEnum.DEFAULT);
-            endCharacter(selectedPlayer);
-        }
-    );
-}
-
 export function doInteract(evt, x, y) {
     // assert(getGlobalState() === StateEnum.PLAYER_INTERACT);
     if (!selectedPlayer) {
@@ -239,16 +190,13 @@ export function doInteract(evt, x, y) {
     });
 }
 
-export function doMoveAttack(evt, x, y) {
+export function doAttack(evt, x, y) {
     // assert(getGlobalState() === StateEnum.PLAYER_ATTACK);
     if (!selectedPlayer) {
         // assert(false); -- Don't think this can happen?
         return;
     } else if (evt.target === null) {
         reportUserError("No enemy there.");
-        return;
-    } else if (isAdjacent({x: x, y: y}, selectedPlayer.getPos())) {
-        doAttack(evt, x, y);
         return;
     } else if (!evt.target.has("Character")) {
         reportUserError("Can't attack non-character.");
@@ -260,47 +208,59 @@ export function doMoveAttack(evt, x, y) {
     let theMap = findPaths(selectedPlayer.getPos(), MOVE_RANGE);
     let destPos = {x: x, y: y};
     let path = getPath(theMap, selectedPlayer.getPos(), destPos);
-    let moveToPos = path[path.length - 2];
-    if (!isReachable(theMap, moveToPos)) {
-        reportUserError("Target not reachable.");
+    if (path === null) {
+        reportUserError("Can't reach that to attack it.");
         return;
+    }
+    let moveToPos = selectedPlayer.getPos();
+    if (path.length > 1) {
+        path.pop();
+        moveToPos = path[path.length - 1];
+    } else {
+        // assert(false);
     }
 
     Crafty.log(`${selectedPlayer.name_} moved to ` +
         `(${moveToPos.x}, ${moveToPos.y})`);
     Crafty.log(`${selectedPlayer.name_} attacked ${evt.target.name_}`);
 
-    Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
-    setGlobalState(StateEnum.ANIMATING);
-    highlightPath(path);
+    // TODO: Refactor with doMove.
+    let anims = [];
+    for (let i = 1; i < path.length; i++) {
+        anims.push(tweenAnimation(selectedPlayer, function() {
+            selectedPlayer.animateTo(path[i], ANIM_DUR_STEP);
+        }));
+    }
+
+    // Pause between move and attack, but only if we actually moved.
+    if (anims.length > 0) {
+        anims.push(pauseAnimation(ANIM_DUR_PAUSE_BW_MOV_ATK));
+    }
+
+    // Add the attack animation, regardless.
+    let halfPos = midpoint(moveToPos, evt.target.getPos());
+    anims = anims.concat([
+        tweenAnimation(selectedPlayer, function() {
+            selectedPlayer.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
+        }),
+        tweenAnimation(selectedPlayer, function() {
+            selectedPlayer.animateTo(moveToPos, ANIM_DUR_HALF_ATTACK);
+        }),
+    ]);
 
     // Close over a copy of evt.target so we can destroy it at the end of the
     // animation. Empirically if we simply close over evt, sometimes its
     // .target gets set to null by the time we want to destroy it, which was
     // causing the destroy() call to fail.
     let target  = evt.target;
-    let halfPos = midpoint(moveToPos, evt.target.getPos());
 
-    let moveAnims = [];
-    for (let i = 1; i < path.length - 1; i++) {
-        moveAnims.push(tweenAnimation(selectedPlayer, function() {
-            selectedPlayer.animateTo(path[i], ANIM_DUR_STEP);
-        }));
-    }
+    setGlobalState(StateEnum.ANIMATING);
+    highlightPath(path);
     doAnimate(
-        seriesAnimations(
-            moveAnims.concat([
-                pauseAnimation(ANIM_DUR_PAUSE_BW_MOV_ATK),
-                tweenAnimation(selectedPlayer, function() {
-                    selectedPlayer.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
-                }),
-                tweenAnimation(selectedPlayer, function() {
-                    selectedPlayer.animateTo(moveToPos, ANIM_DUR_HALF_ATTACK);
-                }),
-            ])
-        ),
-        function() {
+        seriesAnimations(anims), function() {
             target.takeDamage(ATTACK_DAMAGE);
+
+            Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
             setGlobalState(StateEnum.DEFAULT);
             endCharacter(selectedPlayer);
         }
