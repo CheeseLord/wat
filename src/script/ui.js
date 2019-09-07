@@ -68,10 +68,7 @@ export function worldClickHandler(evt) {
 // Automagically choose the right action for the player to do (corresponds to
 // state "PLAYER_SELECTED").
 function doAutoPlayerAction(evt, x, y) {
-    // assert(getGlobalState() === StateEnum.PLAYER_SELECTED);
-    if (evt.target && evt.target.has("Character")) {
-        doSelectPlayer(evt, x, y);
-    } else {
+    if (!doSelectPlayer(evt, x, y)) {
         doMove(evt, x, y);
     }
 }
@@ -80,19 +77,22 @@ function doSelectPlayer(evt, x, y) {
     // assert(getGlobalState() === StateEnum.DEFAULT ||
     //        getGlobalState() === StateEnum.PLAYER_SELECTED);
 
-    if (evt.target && evt.target.has("Character")) {
-        updateAutoActions(evt.target);
-        if (evt.target.team !== getCurrentTeam()) {
-            reportUserError("Character is on another team");
-            return;
-        }
-        if (getReadyCharacters().indexOf(evt.target) === -1) {
-            reportUserError("Character has already acted");
-            return;
-        }
-        selectPlayer(evt.target);
-        // TODO: Also setFocusOn? Or even call out to startCharacter?
-        doMenu("topMenu");
+    if (!(evt.target && evt.target.has("Character"))) {
+        return false;
     }
+    if (evt.target.team !== getCurrentTeam()) {
+        reportUserError("Character is on another team");
+        return false;
+    }
+    if (getReadyCharacters().indexOf(evt.target) === -1) {
+        reportUserError("Character has already acted");
+        return false;
+    }
+
+    updateAutoActions(evt.target);
+    selectPlayer(evt.target);
+    // TODO: Also setFocusOn? Or even call out to startCharacter?
+    doMenu("topMenu");
+    return true;
 }
 
