@@ -73,7 +73,6 @@ function doAutoPlayerAction(evt, x, y) {
             reportUserError("There's nothing there!");
             return;
         }
-        Crafty.log(evt.target.autoAction);
         switch (evt.target.autoAction) {
             case AutoActionEnum.MOVE:
                 doMove(evt, x, y);
