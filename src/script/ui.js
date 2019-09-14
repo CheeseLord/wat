@@ -63,7 +63,7 @@ export function worldClickHandler(evt) {
     } else if (evt.mouseButton === Crafty.mouseButtons.RIGHT) {
         Crafty.log("AAAAAAAAAA");
     }
-};
+}
 
 // Automagically choose the right action for the character to do (corresponds
 // to state "CHARACTER_SELECTED").

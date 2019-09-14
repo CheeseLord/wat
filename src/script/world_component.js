@@ -373,7 +373,7 @@ function hoverHighlightObj(obj) {
                 }
             }
         });
-    };
+    }
 }
 
 function clearHoverHighlights() {

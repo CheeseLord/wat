@@ -102,7 +102,7 @@ function highlightPath(path) {
                 }
             }
         });
-    };
+    }
 }
 
 export function doSwap(evt, x, y) {
@@ -424,7 +424,7 @@ function createMovementGrid(character) {
             // assert(false);
         }
     });
-};
+}
 
 export function specialAttack(character) {
     Crafty("Character").each(function() {

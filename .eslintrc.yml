@@ -71,4 +71,6 @@ rules:
     no-shadow:
       - error
       - hoist: all
+    no-extra-semi:
+      - error
 

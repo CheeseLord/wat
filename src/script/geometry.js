@@ -166,13 +166,13 @@ function computePathsOnMap(startPos, theMap, distance) {
             let nextPos = neighbors[i];
             if (theMap[nextPos.x][nextPos.y].parent !== null) {
                 continue;
-            };
+            }
             theMap[nextPos.x][nextPos.y].parent = pos;
             if (!theMap[nextPos.x][nextPos.y].isBlocked) {
                 queue.push({"pos": nextPos, "dist": dist - 1});
             }
         }
-    };
+    }
     return theMap;
 }
 
