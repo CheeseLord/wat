@@ -415,16 +415,15 @@ function createMovementGrid(player) {
     let playerPos = player.getPos();
     let theMap = findPaths(playerPos, MOVE_RANGE);
     Crafty("GridObject").each(function() {
-        if (canMoveTo(theMap, this.getPos())) {
-            this.enableHighlight(Highlight.REACHABLE);
-        } else if (isReachable(theMap, this.getPos())) {
-            // FIXME Hack: highlight Enemies as attackable and Levers as
-            // interactable. Neither one is accurate; I just want to see the
-            // highlight colors in action.
-            if (this.has("Enemy")) {
+        if (isReachable(theMap, this.getPos())) {
+            if (this.autoAction === AutoActionEnum.MOVE) {
+                this.enableHighlight(Highlight.REACHABLE);
+            } else if (this.autoAction === AutoActionEnum.ATTACK) {
                 this.enableHighlight(Highlight.ATTACKABLE);
-            } else if (this.has("Lever")) {
+            } else if (this.autoAction === AutoActionEnum.INTERACT) {
                 this.enableHighlight(Highlight.INTERACTABLE);
+            } else if (this.autoAction !== AutoActionEnum.NONE) {
+                // assert(false);
             }
         }
     });
