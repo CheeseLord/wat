@@ -16,7 +16,6 @@ import {
 } from  "./consts.js";
 
 import {
-    canMoveTo,
     findPaths,
     getPath,
     gridPosToGraphics,
@@ -342,10 +341,9 @@ Crafty.c("Lever", {
 // TODO find a better place to put these functions
 
 function hoverHighlightObj(obj) {
-    // TODO: Also do hover highlighting for StateEnum.CHARACTER_SELECTED once
-    // we do REACHABLE highlighting on selection (as opposed to only after
-    // clicking the move button).
-    if (getGlobalState() !== StateEnum.CHARACTER_MOVE) {
+    // TODO hover-highlight movable/interactable/attackable things when that
+    // particular action is selected.
+    if (getGlobalState() !== StateEnum.CHARACTER_SELECTED) {
         return;
     }
 
@@ -353,24 +351,28 @@ function hoverHighlightObj(obj) {
     let destPos = obj.getPos();
     let path    = getPath(theMap, selectedCharacter.getPos(), destPos);
 
-    if (!canMoveTo(theMap, destPos)) {
-        return; // No path
+    if (obj.autoAction === AutoActionEnum.NONE) {
+        return;
     } else if (path === null) {
         // assert(false);
         return;
     }
 
-    for (let i = 0; i < path.length; i++) {
-        // TODO: Why is this Crafty("Ground")? What if we later add other
-        // passable components? Can't we just do it over all GridObjects?
-        Crafty("Ground").each(function() {
+    if (obj.autoAction === AutoActionEnum.MOVE) {
+        obj.enableHighlight(Highlight.HOVER_PATH_END);
+    } else if (obj.autoAction === AutoActionEnum.ATTACK) {
+        obj.enableHighlight(Highlight.HOVER_ATTACK);
+    } else if (obj.autoAction === AutoActionEnum.INTERACT) {
+        obj.enableHighlight(Highlight.HOVER_INTERACT);
+    } else {
+        // assert(false);
+    }
+
+    for (let i = 0; i < path.length - 1; i++) {
+        Crafty("GridObject").each(function() {
             if (this.getPos().x === path[i].x &&
                     this.getPos().y === path[i].y) {
-                if (i === path.length - 1) {
-                    this.enableHighlight(Highlight.HOVER_PATH_END);
-                } else {
-                    this.enableHighlight(Highlight.HOVER_PATH_MIDDLE);
-                }
+                this.enableHighlight(Highlight.HOVER_PATH_MIDDLE);
             }
         });
     }

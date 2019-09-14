@@ -55,6 +55,10 @@ export const Highlight = Object.freeze({
     HOVER_PATH_END:      4, // Destination square of hovered-over path
     HOVER_PATH_MIDDLE:   5, // Intermediate square of hovered-over path
 
+    // FIXME: these should be different from the below.
+    HOVER_ATTACK:        6, // Enemy hovered over to attack
+    HOVER_INTERACT:      7, // Object hovered over to interacted with
+
     ATTACKABLE:          6, // Enemy that can be attacked this turn
     INTERACTABLE:        7, // Object that can be interacted with this turn
     REACHABLE:           8, // Space that can be reached this turn
