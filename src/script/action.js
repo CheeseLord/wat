@@ -21,7 +21,7 @@ import {
     findPaths,
     getPath,
     isAdjacent,
-    isReachable,
+    canMoveTo,
     midpoint,
 } from "./geometry.js";
 import {
@@ -65,7 +65,7 @@ export function doMove(evt, x, y) {
     if (evt.target && evt.target.blocksMovement) {
         reportUserError("Can't move there; something's in the way.");
         return;
-    } else if (!isReachable(theMap, destPos)) {
+    } else if (!canMoveTo(theMap, destPos)) {
         reportUserError("You can't move that far.");
         return;
     } else if (!(evt.target && evt.target.has("Ground"))) {
@@ -414,7 +414,7 @@ function createMovementGrid(player) {
     let playerPos = player.getPos();
     let theMap = findPaths(playerPos, MOVE_RANGE);
     Crafty("GridObject").each(function() {
-        if (isReachable(theMap, this.getPos())) {
+        if (canMoveTo(theMap, this.getPos())) {
             this.enableHighlight(Highlight.REACHABLE);
         } else {
             // FIXME Hack: highlight Enemies as attackable and Levers as

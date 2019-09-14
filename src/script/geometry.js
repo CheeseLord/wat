@@ -105,7 +105,7 @@ export function getPath(theMap, startPos, endPos) {
 
 // Check if it is possible to get from the origin position of theMap to
 // destPos.
-export function isReachable(theMap, destPos) {
+export function canMoveTo(theMap, destPos) {
     let x = destPos.x;
     let y = destPos.y;
     if (theMap[x][y].isBlocked) {
