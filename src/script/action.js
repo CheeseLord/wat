@@ -412,19 +412,17 @@ function centerCameraOn(target, time) {
 }
 
 function createMovementGrid(player) {
-    let playerPos = player.getPos();
-    let theMap = findPaths(playerPos, MOVE_RANGE);
     Crafty("GridObject").each(function() {
-        if (isReachable(theMap, this.getPos())) {
-            if (this.autoAction === AutoActionEnum.MOVE) {
-                this.enableHighlight(Highlight.REACHABLE);
-            } else if (this.autoAction === AutoActionEnum.ATTACK) {
-                this.enableHighlight(Highlight.ATTACKABLE);
-            } else if (this.autoAction === AutoActionEnum.INTERACT) {
-                this.enableHighlight(Highlight.INTERACTABLE);
-            } else if (this.autoAction !== AutoActionEnum.NONE) {
-                // assert(false);
-            }
+        // Note: don't need to check isReachable here, since we only set
+        // autoActions on objects that are in range.
+        if (this.autoAction === AutoActionEnum.MOVE) {
+            this.enableHighlight(Highlight.REACHABLE);
+        } else if (this.autoAction === AutoActionEnum.ATTACK) {
+            this.enableHighlight(Highlight.ATTACKABLE);
+        } else if (this.autoAction === AutoActionEnum.INTERACT) {
+            this.enableHighlight(Highlight.INTERACTABLE);
+        } else if (this.autoAction !== AutoActionEnum.NONE) {
+            // assert(false);
         }
     });
 };
@@ -447,12 +445,15 @@ export function canInteract(character, target) {
 }
 
 export function updateAutoActions(character) {
+    let characterPos = character.getPos();
+    let theMap = findPaths(characterPos, MOVE_RANGE);
     Crafty("GridObject").each(function() {
-        if (canInteract(character, this)) {
+        let canReach = isReachable(theMap, this.getPos());
+        if (canReach && canInteract(character, this)) {
             this.autoAction = AutoActionEnum.INTERACT;
-        } else if (canAttack(character, this)) {
+        } else if (canReach && canAttack(character, this)) {
             this.autoAction = AutoActionEnum.ATTACK;
-        } else if (!this.blocksMovement) {
+        } else if (canMoveTo(theMap, this.getPos())) {
             this.autoAction = AutoActionEnum.MOVE;
         } else {
             this.autoAction = AutoActionEnum.NONE;
