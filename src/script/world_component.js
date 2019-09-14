@@ -24,7 +24,7 @@ import {
 
 import {
     getGlobalState,
-    selectedPlayer,
+    selectedCharacter,
 } from "./action.js";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -132,18 +132,18 @@ Crafty.c("GridObject", {
         let hlColor = null;
         if (HL_STRAT === HighlightStrategy.BORDER) {
             switch (displayHlType) {
-                case Highlight.SELECTED_CHAR:     hlColor = "#ffff00"; break;
-                case Highlight.AVAILABLE_CHAR:    hlColor = "#ff7f00"; break;
+                case Highlight.SELECTED_CHARACTER:  hlColor = "#ffff00"; break;
+                case Highlight.AVAILABLE_CHARACTER: hlColor = "#ff7f00"; break;
 
-                case Highlight.ANIM_PATH_END:     hlColor = "#0000ff"; break;
-                case Highlight.ANIM_PATH_MIDDLE:  hlColor = "#4f4f7f"; break;
-                case Highlight.HOVER_PATH_END:    hlColor = "#ff00ff"; break;
-                case Highlight.HOVER_PATH_MIDDLE: hlColor = "#7f4f7f"; break;
+                case Highlight.ANIM_PATH_END:       hlColor = "#0000ff"; break;
+                case Highlight.ANIM_PATH_MIDDLE:    hlColor = "#4f4f7f"; break;
+                case Highlight.HOVER_PATH_END:      hlColor = "#ff00ff"; break;
+                case Highlight.HOVER_PATH_MIDDLE:   hlColor = "#7f4f7f"; break;
 
-                case Highlight.ATTACKABLE:        hlColor = "#ff0000"; break;
-                case Highlight.INTERACTABLE:      hlColor = "#00ff00"; break;
+                case Highlight.ATTACKABLE:          hlColor = "#ff0000"; break;
+                case Highlight.INTERACTABLE:        hlColor = "#00ff00"; break;
                     // TODO: Green looks bad with green ground
-                case Highlight.REACHABLE:         hlColor = "#00ffff"; break;
+                case Highlight.REACHABLE:           hlColor = "#00ffff"; break;
 
                 default:
                     Crafty.error("Missing case for highlight type: " +
@@ -153,8 +153,10 @@ Crafty.c("GridObject", {
         } else if (HL_STRAT === HighlightStrategy.OVERLAY) {
             switch (displayHlType) {
                 // TODO proper rgba handling
-                case Highlight.SELECTED_CHAR:     hlColor = "#ffff00bb"; break;
-                case Highlight.AVAILABLE_CHAR:    hlColor = "#ffff0066"; break;
+                case Highlight.SELECTED_CHARACTER:
+                    hlColor = "#ffff00bb"; break;
+                case Highlight.AVAILABLE_CHARACTER:
+                    hlColor = "#ffff0066"; break;
 
                 case Highlight.ANIM_PATH_END:     hlColor = "#0000ff88"; break;
                 case Highlight.ANIM_PATH_MIDDLE:  hlColor = "#4f4f7f88"; break;
@@ -340,16 +342,16 @@ Crafty.c("Lever", {
 // TODO find a better place to put these functions
 
 function hoverHighlightObj(obj) {
-    // TODO: Also do hover highlighting for StateEnum.PLAYER_SELECTED once we
-    // do REACHABLE highlighting on selection (as opposed to only after
+    // TODO: Also do hover highlighting for StateEnum.CHARACTER_SELECTED once
+    // we do REACHABLE highlighting on selection (as opposed to only after
     // clicking the move button).
-    if (getGlobalState() !== StateEnum.PLAYER_MOVE) {
+    if (getGlobalState() !== StateEnum.CHARACTER_MOVE) {
         return;
     }
 
-    let theMap  = findPaths(selectedPlayer.getPos(), MOVE_RANGE);
+    let theMap  = findPaths(selectedCharacter.getPos(), MOVE_RANGE);
     let destPos = obj.getPos();
-    let path    = getPath(theMap, selectedPlayer.getPos(), destPos);
+    let path    = getPath(theMap, selectedCharacter.getPos(), destPos);
 
     if (!canMoveTo(theMap, destPos)) {
         return; // No path

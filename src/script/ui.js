@@ -19,7 +19,7 @@ import {
     getGlobalState,
     getReadyCharacters,
     reportUserError,
-    selectPlayer,
+    selectCharacter,
 } from "./action.js";
 
 ///////////////////////////////////////////////////////////////////////
@@ -45,16 +45,16 @@ export function worldClickHandler(evt) {
     if (evt.mouseButton === Crafty.mouseButtons.LEFT) {
         Crafty.log(`You clicked at: (${x}, ${y})`);
         if (getGlobalState() === StateEnum.DEFAULT) {
-            doSelectPlayer(evt, x, y);
-        } else if (getGlobalState() === StateEnum.PLAYER_SELECTED) {
-            doAutoPlayerAction(evt, x, y);
-        } else if (getGlobalState() === StateEnum.PLAYER_MOVE) {
+            doSelectCharacter(evt, x, y);
+        } else if (getGlobalState() === StateEnum.CHARACTER_SELECTED) {
+            doAutoCharacterAction(evt, x, y);
+        } else if (getGlobalState() === StateEnum.CHARACTER_MOVE) {
             doMove(evt, x, y);
-        } else if (getGlobalState() === StateEnum.PLAYER_SWAP) {
+        } else if (getGlobalState() === StateEnum.CHARACTER_SWAP) {
             doSwap(evt, x, y);
-        } else if (getGlobalState() === StateEnum.PLAYER_ATTACK) {
+        } else if (getGlobalState() === StateEnum.CHARACTER_ATTACK) {
             doAttack(evt, x, y);
-        } else if (getGlobalState() === StateEnum.PLAYER_INTERACT) {
+        } else if (getGlobalState() === StateEnum.CHARACTER_INTERACT) {
             doInteract(evt, x, y);
         } else {
             Crafty.error("Unknown state value.");
@@ -65,10 +65,10 @@ export function worldClickHandler(evt) {
     }
 };
 
-// Automagically choose the right action for the player to do (corresponds to
-// state "PLAYER_SELECTED").
-function doAutoPlayerAction(evt, x, y) {
-    if (!doSelectPlayer(evt, x, y)) {
+// Automagically choose the right action for the character to do (corresponds
+// to state "CHARACTER_SELECTED").
+function doAutoCharacterAction(evt, x, y) {
+    if (!doSelectCharacter(evt, x, y)) {
         if (!(evt.target && evt.target.has("GridObject"))) {
             reportUserError("There's nothing there!");
             return;
@@ -93,9 +93,9 @@ function doAutoPlayerAction(evt, x, y) {
     }
 }
 
-function doSelectPlayer(evt, x, y) {
+function doSelectCharacter(evt, x, y) {
     // assert(getGlobalState() === StateEnum.DEFAULT ||
-    //        getGlobalState() === StateEnum.PLAYER_SELECTED);
+    //        getGlobalState() === StateEnum.CHARACTER_SELECTED);
 
     if (!(evt.target && evt.target.has("Character"))) {
         return false;
@@ -109,7 +109,7 @@ function doSelectPlayer(evt, x, y) {
         return false;
     }
 
-    selectPlayer(evt.target);
+    selectCharacter(evt.target);
     // TODO: Also setFocusOn? Or even call out to startCharacter?
     doMenu("topMenu");
     return true;

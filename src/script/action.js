@@ -33,7 +33,7 @@ import {
     tweenAnimation,
 } from "./animation.js";
 
-export var selectedPlayer;
+export var selectedCharacter;
 
 // In JavaScript, if you import a variable and then assign a new value to it,
 // other modules don't see the new value. Therefore, instead of allowing other
@@ -52,15 +52,15 @@ export function getCurrentTeam() { return currentTeam; }
 // Action handlers
 
 export function doMove(evt, x, y) {
-    // assert(getGlobalState() === StateEnum.PLAYER_MOVE ||
-    //        getGlobalState() === StateEnum.PLAYER_SELECTED);
-    if (!selectedPlayer) {
+    // assert(getGlobalState() === StateEnum.CHARACTER_MOVE ||
+    //        getGlobalState() === StateEnum.CHARACTER_SELECTED);
+    if (!selectedCharacter) {
         // assert(false); -- Don't think this can happen?
-        Crafty.error("No player selected.");
+        Crafty.error("No character selected.");
         return;
     }
 
-    let theMap = findPaths(selectedPlayer.getPos(), MOVE_RANGE);
+    let theMap = findPaths(selectedCharacter.getPos(), MOVE_RANGE);
     let destPos = {x: x, y: y};
 
     if (evt.target && evt.target.blocksMovement) {
@@ -74,19 +74,19 @@ export function doMove(evt, x, y) {
         return;
     }
 
-    let path = getPath(theMap, selectedPlayer.getPos(), destPos);
+    let path = getPath(theMap, selectedCharacter.getPos(), destPos);
     setGlobalState(StateEnum.ANIMATING);
     highlightPath(path);
     let anims = [];
     for (let i = 1; i < path.length; i++) {
-        anims.push(tweenAnimation(selectedPlayer, function() {
-            selectedPlayer.animateTo(path[i], ANIM_DUR_STEP);
+        anims.push(tweenAnimation(selectedCharacter, function() {
+            selectedCharacter.animateTo(path[i], ANIM_DUR_STEP);
         }));
     }
     doAnimate(seriesAnimations(anims), function() {
         Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
         setGlobalState(StateEnum.DEFAULT);
-        endCharacter(selectedPlayer);
+        endCharacter(selectedCharacter);
     });
 }
 
@@ -106,10 +106,10 @@ function highlightPath(path) {
 }
 
 export function doSwap(evt, x, y) {
-    // assert(getGlobalState() === StateEnum.PLAYER_SWAP);
-    if (!selectedPlayer) {
+    // assert(getGlobalState() === StateEnum.CHARACTER_SWAP);
+    if (!selectedCharacter) {
         // assert(false); -- Don't think this can happen?
-        Crafty.error("No player selected.");
+        Crafty.error("No character selected.");
         return;
     }
 
@@ -117,38 +117,38 @@ export function doSwap(evt, x, y) {
         reportUserError("There's nothing there to swap with.");
         return;
     } else if (!evt.target.has("Character")) {
-        reportUserError("Can't swap with non-player.");
+        reportUserError("Can't swap with non-character.");
         return;
     } else if (evt.target.team !== currentTeam) {
         reportUserError("Cannot swap with other player's unit.");
         return;
-    } else if (evt.target === selectedPlayer) {
-        reportUserError("Cannot swap player with self.");
+    } else if (evt.target === selectedCharacter) {
+        reportUserError("Cannot swap character with self.");
         return;
     }
 
-    // Swap positions of clicked player and selectedPlayer.
+    // Swap positions of clicked character and selectedCharacter.
     Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
     setGlobalState(StateEnum.DEFAULT);
 
-    let selectPos = selectedPlayer.getPos();
+    let selectPos = selectedCharacter.getPos();
     let clickPos  = evt.target.getPos();
     doAnimate(
         parallelAnimations([
-            tweenAnimation(selectedPlayer, function() {
-                selectedPlayer.animateTo(clickPos, ANIM_DUR_MOVE);
+            tweenAnimation(selectedCharacter, function() {
+                selectedCharacter.animateTo(clickPos, ANIM_DUR_MOVE);
             }),
             tweenAnimation(evt.target, function() {
                 evt.target.animateTo(selectPos, ANIM_DUR_MOVE);
             }),
         ]),
-        function() { endCharacter(selectedPlayer); }
+        function() { endCharacter(selectedCharacter); }
     );
 }
 
 export function doInteract(evt, x, y) {
-    // assert(getGlobalState() === StateEnum.PLAYER_INTERACT);
-    if (!selectedPlayer) {
+    // assert(getGlobalState() === StateEnum.CHARACTER_INTERACT);
+    if (!selectedCharacter) {
         // assert(false); -- Don't think this can happen?
         return;
     } else if (evt.target === null) {
@@ -161,9 +161,9 @@ export function doInteract(evt, x, y) {
 
     // Do a move-and-interact.
     // TODO: Wait, we really don't already have a map?
-    let theMap = findPaths(selectedPlayer.getPos(), MOVE_RANGE);
+    let theMap = findPaths(selectedCharacter.getPos(), MOVE_RANGE);
     let destPos = {x: x, y: y};
-    let path = getPath(theMap, selectedPlayer.getPos(), destPos);
+    let path = getPath(theMap, selectedCharacter.getPos(), destPos);
     if (path === null) {
         reportUserError("Can't reach that to interact with it.");
         return;
@@ -176,25 +176,25 @@ export function doInteract(evt, x, y) {
     highlightPath(path);
     let anims = [];
     for (let i = 1; i < path.length; i++) {
-        anims.push(tweenAnimation(selectedPlayer, function() {
-            selectedPlayer.animateTo(path[i], ANIM_DUR_STEP);
+        anims.push(tweenAnimation(selectedCharacter, function() {
+            selectedCharacter.animateTo(path[i], ANIM_DUR_STEP);
         }));
     }
     // Need to close over evt.target rather than evt.
     let target = evt.target;
     // TODO some sort of animation for the interaction itself?
     doAnimate(seriesAnimations(anims), function() {
-        target.interact(selectedPlayer);
+        target.interact(selectedCharacter);
 
         Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
         setGlobalState(StateEnum.DEFAULT);
-        endCharacter(selectedPlayer);
+        endCharacter(selectedCharacter);
     });
 }
 
 export function doAttack(evt, x, y) {
-    // assert(getGlobalState() === StateEnum.PLAYER_ATTACK);
-    if (!selectedPlayer) {
+    // assert(getGlobalState() === StateEnum.CHARACTER_ATTACK);
+    if (!selectedCharacter) {
         // assert(false); -- Don't think this can happen?
         return;
     } else if (evt.target === null) {
@@ -207,14 +207,14 @@ export function doAttack(evt, x, y) {
         reportUserError("Can't attack friendly unit.");
         return;
     }
-    let theMap = findPaths(selectedPlayer.getPos(), MOVE_RANGE);
+    let theMap = findPaths(selectedCharacter.getPos(), MOVE_RANGE);
     let destPos = {x: x, y: y};
-    let path = getPath(theMap, selectedPlayer.getPos(), destPos);
+    let path = getPath(theMap, selectedCharacter.getPos(), destPos);
     if (path === null) {
         reportUserError("Can't reach that to attack it.");
         return;
     }
-    let moveToPos = selectedPlayer.getPos();
+    let moveToPos = selectedCharacter.getPos();
     if (path.length > 1) {
         path.pop();
         moveToPos = path[path.length - 1];
@@ -222,15 +222,15 @@ export function doAttack(evt, x, y) {
         // assert(false);
     }
 
-    Crafty.log(`${selectedPlayer.name_} moved to ` +
+    Crafty.log(`${selectedCharacter.name_} moved to ` +
         `(${moveToPos.x}, ${moveToPos.y})`);
-    Crafty.log(`${selectedPlayer.name_} attacked ${evt.target.name_}`);
+    Crafty.log(`${selectedCharacter.name_} attacked ${evt.target.name_}`);
 
     // TODO: Refactor with doMove.
     let anims = [];
     for (let i = 1; i < path.length; i++) {
-        anims.push(tweenAnimation(selectedPlayer, function() {
-            selectedPlayer.animateTo(path[i], ANIM_DUR_STEP);
+        anims.push(tweenAnimation(selectedCharacter, function() {
+            selectedCharacter.animateTo(path[i], ANIM_DUR_STEP);
         }));
     }
 
@@ -242,11 +242,11 @@ export function doAttack(evt, x, y) {
     // Add the attack animation, regardless.
     let halfPos = midpoint(moveToPos, evt.target.getPos());
     anims = anims.concat([
-        tweenAnimation(selectedPlayer, function() {
-            selectedPlayer.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
+        tweenAnimation(selectedCharacter, function() {
+            selectedCharacter.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
         }),
-        tweenAnimation(selectedPlayer, function() {
-            selectedPlayer.animateTo(moveToPos, ANIM_DUR_HALF_ATTACK);
+        tweenAnimation(selectedCharacter, function() {
+            selectedCharacter.animateTo(moveToPos, ANIM_DUR_HALF_ATTACK);
         }),
     ]);
 
@@ -264,7 +264,7 @@ export function doAttack(evt, x, y) {
 
             Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
             setGlobalState(StateEnum.DEFAULT);
-            endCharacter(selectedPlayer);
+            endCharacter(selectedCharacter);
         }
     );
 }
@@ -291,17 +291,16 @@ export function startTeam(team) {
 function startCharacter(character) {
     clearAllHighlights();
     for (let i = 0; i < readyCharacters.length; i++) {
-        readyCharacters[i].enableHighlight(Highlight.AVAILABLE_CHAR);
+        readyCharacters[i].enableHighlight(Highlight.AVAILABLE_CHARACTER);
     }
-    // TODO: Why does startCharacter not call selectPlayer? Who calls it
+    // TODO: Why does startCharacter not call selectCharacter? Who calls it
     // instead?
-    // (TODO: Also, rename selectPlayer to selectCharacter.)
     setFocusOn(character);
     // TODO: Should we select them, too?
 }
 
 export function endCharacter(character) {
-    deselectPlayer();
+    deselectCharacter();
 
     // Unready the current character.
     let index = readyCharacters.indexOf(character);
@@ -354,20 +353,20 @@ export function reportUserError(text) {
     Crafty.error(text);
 }
 
-export function selectPlayer(player) {
-    deselectPlayer();
-    selectedPlayer = player;
-    selectedPlayer.enableHighlight(Highlight.SELECTED_CHAR);
-    updateAutoActions(player);
-    createMovementGrid(player);
+export function selectCharacter(character) {
+    deselectCharacter();
+    selectedCharacter = character;
+    selectedCharacter.enableHighlight(Highlight.SELECTED_CHARACTER);
+    updateAutoActions(character);
+    createMovementGrid(character);
 }
 
-export function deselectPlayer() {
+export function deselectCharacter() {
     clearAutoActions();
 
-    if (selectedPlayer) {
-        selectedPlayer.disableHighlight(Highlight.SELECTED_CHAR);
-        selectedPlayer = null;
+    if (selectedCharacter) {
+        selectedCharacter.disableHighlight(Highlight.SELECTED_CHARACTER);
+        selectedCharacter = null;
         // TODO: Probably the menu table should instead define the state we
         // transition to on CLEAR_MENU?
         setGlobalState(StateEnum.DEFAULT);
@@ -411,7 +410,7 @@ function centerCameraOn(target, time) {
     Crafty.viewport.pan(newX, newY, time);
 }
 
-function createMovementGrid(player) {
+function createMovementGrid(character) {
     Crafty("GridObject").each(function() {
         // Note: don't need to check isReachable here, since we only set
         // autoActions on objects that are in range.
@@ -427,10 +426,10 @@ function createMovementGrid(player) {
     });
 };
 
-export function specialAttack(player) {
+export function specialAttack(character) {
     Crafty("Character").each(function() {
-        if (this.team !== player.team &&
-                isAdjacent(player.getPos(), this.getPos())) {
+        if (this.team !== character.team &&
+                isAdjacent(character.getPos(), this.getPos())) {
             this.takeDamage(SPECIAL_ATTACK_DAMAGE);
         }
     });

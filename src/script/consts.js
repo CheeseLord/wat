@@ -28,13 +28,13 @@ export const SPECIAL_ATTACK_DAMAGE = 1;
 //     https://stackoverflow.com/a/5040502
 // Always use === for checking equality, otherwise always true
 export const StateEnum = Object.freeze({
-    DEFAULT:         {},
-    ANIMATING:       {},
-    PLAYER_SELECTED: {},
-    PLAYER_MOVE:     {},
-    PLAYER_SWAP:     {},
-    PLAYER_ATTACK:   {},
-    PLAYER_INTERACT: {},
+    DEFAULT:            {},
+    ANIMATING:          {},
+    CHARACTER_SELECTED: {},
+    CHARACTER_MOVE:     {},
+    CHARACTER_SWAP:     {},
+    CHARACTER_ATTACK:   {},
+    CHARACTER_INTERACT: {},
 });
 
 export const AutoActionEnum = Object.freeze({
@@ -47,19 +47,19 @@ export const AutoActionEnum = Object.freeze({
 // List of highlighting types. Several of these can be set on a single object,
 // in which case the lowest-valued one is the one that will be displayed.
 export const Highlight = Object.freeze({
-    SELECTED_CHAR:     0, // Character currently selected
-    AVAILABLE_CHAR:    1, // Character that can be selected this turn
+    SELECTED_CHARACTER:  0, // Character currently selected
+    AVAILABLE_CHARACTER: 1, // Character that can be selected this turn
 
-    ANIM_PATH_END:     2, // Destination square of animated path
-    ANIM_PATH_MIDDLE:  3, // Intermediate square of animated path
-    HOVER_PATH_END:    4, // Destination square of hovered-over path
-    HOVER_PATH_MIDDLE: 5, // Intermediate square of hovered-over path
+    ANIM_PATH_END:       2, // Destination square of animated path
+    ANIM_PATH_MIDDLE:    3, // Intermediate square of animated path
+    HOVER_PATH_END:      4, // Destination square of hovered-over path
+    HOVER_PATH_MIDDLE:   5, // Intermediate square of hovered-over path
 
-    ATTACKABLE:        6, // Enemy that can be attacked this turn
-    INTERACTABLE:      7, // Object that can be interacted with this turn
-    REACHABLE:         8, // Space that can be reached this turn
+    ATTACKABLE:          6, // Enemy that can be attacked this turn
+    INTERACTABLE:        7, // Object that can be interacted with this turn
+    REACHABLE:           8, // Space that can be reached this turn
 
-    NUM_VALS:          9, // For sizing arrays of flag values
+    NUM_VALS:            9, // For sizing arrays of flag values
 });
 
 // TODO: Maybe separate horiz. and vert.? Should probably in general be

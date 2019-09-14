@@ -5,10 +5,10 @@
 import {StateEnum} from "./consts.js";
 
 import {
-    selectedPlayer,
+    selectedCharacter,
     endCharacter,
     setGlobalState,
-    deselectPlayer,
+    deselectCharacter,
     specialAttack,
     endTeam,
 } from  "./action.js";
@@ -31,7 +31,7 @@ function doNothing() {}
 var menuTable = {
     topMenu: {
         title:   "Select Action",
-        state:   StateEnum.PLAYER_SELECTED,
+        state:   StateEnum.CHARACTER_SELECTED,
         buttons: [
             // Text         New Menu      Action
             ["Move",        "move",       doNothing],
@@ -39,16 +39,16 @@ var menuTable = {
             ["Attack",      "attack",     doNothing],
             ["Interact",    "interact",   doNothing],
             ["End Turn",    CLEAR_MENU,   () => {
-                deselectPlayer();
+                deselectCharacter();
                 endTeam();
             }],
-            ["Cancel",      CLEAR_MENU,   () => { deselectPlayer(); }],
+            ["Cancel",      CLEAR_MENU,   () => { deselectCharacter(); }],
         ],
     },
 
     move: {
         title:   "Moving",
-        state:   StateEnum.PLAYER_MOVE,
+        state:   StateEnum.CHARACTER_MOVE,
         buttons: [
             // Text  New Menu     Action
             ["Back", PARENT_MENU, doNothing],
@@ -57,7 +57,7 @@ var menuTable = {
 
     swapPlaces: {
         title:   "Swap Places",
-        state:   StateEnum.PLAYER_SWAP,
+        state:   StateEnum.CHARACTER_SWAP,
         buttons: [
             // Text  New Menu     Action
             ["Back", PARENT_MENU, doNothing],
@@ -66,7 +66,7 @@ var menuTable = {
 
     interact: {
         title:   "Interact",
-        state:   StateEnum.PLAYER_INTERACT,
+        state:   StateEnum.CHARACTER_INTERACT,
         buttons: [
             // Text  New Menu     Action
             ["Back", PARENT_MENU, doNothing],
@@ -75,14 +75,14 @@ var menuTable = {
 
     attack: {
         title:   "Attack",
-        state:   StateEnum.PLAYER_ATTACK,
+        state:   StateEnum.CHARACTER_ATTACK,
         buttons: [
             // Text            New Menu       Action
             ["Basic Attack",   "basicAttack", doNothing],
             ["Special Attack", CLEAR_MENU,
                 () => {
-                    specialAttack(selectedPlayer);
-                    endCharacter(selectedPlayer);
+                    specialAttack(selectedCharacter);
+                    endCharacter(selectedCharacter);
                 }],
             ["Back",           PARENT_MENU,   doNothing],
         ],
@@ -90,7 +90,7 @@ var menuTable = {
 
     basicAttack: {
         title:   "Basic Attack",
-        state:   StateEnum.PLAYER_ATTACK,
+        state:   StateEnum.CHARACTER_ATTACK,
         buttons: [
             // Text  New Menu     Action
             ["Back", PARENT_MENU, doNothing],
