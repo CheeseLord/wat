@@ -18,10 +18,11 @@ import {
     StateEnum,
 } from "./consts.js";
 import {
+    canMoveTo,
     findPaths,
     getPath,
     isAdjacent,
-    canMoveTo,
+    isReachable,
     midpoint,
 } from "./geometry.js";
 import {
@@ -416,7 +417,7 @@ function createMovementGrid(player) {
     Crafty("GridObject").each(function() {
         if (canMoveTo(theMap, this.getPos())) {
             this.enableHighlight(Highlight.REACHABLE);
-        } else {
+        } else if (isReachable(theMap, this.getPos())) {
             // FIXME Hack: highlight Enemies as attackable and Levers as
             // interactable. Neither one is accurate; I just want to see the
             // highlight colors in action.

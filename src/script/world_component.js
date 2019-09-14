@@ -16,10 +16,10 @@ import {
 } from  "./consts.js";
 
 import {
+    canMoveTo,
     findPaths,
     getPath,
     gridPosToGraphics,
-    canMoveTo,
 } from "./geometry.js";
 
 import {

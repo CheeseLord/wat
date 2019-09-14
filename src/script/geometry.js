@@ -103,15 +103,22 @@ export function getPath(theMap, startPos, endPos) {
     return cells.reverse();
 }
 
-// Check if it is possible to get from the origin position of theMap to
-// destPos.
+// Check if it is possible to get next to destPos and do something with the
+// object at destPos (such as interacting with an object or attacking from
+// melee range). A destPos is also considered reachable if it is a passable
+// square that you can move to.
+export function isReachable(theMap, destPos) {
+    let x = destPos.x;
+    let y = destPos.y;
+    return (theMap[x][y].parent !== null);
+}
+
+// Check if it is possible to move to destPos. This requires both that destPos
+// is within range and that there is nothing blocking the movement.
 export function canMoveTo(theMap, destPos) {
     let x = destPos.x;
     let y = destPos.y;
-    if (theMap[x][y].isBlocked) {
-        return false;
-    }
-    return (theMap[x][y].parent !== null);
+    return isReachable(theMap, destPos) && !theMap[x][y].isBlocked;
 }
 
 // Internal helpers
