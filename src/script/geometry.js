@@ -183,10 +183,10 @@ function getNeighbors(theMap, pos) {
 
     var xNeighbors = [x];
     var yNeighbors = [y];
-    if (x !== 0)                 { xNeighbors.push(x - 1); }
-    if (x !== theMap.length - 1) { xNeighbors.push(x + 1); }
-    if (y !== 0)                 { yNeighbors.push(y - 1); }
-    if (y !== theMap.length - 1) { yNeighbors.push(y + 1); }
+    if (x !== 0)                    { xNeighbors.push(x - 1); }
+    if (x !== theMap.length - 1)    { xNeighbors.push(x + 1); }
+    if (y !== 0)                    { yNeighbors.push(y - 1); }
+    if (y !== theMap[0].length - 1) { yNeighbors.push(y + 1); }
 
     for (let i = 0; i < xNeighbors.length; i++) {
         let x_ = xNeighbors[i];
