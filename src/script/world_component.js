@@ -27,6 +27,7 @@ import {
 } from "./action.js";
 
 import {
+    assert,
     internalError,
     userMessage,
 } from "./message.js";
@@ -385,7 +386,7 @@ function hoverHighlightObj(obj) {
     if (obj.autoAction === AutoActionEnum.NONE) {
         return;
     } else if (path === null) {
-        // assert(false);
+        assert(false);
         return;
     }
 
@@ -402,7 +403,7 @@ function hoverHighlightObj(obj) {
         endHighlight  = Highlight.HOVER_INTERACT_END;
         pathHighlight = Highlight.HOVER_INTERACT_MIDDLE;
     } else {
-        // assert(false);
+        assert(false);
         // Should never happen, but I guess this is as good a default as any?
         endHighlight  = Highlight.HOVER_MOVE_END;
         pathHighlight = Highlight.HOVER_MOVE_MIDDLE;

@@ -33,6 +33,7 @@ import {
     tweenAnimation,
 } from "./animation.js";
 import {
+    assert,
     debugLog,
     internalError,
     userError,
@@ -58,10 +59,10 @@ export function getCurrentTeam() { return currentTeam; }
 // Action handlers
 
 export function doMove(evt, x, y) {
-    // assert(getGlobalState() === StateEnum.CHARACTER_MOVE ||
-    //        getGlobalState() === StateEnum.CHARACTER_SELECTED);
+    assert(getGlobalState() === StateEnum.CHARACTER_MOVE ||
+           getGlobalState() === StateEnum.CHARACTER_SELECTED);
     if (!selectedCharacter) {
-        // assert(false); -- Don't think this can happen?
+        assert(false);
         internalError("No character selected.");
         return;
     }
@@ -112,9 +113,9 @@ function highlightPath(path) {
 }
 
 export function doSwap(evt, x, y) {
-    // assert(getGlobalState() === StateEnum.CHARACTER_SWAP);
+    assert(getGlobalState() === StateEnum.CHARACTER_SWAP);
     if (!selectedCharacter) {
-        // assert(false); -- Don't think this can happen?
+        assert(false);
         internalError("No character selected.");
         return;
     }
@@ -153,9 +154,8 @@ export function doSwap(evt, x, y) {
 }
 
 export function doInteract(evt, x, y) {
-    // assert(getGlobalState() === StateEnum.CHARACTER_INTERACT);
     if (!selectedCharacter) {
-        // assert(false); -- Don't think this can happen?
+        assert(false);
         return;
     } else if (evt.target === null) {
         userError("Nothing there to interact with.");
@@ -174,7 +174,7 @@ export function doInteract(evt, x, y) {
         userError("Can't reach that to interact with it.");
         return;
     }
-    // assert(path.length > 1);
+    assert(path.length > 1);
     path.pop();
 
     // TODO: Refactor with doMove.
@@ -199,9 +199,8 @@ export function doInteract(evt, x, y) {
 }
 
 export function doAttack(evt, x, y) {
-    // assert(getGlobalState() === StateEnum.CHARACTER_ATTACK);
     if (!selectedCharacter) {
-        // assert(false); -- Don't think this can happen?
+        assert(false);
         return;
     } else if (evt.target === null) {
         userError("No enemy there.");
@@ -225,7 +224,7 @@ export function doAttack(evt, x, y) {
         path.pop();
         moveToPos = path[path.length - 1];
     } else {
-        // assert(false);
+        assert(false);
     }
 
     userMessage(`${selectedCharacter.name_} moved to ` +
@@ -343,7 +342,7 @@ export function endTeam() {
     } while (readyCharacters.length === 0 && maxTries > 0);
 
     if (readyCharacters.length === 0) {
-        // assert(maxTries === 0);
+        assert(maxTries === 0);
         // Eventually, this should probably be detected and result in something
         // actually happening in-game. (Maybe a game-over screen since your
         // whole team is dead?)
@@ -422,7 +421,7 @@ function createMovementGrid(character) {
         } else if (this.autoAction === AutoActionEnum.INTERACT) {
             this.enableHighlight(Highlight.CAN_INTERACT);
         } else if (this.autoAction !== AutoActionEnum.NONE) {
-            // assert(false);
+            assert(false);
         }
     });
 }

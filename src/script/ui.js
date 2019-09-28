@@ -21,6 +21,7 @@ import {
     selectCharacter,
 } from "./action.js";
 import {
+    assert,
     debugLog,
     internalError,
     userError,
@@ -62,7 +63,7 @@ export function worldClickHandler(evt) {
             doInteract(evt, x, y);
         } else {
             internalError("Unknown state value.");
-            // assert(false);
+            assert(false);
         }
     } else if (evt.mouseButton === Crafty.mouseButtons.RIGHT) {
         debugLog("AAAAAAAAAA");
@@ -91,15 +92,15 @@ function doAutoCharacterAction(evt, x, y) {
                 userError("No auto-action defined for that target.");
                 break;
             default:
-                // assert(false);
+                assert(false);
                 break;
         }
     }
 }
 
 function doSelectCharacter(evt, x, y) {
-    // assert(getGlobalState() === StateEnum.DEFAULT ||
-    //        getGlobalState() === StateEnum.CHARACTER_SELECTED);
+    assert(getGlobalState() === StateEnum.DEFAULT ||
+           getGlobalState() === StateEnum.CHARACTER_SELECTED);
 
     if (!(evt.target && evt.target.has("Character"))) {
         return false;

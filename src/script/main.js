@@ -15,12 +15,14 @@ import {
     worldClickHandler,
 } from "./ui.js";
 import {
+    readyCharacters,
     startTeam,
 } from "./action.js";
 import {
     updateMapForNewLevel,
 } from "./geometry.js";
 import {
+    assert,
     // TODO why does this not fail linting?
     // displayMessage,
     userMessage,
@@ -113,7 +115,7 @@ export function doTheThing() {
                     .setAnimation(3, 4);
 
             startTeam(0);
-            // assert(readyCharacters.length > 0);
+            assert(readyCharacters.length > 0);
         }
     );
 

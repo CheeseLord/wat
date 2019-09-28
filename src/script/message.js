@@ -33,11 +33,17 @@ export function userError(message) {
     display.textColor("#ff0000");
 }
 
+export function debugLog(message) {
+    Crafty.log(message);
+}
+
 export function internalError(message) {
     Crafty.error(message);
 }
 
-export function debugLog(message) {
-    Crafty.log(message);
+export function assert(expr) {
+    if (!expr) {
+        Crafty.error("Assertion failed.");
+    }
 }
 
