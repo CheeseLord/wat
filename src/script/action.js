@@ -32,6 +32,12 @@ import {
     seriesAnimations,
     tweenAnimation,
 } from "./animation.js";
+import {
+    debugLog,
+    internalError,
+    userError,
+    userMessage,
+} from "./message.js";
 
 export var selectedCharacter;
 
@@ -56,7 +62,7 @@ export function doMove(evt, x, y) {
     //        getGlobalState() === StateEnum.CHARACTER_SELECTED);
     if (!selectedCharacter) {
         // assert(false); -- Don't think this can happen?
-        Crafty.error("No character selected.");
+        internalError("No character selected.");
         return;
     }
 
@@ -64,13 +70,13 @@ export function doMove(evt, x, y) {
     let destPos = {x: x, y: y};
 
     if (evt.target && evt.target.blocksMovement) {
-        reportUserError("Can't move there; something's in the way.");
+        userError("Can't move there; something's in the way.");
         return;
     } else if (!canMoveTo(theMap, destPos)) {
-        reportUserError("You can't move that far.");
+        userError("You can't move that far.");
         return;
     } else if (!(evt.target && evt.target.has("Ground"))) {
-        reportUserError("That's not a tile.");
+        userError("That's not a tile.");
         return;
     }
 
@@ -109,21 +115,21 @@ export function doSwap(evt, x, y) {
     // assert(getGlobalState() === StateEnum.CHARACTER_SWAP);
     if (!selectedCharacter) {
         // assert(false); -- Don't think this can happen?
-        Crafty.error("No character selected.");
+        internalError("No character selected.");
         return;
     }
 
     if (evt.target === null) {
-        reportUserError("There's nothing there to swap with.");
+        userError("There's nothing there to swap with.");
         return;
     } else if (!evt.target.has("Character")) {
-        reportUserError("Can't swap with non-character.");
+        userError("Can't swap with non-character.");
         return;
     } else if (evt.target.team !== currentTeam) {
-        reportUserError("Cannot swap with other player's unit.");
+        userError("Cannot swap with other player's unit.");
         return;
     } else if (evt.target === selectedCharacter) {
-        reportUserError("Cannot swap character with self.");
+        userError("Cannot swap character with self.");
         return;
     }
 
@@ -152,10 +158,10 @@ export function doInteract(evt, x, y) {
         // assert(false); -- Don't think this can happen?
         return;
     } else if (evt.target === null) {
-        reportUserError("Nothing there to interact with.");
+        userError("Nothing there to interact with.");
         return;
     } else if (!evt.target.has("Interactable")) {
-        reportUserError("Can't interact with that.");
+        userError("Can't interact with that.");
         return;
     }
 
@@ -165,7 +171,7 @@ export function doInteract(evt, x, y) {
     let destPos = {x: x, y: y};
     let path = getPath(theMap, selectedCharacter.getPos(), destPos);
     if (path === null) {
-        reportUserError("Can't reach that to interact with it.");
+        userError("Can't reach that to interact with it.");
         return;
     }
     // assert(path.length > 1);
@@ -198,20 +204,20 @@ export function doAttack(evt, x, y) {
         // assert(false); -- Don't think this can happen?
         return;
     } else if (evt.target === null) {
-        reportUserError("No enemy there.");
+        userError("No enemy there.");
         return;
     } else if (!evt.target.has("Character")) {
-        reportUserError("Can't attack non-character.");
+        userError("Can't attack non-character.");
         return;
     } else if (evt.target.team === currentTeam) {
-        reportUserError("Can't attack friendly unit.");
+        userError("Can't attack friendly unit.");
         return;
     }
     let theMap = findPaths(selectedCharacter.getPos(), MOVE_RANGE);
     let destPos = {x: x, y: y};
     let path = getPath(theMap, selectedCharacter.getPos(), destPos);
     if (path === null) {
-        reportUserError("Can't reach that to attack it.");
+        userError("Can't reach that to attack it.");
         return;
     }
     let moveToPos = selectedCharacter.getPos();
@@ -222,9 +228,9 @@ export function doAttack(evt, x, y) {
         // assert(false);
     }
 
-    Crafty.log(`${selectedCharacter.name_} moved to ` +
+    userMessage(`${selectedCharacter.name_} moved to ` +
         `(${moveToPos.x}, ${moveToPos.y})`);
-    Crafty.log(`${selectedCharacter.name_} attacked ${evt.target.name_}`);
+    userMessage(`${selectedCharacter.name_} attacked ${evt.target.name_}`);
 
     // TODO: Refactor with doMove.
     let anims = [];
@@ -273,7 +279,7 @@ export function doAttack(evt, x, y) {
 // "Milestones" in turn order
 
 export function startTeam(team) {
-    Crafty.log(`Starting turn for team ${team}.`);
+    debugLog(`Starting turn for team ${team}.`);
 
     currentTeam = team;
     readyCharacters = [];
@@ -321,7 +327,7 @@ export function endCharacter(character) {
 }
 
 export function endTeam() {
-    Crafty.log(`Reached end of turn for team ${currentTeam}.`);
+    debugLog(`Reached end of turn for team ${currentTeam}.`);
 
     let team = currentTeam;
     let maxTries = NUM_TEAMS;
@@ -341,17 +347,12 @@ export function endTeam() {
         // Eventually, this should probably be detected and result in something
         // actually happening in-game. (Maybe a game-over screen since your
         // whole team is dead?)
-        Crafty.error("There's no one left to act.");
+        internalError("There's no one left to act.");
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Menu-related action helpers (and some misc?)
-
-export function reportUserError(text) {
-    // TODO: Put this somewhere the user will actually see it.
-    Crafty.error(text);
-}
 
 export function selectCharacter(character) {
     deselectCharacter();

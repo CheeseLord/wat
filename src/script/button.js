@@ -3,6 +3,10 @@
 "use strict";
 
 import {MENU_WIDTH} from "./consts.js";
+import {
+    debugLog,
+    internalError,
+} from "./message.js";
 
 // Size parameters for autopositioning buttons.
 // TODO: Make these configurable somehow?
@@ -73,7 +77,7 @@ Crafty.s("ButtonMenu", {
         let buttonList = [];
         for (let i = 0; i < buttonDescList.length; i++) {
             if (buttonDescList[i].length !== 2) {
-                Crafty.error("Bad button desc");
+                internalError("Bad button desc");
             }
             buttonList.push(Crafty.e("MyButton, UILayer")
                     .text(buttonDescList[i][0])
@@ -285,9 +289,9 @@ Crafty.c("MyButton", {
         return this;
     },
     click: function() {
-        Crafty.log(`Clicked button ${this.index}`);
+        debugLog(`Clicked button ${this.index}`);
         if (this._onclick === undefined) {
-            Crafty.error(`No handler defined for button ${this.index}`);
+            internalError(`No handler defined for button ${this.index}`);
         } else {
             this._onclick();
         }

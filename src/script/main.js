@@ -21,9 +21,11 @@ import {
     updateMapForNewLevel,
 } from "./geometry.js";
 import {
-    displayMessage,
+    // TODO why does this not fail linting?
+    // displayMessage,
+    userMessage,
     initMessageDisplay,
-} from "./messageDisplay.js";
+} from "./message.js";
 
 
 export function doTheThing() {
@@ -157,7 +159,7 @@ export function doTheThing() {
 
     // Message log.
     initMessageDisplay({x: 500, y: 50, w: 500, h: 100});
-    displayMessage("Haldo World!");
+    userMessage("Haldo World!");
 
     // Convert regular mouse events to WorldClick events, so we can handle
     // that case without doing weird things when the player clicks on the

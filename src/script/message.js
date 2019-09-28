@@ -22,7 +22,21 @@ export function initMessageDisplay(attrs) {
     display.attr(attrs);
 }
 
-export function displayMessage(message) {
+export function userMessage(message) {
     // displays a message, no formatting is done here
     display.addMessage(message);
 }
+
+export function userError(message) {
+    // TODO make it red
+    userMessage(message);
+}
+
+export function internalError(message) {
+    Crafty.error(message);
+}
+
+export function debugLog(message) {
+    Crafty.log(message);
+}
+

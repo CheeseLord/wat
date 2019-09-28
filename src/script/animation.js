@@ -1,6 +1,8 @@
-/* global Crafty */
-
 "use strict";
+
+import {
+    internalError,
+} from "./message.js";
 
 const AnimType = Object.freeze({
     SINGLE:   {},
@@ -87,7 +89,7 @@ export function doAnimate(animDesc, callback) {
             doAnimate(animDesc.contents[i], f);
         }
     } else {
-        Crafty.error("Internal error in doAnimate() -- unknown type.");
+        internalError("In doAnimate(): unknown type.");
     }
 }
 

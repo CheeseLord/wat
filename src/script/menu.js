@@ -12,6 +12,10 @@ import {
     specialAttack,
     endTeam,
 } from  "./action.js";
+import {
+    debugLog,
+    internalError,
+} from "./message.js";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Menu table handling
@@ -127,11 +131,12 @@ function transitionToMenu(menuName, isTop) {
 function applyMenuByName(menuName) {
     let menuDesc = menuTable[menuName];
     if (!menuDesc) {
-        Crafty.error("No such menu: " + menuName);
+        internalError("No such menu: " + menuName);
         return;
     }
     if (!menuDesc["title"] || !menuDesc["state"] || !menuDesc["buttons"]) {
-        Crafty.error("Description for menu '" + menuName + "' is ill-formed.");
+        internalError("Description for menu '" + menuName +
+            "' is ill-formed.");
         return;
     }
 
@@ -155,7 +160,7 @@ function applyMenuByName(menuName) {
     for (let i = 0; i < menuDesc["buttons"].length; i++) {
         let buttonDesc = menuDesc["buttons"][i];
         if (buttonDesc.length !== 3) {
-            Crafty.error("Description for menu '" + menuName +
+            internalError("Description for menu '" + menuName +
                 "' is ill-formed.");
             return;
         }
@@ -172,7 +177,7 @@ function applyMenuByName(menuName) {
         ]);
     }
 
-    Crafty.log("Enter menu: " + menuName);
+    debugLog("Enter menu: " + menuName);
     onEntry();
     Crafty.s("ButtonMenu").setMenu(title, buttonList);
 }

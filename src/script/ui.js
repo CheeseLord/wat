@@ -18,9 +18,13 @@ import {
     getCurrentTeam,
     getGlobalState,
     getReadyCharacters,
-    reportUserError,
     selectCharacter,
 } from "./action.js";
+import {
+    debugLog,
+    internalError,
+    userError,
+} from "./message.js";
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -39,11 +43,11 @@ export function worldClickHandler(evt) {
     let y = Math.floor(evt.realY /
             (MapGrid.tile.height + MapGrid.tile.vspace));
     if (x < 0 || x >= MapGrid.width || y < 0 || y >= MapGrid.height) {
-        Crafty.log(`Ignoring click (${x}, ${y}) because it's out of bounds.`);
+        debugLog(`Ignoring click (${x}, ${y}) because it's out of bounds.`);
         return;
     }
     if (evt.mouseButton === Crafty.mouseButtons.LEFT) {
-        Crafty.log(`You clicked at: (${x}, ${y})`);
+        debugLog(`You clicked at: (${x}, ${y})`);
         if (getGlobalState() === StateEnum.DEFAULT) {
             doSelectCharacter(evt, x, y);
         } else if (getGlobalState() === StateEnum.CHARACTER_SELECTED) {
@@ -57,11 +61,11 @@ export function worldClickHandler(evt) {
         } else if (getGlobalState() === StateEnum.CHARACTER_INTERACT) {
             doInteract(evt, x, y);
         } else {
-            Crafty.error("Unknown state value.");
+            internalError("Unknown state value.");
             // assert(false);
         }
     } else if (evt.mouseButton === Crafty.mouseButtons.RIGHT) {
-        Crafty.log("AAAAAAAAAA");
+        debugLog("AAAAAAAAAA");
     }
 }
 
@@ -70,7 +74,7 @@ export function worldClickHandler(evt) {
 function doAutoCharacterAction(evt, x, y) {
     if (!doSelectCharacter(evt, x, y)) {
         if (!(evt.target && evt.target.has("GridObject"))) {
-            reportUserError("There's nothing there!");
+            userError("There's nothing there!");
             return;
         }
         switch (evt.target.autoAction) {
@@ -84,7 +88,7 @@ function doAutoCharacterAction(evt, x, y) {
                 doInteract(evt, x, y);
                 break;
             case AutoActionEnum.NONE:
-                reportUserError("No auto-action defined for that target.");
+                userError("No auto-action defined for that target.");
                 break;
             default:
                 // assert(false);
@@ -101,11 +105,11 @@ function doSelectCharacter(evt, x, y) {
         return false;
     }
     if (evt.target.team !== getCurrentTeam()) {
-        reportUserError("Character is on another team");
+        userError("Character is on another team");
         return false;
     }
     if (getReadyCharacters().indexOf(evt.target) === -1) {
-        reportUserError("Character has already acted");
+        userError("Character has already acted");
         return false;
     }
 

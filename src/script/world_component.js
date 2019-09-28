@@ -26,6 +26,11 @@ import {
     selectedCharacter,
 } from "./action.js";
 
+import {
+    internalError,
+    userMessage,
+} from "./message.js";
+
 ///////////////////////////////////////////////////////////////////////////////
 
 const HighlightStrategy = Object.freeze({
@@ -99,7 +104,7 @@ Crafty.c("GridObject", {
             this._highlights[hlType] = val;
             return this._redraw();
         } else {
-            Crafty.error(`Unrecognized highlight type: ${hlType}.`);
+            internalError(`Unrecognized highlight type: ${hlType}.`);
             return this;
         }
     },
@@ -147,7 +152,7 @@ Crafty.c("GridObject", {
                 default:
                     // I know, I haven't implemented a bunch of highlight cases
                     // for BORDER. TODO I guess.
-                    Crafty.error("Missing case for highlight type: " +
+                    internalError("Missing case for highlight type: " +
                         `${displayHlType}.`);
                     hlColor = "#000000";
             }
@@ -194,12 +199,12 @@ Crafty.c("GridObject", {
                     hlColor = "#00bf0088"; break;
 
                 default:
-                    Crafty.error("Missing case for highlight type: " +
+                    internalError("Missing case for highlight type: " +
                             `${displayHlType}.`);
                     return this;
             }
         } else {
-            Crafty.log("Error: unknown HighlightStrategy.");
+            internalError("Unknown HighlightStrategy.");
             return this;
         }
 
@@ -215,7 +220,7 @@ Crafty.c("GridObject", {
                 "background-color": color,
             });
         } else {
-            Crafty.log("Error: unknown HighlightStrategy.");
+            internalError("Unknown HighlightStrategy.");
             return this;
         }
     },
@@ -229,7 +234,7 @@ Crafty.c("GridObject", {
                 "background-color": this._baseBgColor,
             });
         } else {
-            Crafty.log("Error: unknown HighlightStrategy.");
+            internalError("Unknown HighlightStrategy.");
             return this;
         }
     },
@@ -359,7 +364,7 @@ Crafty.c("Lever", {
     },
 
     interact: function(user) {
-        Crafty.log(`${user.name_} pulled a lever.`);
+        userMessage(`${user.name_} pulled a lever.`);
     },
 });
 
