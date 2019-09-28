@@ -20,6 +20,9 @@ import {
 import {
     updateMapForNewLevel,
 } from "./geometry.js";
+import {
+    getMessageDisplay,
+} from "./messageDisplay.js";
 
 
 export function doTheThing() {
@@ -150,6 +153,11 @@ export function doTheThing() {
     Crafty.e("2D, UILayer, Color, Mouse")
             .attr({x: 0, y: 0, w: MENU_WIDTH, h: Game.height})
             .color("#eee");
+
+    // Message log.
+    let display = getMessageDisplay()
+            .attr({x: 500, y: 50, w: 500, h: 100});
+    display.addMessage("Haldo World!");
 
     // Convert regular mouse events to WorldClick events, so we can handle
     // that case without doing weird things when the player clicks on the
