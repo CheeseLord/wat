@@ -25,11 +25,12 @@ export function initMessageDisplay(attrs) {
 export function userMessage(message) {
     // displays a message, no formatting is done here
     display.addMessage(message);
+    display.textColor("#000000");
 }
 
 export function userError(message) {
-    // TODO make it red
-    userMessage(message);
+    display.addMessage(message);
+    display.textColor("#ff0000");
 }
 
 export function internalError(message) {
