@@ -134,38 +134,64 @@ Crafty.c("GridObject", {
                 case Highlight.SELECTED_CHARACTER:  hlColor = "#ffff00"; break;
                 case Highlight.AVAILABLE_CHARACTER: hlColor = "#ff7f00"; break;
 
-                case Highlight.ANIM_PATH_END:       hlColor = "#0000ff"; break;
-                case Highlight.ANIM_PATH_MIDDLE:    hlColor = "#4f4f7f"; break;
-                case Highlight.HOVER_PATH_END:      hlColor = "#ff00ff"; break;
-                case Highlight.HOVER_PATH_MIDDLE:   hlColor = "#7f4f7f"; break;
+                case Highlight.ANIM_MOVE_END:       hlColor = "#0000ff"; break;
+                case Highlight.ANIM_MOVE_MIDDLE:    hlColor = "#4f4f7f"; break;
+                case Highlight.HOVER_MOVE_END:      hlColor = "#ff00ff"; break;
+                case Highlight.HOVER_MOVE_MIDDLE:   hlColor = "#7f4f7f"; break;
 
-                case Highlight.ATTACKABLE:          hlColor = "#ff0000"; break;
-                case Highlight.INTERACTABLE:        hlColor = "#00ff00"; break;
+                case Highlight.CAN_ATTACK:          hlColor = "#ff0000"; break;
+                case Highlight.CAN_INTERACT:        hlColor = "#00ff00"; break;
                     // TODO: Green looks bad with green ground
-                case Highlight.REACHABLE:           hlColor = "#00ffff"; break;
+                case Highlight.CAN_MOVE:            hlColor = "#00ffff"; break;
 
                 default:
+                    // I know, I haven't implemented a bunch of highlight cases
+                    // for BORDER. TODO I guess.
                     Crafty.error("Missing case for highlight type: " +
                         `${displayHlType}.`);
-                    return this;
+                    hlColor = "#000000";
             }
         } else if (HL_STRAT === HighlightStrategy.OVERLAY) {
             switch (displayHlType) {
                 // TODO proper rgba handling
+                // TODO: these colors still need tweaking.
                 case Highlight.SELECTED_CHARACTER:
                     hlColor = "#ffff00bb"; break;
                 case Highlight.AVAILABLE_CHARACTER:
                     hlColor = "#ffff0066"; break;
 
-                case Highlight.ANIM_PATH_END:     hlColor = "#0000ff88"; break;
-                case Highlight.ANIM_PATH_MIDDLE:  hlColor = "#4f4f7f88"; break;
-                case Highlight.HOVER_PATH_END:    hlColor = "#ff00ff88"; break;
-                case Highlight.HOVER_PATH_MIDDLE: hlColor = "#7f4f7f88"; break;
+                case Highlight.CAN_MOVE:
+                    hlColor = "#9f6900ff"; break;
+                case Highlight.CAN_ATTACK:
+                    hlColor = "#7f000088"; break;
+                case Highlight.CAN_INTERACT:
+                    hlColor = "#007f0088"; break;
 
-                case Highlight.ATTACKABLE:        hlColor = "#ff000088"; break;
-                case Highlight.INTERACTABLE:      hlColor = "#00ff0088"; break;
-                    // TODO: Green looks bad with green ground
-                case Highlight.REACHABLE:         hlColor = "#9f6900ff"; break;
+                case Highlight.HOVER_MOVE_MIDDLE:
+                    hlColor = "#003f3f88"; break;
+                case Highlight.HOVER_MOVE_END:
+                    hlColor = "#00007f88"; break;
+                case Highlight.HOVER_ATTACK_MIDDLE:
+                    hlColor = "#cf3400ff"; break;
+                case Highlight.HOVER_ATTACK_END:
+                    hlColor = "#ff000088"; break;
+                case Highlight.HOVER_INTERACT_MIDDLE:
+                    hlColor = "#4fb400ff"; break;
+                case Highlight.HOVER_INTERACT_END:
+                    hlColor = "#00ff0088"; break;
+
+                case Highlight.ANIM_MOVE_MIDDLE:
+                    hlColor = "#007f7f88"; break;
+                case Highlight.ANIM_MOVE_END:
+                    hlColor = "#0000ff88"; break;
+                case Highlight.ANIM_ATTACK_MIDDLE:
+                    hlColor = "#ff690088"; break;
+                case Highlight.ANIM_ATTACK_END:
+                    hlColor = "#bf000088"; break;
+                case Highlight.ANIM_INTERACT_MIDDLE:
+                    hlColor = "#9fff00ff"; break;
+                case Highlight.ANIM_INTERACT_END:
+                    hlColor = "#00bf0088"; break;
 
                 default:
                     Crafty.error("Missing case for highlight type: " +
@@ -341,8 +367,8 @@ Crafty.c("Lever", {
 // TODO find a better place to put these functions
 
 function hoverHighlightObj(obj) {
-    // TODO hover-highlight movable/interactable/attackable things when that
-    // particular action is selected.
+    // TODO hover-highlight in other states (but only for actions that would
+    // actually be performed).
     if (getGlobalState() !== StateEnum.CHARACTER_SELECTED) {
         return;
     }
@@ -358,21 +384,32 @@ function hoverHighlightObj(obj) {
         return;
     }
 
+    let endHighlight  = null;
+    let pathHighlight = null;
+
     if (obj.autoAction === AutoActionEnum.MOVE) {
-        obj.enableHighlight(Highlight.HOVER_PATH_END);
+        endHighlight  = Highlight.HOVER_MOVE_END;
+        pathHighlight = Highlight.HOVER_MOVE_MIDDLE;
     } else if (obj.autoAction === AutoActionEnum.ATTACK) {
-        obj.enableHighlight(Highlight.HOVER_ATTACK);
+        endHighlight  = Highlight.HOVER_ATTACK_END;
+        pathHighlight = Highlight.HOVER_ATTACK_MIDDLE;
     } else if (obj.autoAction === AutoActionEnum.INTERACT) {
-        obj.enableHighlight(Highlight.HOVER_INTERACT);
+        endHighlight  = Highlight.HOVER_INTERACT_END;
+        pathHighlight = Highlight.HOVER_INTERACT_MIDDLE;
     } else {
         // assert(false);
+        // Should never happen, but I guess this is as good a default as any?
+        endHighlight  = Highlight.HOVER_MOVE_END;
+        pathHighlight = Highlight.HOVER_MOVE_MIDDLE;
     }
+
+    obj.enableHighlight(endHighlight);
 
     for (let i = 0; i < path.length - 1; i++) {
         Crafty("GridObject").each(function() {
             if (this.getPos().x === path[i].x &&
                     this.getPos().y === path[i].y) {
-                this.enableHighlight(Highlight.HOVER_PATH_MIDDLE);
+                this.enableHighlight(pathHighlight);
             }
         });
     }
@@ -380,7 +417,11 @@ function hoverHighlightObj(obj) {
 
 function clearHoverHighlights() {
     Crafty("GridObject").each(function() {
-        this.disableHighlight(Highlight.HOVER_PATH_END);
-        this.disableHighlight(Highlight.HOVER_PATH_MIDDLE);
+        this.disableHighlight(Highlight.HOVER_INTERACT_END);
+        this.disableHighlight(Highlight.HOVER_INTERACT_MIDDLE);
+        this.disableHighlight(Highlight.HOVER_ATTACK_END);
+        this.disableHighlight(Highlight.HOVER_ATTACK_MIDDLE);
+        this.disableHighlight(Highlight.HOVER_MOVE_END);
+        this.disableHighlight(Highlight.HOVER_MOVE_MIDDLE);
     });
 }

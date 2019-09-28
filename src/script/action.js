@@ -96,9 +96,9 @@ function highlightPath(path) {
             if (this.getPos().x === path[i].x &&
                     this.getPos().y === path[i].y) {
                 if (i === path.length - 1) {
-                    this.enableHighlight(Highlight.ANIM_PATH_END);
+                    this.enableHighlight(Highlight.ANIM_MOVE_END);
                 } else {
-                    this.enableHighlight(Highlight.ANIM_PATH_MIDDLE);
+                    this.enableHighlight(Highlight.ANIM_MOVE_MIDDLE);
                 }
             }
         });
@@ -372,9 +372,9 @@ export function deselectCharacter() {
         setGlobalState(StateEnum.DEFAULT);
     }
     // Clear movement grid.
-    clearHighlightType(Highlight.REACHABLE);
-    clearHighlightType(Highlight.ATTACKABLE);
-    clearHighlightType(Highlight.INTERACTABLE);
+    clearHighlightType(Highlight.CAN_MOVE);
+    clearHighlightType(Highlight.CAN_ATTACK);
+    clearHighlightType(Highlight.CAN_INTERACT);
 }
 
 function clearHighlightType(hlType) {
@@ -415,11 +415,11 @@ function createMovementGrid(character) {
         // Note: don't need to check isReachable here, since we only set
         // autoActions on objects that are in range.
         if (this.autoAction === AutoActionEnum.MOVE) {
-            this.enableHighlight(Highlight.REACHABLE);
+            this.enableHighlight(Highlight.CAN_MOVE);
         } else if (this.autoAction === AutoActionEnum.ATTACK) {
-            this.enableHighlight(Highlight.ATTACKABLE);
+            this.enableHighlight(Highlight.CAN_ATTACK);
         } else if (this.autoAction === AutoActionEnum.INTERACT) {
-            this.enableHighlight(Highlight.INTERACTABLE);
+            this.enableHighlight(Highlight.CAN_INTERACT);
         } else if (this.autoAction !== AutoActionEnum.NONE) {
             // assert(false);
         }

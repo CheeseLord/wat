@@ -47,23 +47,35 @@ export const AutoActionEnum = Object.freeze({
 // List of highlighting types. Several of these can be set on a single object,
 // in which case the lowest-valued one is the one that will be displayed.
 export const Highlight = Object.freeze({
-    SELECTED_CHARACTER:  0, // Character currently selected
-    AVAILABLE_CHARACTER: 1, // Character that can be selected this turn
+    SELECTED_CHARACTER:     0, // Character currently selected
+    AVAILABLE_CHARACTER:    1, // Character that can be selected this turn
 
-    ANIM_PATH_END:       2, // Destination square of animated path
-    ANIM_PATH_MIDDLE:    3, // Intermediate square of animated path
-    HOVER_PATH_END:      4, // Destination square of hovered-over path
-    HOVER_PATH_MIDDLE:   5, // Intermediate square of hovered-over path
+    // ANIM_<foo>_* is like HOVER_<foo>_*, but when the action is being
+    // animated rather than simply considered.
+    ANIM_INTERACT_END:      2,
+    ANIM_INTERACT_MIDDLE:   3,
+    ANIM_ATTACK_END:        4,
+    ANIM_ATTACK_MIDDLE:     5,
+    ANIM_MOVE_END:          6,
+    ANIM_MOVE_MIDDLE:       7,
 
-    // FIXME: these should be different from the below.
-    HOVER_ATTACK:        6, // Enemy hovered over to attack
-    HOVER_INTERACT:      7, // Object hovered over to interacted with
+    // HOVER_<foo>_{MIDDLE,END} are used to highlight how action <foo> will be
+    // performed. _MIDDLE is for cells on the path to the target, _END is for
+    // the target itself.
+    HOVER_INTERACT_END:     8,
+    HOVER_INTERACT_MIDDLE:  9,
+    HOVER_ATTACK_END:      10,
+    HOVER_ATTACK_MIDDLE:   11,
+    HOVER_MOVE_END:        12,
+    HOVER_MOVE_MIDDLE:     13,
 
-    ATTACKABLE:          6, // Enemy that can be attacked this turn
-    INTERACTABLE:        7, // Object that can be interacted with this turn
-    REACHABLE:           8, // Space that can be reached this turn
+    // CAN_<foo> is the highlight applied when choosing a move for a character,
+    // to indicate that <foo> is a valid action on the highlighted square.
+    CAN_INTERACT:          14,
+    CAN_ATTACK:            15,
+    CAN_MOVE:              16,
 
-    NUM_VALS:            9, // For sizing arrays of flag values
+    NUM_VALS:              17, // For sizing arrays of flag values
 });
 
 // TODO: Maybe separate horiz. and vert.? Should probably in general be
