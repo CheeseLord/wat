@@ -405,7 +405,11 @@ function hoverHighlightObj(obj) {
 
     obj.enableHighlight(endHighlight);
 
-    for (let i = 0; i < path.length - 1; i++) {
+    // Start at 1 because 0 is the ground under the character that's moving,
+    // and that character is probably already highlighted as "selected".
+    // End before length-1 because length-1 is the target, which was separately
+    // highlighted above with endHighlight.
+    for (let i = 1; i < path.length - 1; i++) {
         Crafty("GridObject").each(function() {
             if (this.getPos().x === path[i].x &&
                     this.getPos().y === path[i].y) {
