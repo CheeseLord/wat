@@ -21,7 +21,8 @@ import {
     updateMapForNewLevel,
 } from "./geometry.js";
 import {
-    getMessageDisplay,
+    displayMessage,
+    initMessageDisplay,
 } from "./messageDisplay.js";
 
 
@@ -155,9 +156,8 @@ export function doTheThing() {
             .color("#eee");
 
     // Message log.
-    let display = getMessageDisplay()
-            .attr({x: 500, y: 50, w: 500, h: 100});
-    display.addMessage("Haldo World!");
+    initMessageDisplay({x: 500, y: 50, w: 500, h: 100});
+    displayMessage("Haldo World!");
 
     // Convert regular mouse events to WorldClick events, so we can handle
     // that case without doing weird things when the player clicks on the
