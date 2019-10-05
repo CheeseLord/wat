@@ -278,27 +278,32 @@ Crafty.c("Health", {
     },
 
     setupHealthBar_: function() {
-        let x = this.x + (this.w / 8);
-        let y = this.y + (6 * this.h / 8);
-        let w = this.w * 6 / 8;
-        let h = this.h * 1 / 8;
+        let x = Math.round(this.x + (this.w / 8));
+        let y = Math.round(this.y + (6 * this.h / 8));
+        let w = Math.round(this.w * 6 / 8);
+        let h = Math.round(this.h * 1 / 8);
 
         // TODO Magic colors etc.
         // TODO Better way to have a few stacked z levels that are conceptually
         // in a single layer
+        this.healthBarTotWidth_ = w;
         this.healthBarBackground_ = Crafty.e("2D, DOM, Color")
                 .color("#800000")
-                .attr({x: x, y: y, w: w, h: h, z: Z_WORLD_UI});
+                .attr({x: x - 1, y: y - 1, w: w + 2, h: h + 2, z: Z_WORLD_UI});
         this.healthBarForeground_ = Crafty.e("2D, DOM, Color")
                 .color("#008000")
                 .attr({x: x, y: y, w: w, h: h, z: Z_WORLD_UI + 1});
+        this.healthBarBackground_.css({
+            "box-sizing": "border-box",
+            "border":     "1px solid white",
+        });
         this.attach(this.healthBarBackground_);
         this.attach(this.healthBarForeground_);
     },
 
     updateHealthBar_: function() {
         let healthFrac = getProportion(this.health_, this.maxHealth_);
-        let newW = this.healthBarBackground_.w * healthFrac;
+        let newW = this.healthBarTotWidth_ * healthFrac;
         this.healthBarForeground_.attr({w: newW});
     },
 
@@ -310,7 +315,7 @@ Crafty.c("Health", {
         return this;
     },
 
-    setHealth2: function(health) {
+    setHealth: function(health) {
         this.health = health;
         this.updateHealthBar_();
         return this;
