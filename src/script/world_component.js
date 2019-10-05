@@ -13,6 +13,7 @@ import {
     Z_CHARACTER,
     Z_GROUND,
     Z_SCENERY,
+    Z_WORLD_UI,
 } from  "./consts.js";
 
 import {
@@ -31,6 +32,10 @@ import {
     internalError,
     userMessage,
 } from "./message.js";
+
+import {
+    getProportion,
+} from "./util.js";
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -264,12 +269,69 @@ Crafty.c("DynamicObject", {
     },
 });
 
-Crafty.c("Character", {
+Crafty.c("Health", {
     required: "DynamicObject",
 
     init: function() {
+        this.setupHealthBar_();
+        this.maxHealth(1);
+    },
+
+    setupHealthBar_: function() {
+        let x = this.x + (this.w / 8);
+        let y = this.y + (6 * this.h / 8);
+        let w = this.w * 6 / 8;
+        let h = this.h * 1 / 8;
+
+        // TODO Magic colors etc.
+        // TODO Better way to have a few stacked z levels that are conceptually
+        // in a single layer
+        this.healthBarBackground_ = Crafty.e("2D, DOM, Color")
+                .color("#800000")
+                .attr({x: x, y: y, w: w, h: h, z: Z_WORLD_UI});
+        this.healthBarForeground_ = Crafty.e("2D, DOM, Color")
+                .color("#008000")
+                .attr({x: x, y: y, w: w, h: h, z: Z_WORLD_UI + 1});
+        this.attach(this.healthBarBackground_);
+        this.attach(this.healthBarForeground_);
+    },
+
+    updateHealthBar_: function() {
+        let healthFrac = getProportion(this.health_, this.maxHealth_);
+        let newW = this.healthBarBackground_.w * healthFrac;
+        this.healthBarForeground_.attr({w: newW});
+    },
+
+    // Set the initial health of the object.
+    maxHealth: function(health) {
+        this.maxHealth_ = health;
+        this.health_    = health;
+        this.updateHealthBar_();
+        return this;
+    },
+
+    setHealth2: function(health) {
+        this.health = health;
+        this.updateHealthBar_();
+        return this;
+    },
+
+    takeDamage: function(damage) {
+        this.health_ -= damage;
+        if (this.health_ <= 0) {
+            this.destroy();
+        } else {
+            this.updateHealthBar_();
+        }
+        return this;
+    },
+});
+
+Crafty.c("Character", {
+    required: "DynamicObject, Health",
+
+    init: function() {
         this.name_ = "Steve";
-        this.health = 1;
         this.team = -1;
         this.attr({z: Z_CHARACTER});
         // inherit blocksMovement=true from DynamicObject
@@ -280,21 +342,8 @@ Crafty.c("Character", {
         return this;
     },
 
-    setHealth: function(health) {
-        this.health = health;
-        return this;
-    },
-
     setTeam: function(team) {
         this.team = team;
-        return this;
-    },
-
-    takeDamage: function(damage) {
-        this.health -= damage;
-        if (this.health <= 0) {
-            this.destroy();
-        }
         return this;
     },
 });

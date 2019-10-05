@@ -11,7 +11,8 @@ export const Z_BACKGROUND  =  0; // Probably no entities here?
 export const Z_GROUND      = 10;
 export const Z_SCENERY     = 20; // Walls, doodads
 export const Z_CHARACTER   = 30; // Things that move around
-export const Z_UI          = 50; // UI layer - above all world stuff
+export const Z_WORLD_UI    = 40; // UI stuff in the world itself
+export const Z_UI          = 50; // Separate UI layer - above all world stuff
 
 export const SPRITE_DUR_PER_FRAME      = 250;
 export const ANIM_DUR_SCROLL           = 50;
