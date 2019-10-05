@@ -8,9 +8,11 @@ import {
     ANIM_DUR_MOVE,
     ANIM_DUR_PAUSE_BW_MOV_ATK,
     ANIM_DUR_STEP,
-    ATTACK_DAMAGE,
+    ATTACK_DAMAGE_MIN,
+    ATTACK_DAMAGE_MAX,
     AutoActionEnum,
-    SPECIAL_ATTACK_DAMAGE,
+    SPECIAL_ATTACK_DAMAGE_MIN,
+    SPECIAL_ATTACK_DAMAGE_MAX,
     Highlight,
     MOVE_RANGE,
     NUM_TEAMS,
@@ -39,6 +41,9 @@ import {
     userError,
     userMessage,
 } from "./message.js";
+import {
+    randInt,
+} from "./util.js";
 
 export var selectedCharacter;
 
@@ -265,7 +270,7 @@ export function doAttack(evt, x, y) {
     highlightPath(path);
     doAnimate(
         seriesAnimations(anims), function() {
-            target.takeDamage(ATTACK_DAMAGE);
+            target.takeDamage(randInt(ATTACK_DAMAGE_MIN, ATTACK_DAMAGE_MAX));
 
             Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
             setGlobalState(StateEnum.DEFAULT);
@@ -430,7 +435,8 @@ export function specialAttack(character) {
     Crafty("Character").each(function() {
         if (this.team !== character.team &&
                 isAdjacent(character.getPos(), this.getPos())) {
-            this.takeDamage(SPECIAL_ATTACK_DAMAGE);
+            this.takeDamage(randInt(SPECIAL_ATTACK_DAMAGE_MIN,
+                SPECIAL_ATTACK_DAMAGE_MAX));
         }
     });
 }

@@ -22,8 +22,12 @@ export const ANIM_DUR_STEP             = 100;
 export const ANIM_DUR_HALF_ATTACK      = 100;
 export const ANIM_DUR_PAUSE_BW_MOV_ATK = 80;
 
-export const ATTACK_DAMAGE = 2;
-export const SPECIAL_ATTACK_DAMAGE = 1;
+// 1d4 + 3
+export const ATTACK_DAMAGE_MIN = 4;
+export const ATTACK_DAMAGE_MAX = 7;
+// Exactly 4 damage
+export const SPECIAL_ATTACK_DAMAGE_MIN = 4;
+export const SPECIAL_ATTACK_DAMAGE_MAX = 4;
 
 // Based on one of the comments on:
 //     https://stackoverflow.com/a/5040502

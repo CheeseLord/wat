@@ -89,28 +89,28 @@ export function doTheThing() {
             Crafty.e("SpriteCharacter, anim_start")
                     .initPos({x: 5, y: 3})
                     .setName_("Not Greg")
-                    .maxHealth(2)
+                    .maxHealth(15)
                     .setTeam(0)
                     .setAnimation(0, 4);
 
             Crafty.e("SpriteCharacter, anim_start")
                     .initPos({x: 7, y: 3})
                     .setName_("Also Not Greg")
-                    .maxHealth(2)
+                    .maxHealth(15)
                     .setTeam(0)
                     .setAnimation(1, 4);
 
             Crafty.e("SpriteCharacter, anim_start")
                     .initPos({x: 5, y: 5})
                     .setName_("Not Joel")
-                    .maxHealth(2)
+                    .maxHealth(15)
                     .setTeam(1)
                     .setAnimation(2, 4);
 
             Crafty.e("SpriteCharacter, anim_start")
                     .initPos({x: 7, y: 5})
                     .setName_("Samson")
-                    .maxHealth(2)
+                    .maxHealth(15)
                     .setTeam(1)
                     .setAnimation(3, 4);
 
@@ -120,15 +120,15 @@ export function doTheThing() {
     );
 
     // Static enemies
-    Crafty.e("Enemy").initPos({x: 11, y:  3});
-    Crafty.e("Enemy").initPos({x: 19, y: 11});
-    Crafty.e("Enemy").initPos({x:  8, y: 11});
-    Crafty.e("Enemy").initPos({x: 11, y: 12});
-    Crafty.e("Enemy").initPos({x: 14, y:  9});
-    Crafty.e("Enemy").initPos({x: 21, y:  5});
-    Crafty.e("Enemy").initPos({x: 17, y: 13});
-    Crafty.e("Enemy").initPos({x:  2, y: 13});
-    Crafty.e("Enemy").initPos({x:  2, y:  9});
+    Crafty.e("Enemy").initPos({x: 11, y:  3}).maxHealth(10);
+    Crafty.e("Enemy").initPos({x: 19, y: 11}).maxHealth(10);
+    Crafty.e("Enemy").initPos({x:  8, y: 11}).maxHealth(10);
+    Crafty.e("Enemy").initPos({x: 11, y: 12}).maxHealth(10);
+    Crafty.e("Enemy").initPos({x: 14, y:  9}).maxHealth(10);
+    Crafty.e("Enemy").initPos({x: 21, y:  5}).maxHealth(10);
+    Crafty.e("Enemy").initPos({x: 17, y: 13}).maxHealth(10);
+    Crafty.e("Enemy").initPos({x:  2, y: 13}).maxHealth(10);
+    Crafty.e("Enemy").initPos({x:  2, y:  9}).maxHealth(10);
 
     // The ground
     for (let y = 0; y < MapGrid.height; y++) {

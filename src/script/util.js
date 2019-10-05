@@ -14,3 +14,9 @@ export function getProportion(numer, denom) {
         return prop;
     }
 }
+
+// Return random integer between low and high, inclusive on both ends.
+export function randInt(low, high) {
+    let numVals = (high - low + 1);
+    return Math.floor(Math.random() * numVals) + low;
+}
