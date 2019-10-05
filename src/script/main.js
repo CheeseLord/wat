@@ -160,7 +160,13 @@ export function doTheThing() {
             .color("#eee");
 
     // Message log.
-    initMessageDisplay({x: 500, y: 50, w: 500, h: 100});
+    initMessageDisplay(
+        {
+            x: MENU_WIDTH + (Game.width - MENU_WIDTH) / 2 - 150,
+            y: 50,
+            w: 300,
+            h: 25,
+        });
     userMessage("Haldo World!");
 
     // Convert regular mouse events to WorldClick events, so we can handle

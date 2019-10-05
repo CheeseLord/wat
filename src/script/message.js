@@ -2,6 +2,7 @@
 
 "use strict";
 let display = null;
+let displayBackground = null;
 
 Crafty.c("MessageDisplay", {
     required: "2D, DOM, Text, UILayer",
@@ -18,6 +19,9 @@ Crafty.c("MessageDisplay", {
 });
 
 export function initMessageDisplay(attrs) {
+    displayBackground = Crafty.e("2D, UILayer, Color")
+            .color("#eee");
+    displayBackground.attr(attrs);
     display = Crafty.e("MessageDisplay");
     display.attr(attrs);
 }
@@ -26,11 +30,13 @@ export function userMessage(message) {
     // displays a message, no formatting is done here
     display.addMessage(message);
     display.textColor("#000000");
+    display.textAlign("center");
 }
 
 export function userError(message) {
     display.addMessage(message);
     display.textColor("#ff0000");
+    display.textAlign("center");
 }
 
 export function debugLog(message) {
