@@ -39,6 +39,10 @@ export function worldClickHandler(evt) {
         // That's just asking for the game to wind up in an inconsistent state
         // where things get weirdly messed up.
         return;
+    } else if (getGlobalState() === StateEnum.NO_INPUT) {
+        // Ditto if we're not accepting input.
+        // TODO merge these two states.
+        return;
     }
 
     // TODO: Can't we just use evt.target.getPos()? If there's no target, we

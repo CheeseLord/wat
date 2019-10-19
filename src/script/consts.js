@@ -34,6 +34,7 @@ export const SPECIAL_ATTACK_DAMAGE_MAX = 4;
 // Always use === for checking equality, otherwise always true
 export const StateEnum = Object.freeze({
     DEFAULT:            {},
+    NO_INPUT:           {},
     ANIMATING:          {},
     CHARACTER_SELECTED: {},
     CHARACTER_MOVE:     {},
