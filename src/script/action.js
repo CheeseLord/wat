@@ -283,10 +283,15 @@ function startCharacter(character) {
     for (let i = 0; i < readyCharacters.length; i++) {
         readyCharacters[i].enableHighlight(Highlight.AVAILABLE_CHARACTER);
     }
-    // TODO: Why does startCharacter not call selectCharacter? Who calls it
-    // instead?
-    setFocusOn(character);
-    // TODO: Should we select them, too?
+
+    // TODO refactor this. Have a real concept of teams, probably with some
+    // sort of callback tied to each one specifying how it chooses its turns.
+    if (currentTeam === 0) {
+        // Player team
+        requestMoveFromPlayer(character);
+    } else {
+        requestMoveFromAI(character);
+    }
 }
 
 export function endCharacter(character) {
@@ -333,6 +338,22 @@ export function endTeam() {
         // whole team is dead?)
         internalError("There's no one left to act.");
     }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Requesting moves (TODO maybe put in different module?)
+
+function requestMoveFromPlayer(character) {
+    // TODO: Why does startCharacter not call selectCharacter? Who calls it
+    // instead?
+    setFocusOn(character);
+    // TODO: Should we select them, too?
+}
+
+function requestMoveFromAI(character) {
+    setGlobalState(StateEnum.NO_INPUT);
+    // TODO actually choose a move
+    endCharacter(character);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
