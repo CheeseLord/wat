@@ -64,7 +64,7 @@ export function getCurrentTeam() { return currentTeam; }
 ///////////////////////////////////////////////////////////////////////////////
 // Action handlers
 
-export function doMove(evt, x, y, callback) {
+export function doMove(target, x, y, callback) {
     assert(getGlobalState() === StateEnum.CHARACTER_MOVE ||
            getGlobalState() === StateEnum.CHARACTER_SELECTED);
     if (!selectedCharacter) {
@@ -76,13 +76,13 @@ export function doMove(evt, x, y, callback) {
     let theMap = findPaths(selectedCharacter.getPos(), MOVE_RANGE);
     let destPos = {x: x, y: y};
 
-    if (evt.target && evt.target.blocksMovement) {
+    if (target && target.blocksMovement) {
         userError("Can't move there; something's in the way.");
         return;
     } else if (!canMoveTo(theMap, destPos)) {
         userError("You can't move that far.");
         return;
-    } else if (!(evt.target && evt.target.has("Ground"))) {
+    } else if (!(target && target.has("Ground"))) {
         userError("That's not a tile.");
         return;
     }
@@ -114,7 +114,7 @@ function highlightPath(path) {
     }
 }
 
-export function doSwap(evt, x, y, callback) {
+export function doSwap(target, x, y, callback) {
     assert(getGlobalState() === StateEnum.CHARACTER_SWAP);
     if (!selectedCharacter) {
         assert(false);
@@ -122,44 +122,44 @@ export function doSwap(evt, x, y, callback) {
         return;
     }
 
-    if (evt.target === null) {
+    if (target === null) {
         userError("There's nothing there to swap with.");
         return;
-    } else if (!evt.target.has("Character")) {
+    } else if (!target.has("Character")) {
         userError("Can't swap with non-character.");
         return;
-    } else if (evt.target.team !== currentTeam) {
+    } else if (target.team !== currentTeam) {
         userError("Cannot swap with other player's unit.");
         return;
-    } else if (evt.target === selectedCharacter) {
+    } else if (target === selectedCharacter) {
         userError("Cannot swap character with self.");
         return;
     }
 
     // Swap positions of clicked character and selectedCharacter.
     let selectPos = selectedCharacter.getPos();
-    let clickPos  = evt.target.getPos();
+    let clickPos  = target.getPos();
     doAnimate(
         parallelAnimations([
             tweenAnimation(selectedCharacter, function() {
                 selectedCharacter.animateTo(clickPos, ANIM_DUR_MOVE);
             }),
-            tweenAnimation(evt.target, function() {
-                evt.target.animateTo(selectPos, ANIM_DUR_MOVE);
+            tweenAnimation(target, function() {
+                target.animateTo(selectPos, ANIM_DUR_MOVE);
             }),
         ]),
         callback
     );
 }
 
-export function doInteract(evt, x, y, callback) {
+export function doInteract(target, x, y, callback) {
     if (!selectedCharacter) {
         assert(false);
         return;
-    } else if (evt.target === null) {
+    } else if (target === null) {
         userError("Nothing there to interact with.");
         return;
-    } else if (!evt.target.has("Interactable")) {
+    } else if (!target.has("Interactable")) {
         userError("Can't interact with that.");
         return;
     }
@@ -185,8 +185,6 @@ export function doInteract(evt, x, y, callback) {
             selectedCharacter.animateTo(path[i], ANIM_DUR_STEP);
         }));
     }
-    // Need to close over evt.target rather than evt.
-    let target = evt.target;
     // TODO some sort of animation for the interaction itself?
     doAnimate(seriesAnimations(anims), function() {
         target.interact(selectedCharacter);
@@ -194,28 +192,22 @@ export function doInteract(evt, x, y, callback) {
     });
 }
 
-export function doAttack(evt, x, y, callback) {
+export function doAttack(target, x, y, callback) {
     if (!selectedCharacter) {
         assert(false);
         return;
-    } else if (evt.target === null) {
+    } else if (target === null) {
         userError("No enemy there.");
         return;
-    } else if (!evt.target.has("Character")) {
+    } else if (!target.has("Character")) {
         userError("Can't attack non-character.");
         return;
-    }
-    attack(evt.target);
-    callback();
-}
-
-function attack(target) {
-    if (target.team === currentTeam) {
+    } else if (target.team === currentTeam) {
         userError("Can't attack friendly unit.");
         return;
     }
     let theMap = findPaths(selectedCharacter.getPos(), MOVE_RANGE);
-    let destPos = {x: target.getPos().x, y: target.getPos().y};
+    let destPos = {x: x, y: y};
     let path = getPath(theMap, selectedCharacter.getPos(), destPos);
     if (path === null) {
         userError("Can't reach that to attack it.");
@@ -262,6 +254,7 @@ function attack(target) {
     doAnimate(
         seriesAnimations(anims), function() {
             target.takeDamage(randInt(ATTACK_DAMAGE_MIN, ATTACK_DAMAGE_MAX));
+            callback();
         }
     );
 }
@@ -344,6 +337,12 @@ export function endTeam() {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Menu-related action helpers (and some misc?)
+
+export function afterPlayerMove() {
+    Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
+    setGlobalState(StateEnum.DEFAULT);
+    endCharacter(selectedCharacter);
+}
 
 export function selectCharacter(character) {
     deselectCharacter();
@@ -453,7 +452,7 @@ export function updateAutoActions(character) {
     });
 }
 
-export function doAutoAttack(character) {
+export function doAutoAttack(character, callback) {
     let characterPos = character.getPos();
     let theMap = findPaths(characterPos, MOVE_RANGE);
     let nearestTarget = null;
@@ -474,7 +473,8 @@ export function doAutoAttack(character) {
         endCharacter(character);
     } else if (getDist(theMap, characterPos, nearestTarget.getPos()) <=
                MOVE_RANGE) {
-        attack(nearestTarget);
+        let pos = nearestTarget.getPos();
+        doAttack(nearestTarget, pos.x, pos.y, callback);
     }
 }
 

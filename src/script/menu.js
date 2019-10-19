@@ -5,13 +5,14 @@
 import {StateEnum} from "./consts.js";
 
 import {
-    selectedCharacter,
-    endCharacter,
-    setGlobalState,
+    afterPlayerMove,
     deselectCharacter,
-    specialAttack,
-    endTeam,
     doAutoAttack,
+    endCharacter,
+    endTeam,
+    selectedCharacter,
+    setGlobalState,
+    specialAttack,
 } from  "./action.js";
 import {
     debugLog,
@@ -44,7 +45,7 @@ var menuTable = {
             ["Attack",      "attack",     doNothing],
             ["Interact",    "interact",   doNothing],
             ["Auto Attack", CLEAR_MENU,    () => {
-                doAutoAttack(selectedCharacter);
+                doAutoAttack(selectedCharacter, afterPlayerMove);
             }],
             ["End Turn",    CLEAR_MENU,   () => {
                 deselectCharacter();

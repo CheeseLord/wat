@@ -11,17 +11,15 @@ import {
     doMenu,
 } from "./menu.js";
 import {
+    afterPlayerMove,
     doAttack,
     doInteract,
     doMove,
     doSwap,
-    endCharacter,
     getCurrentTeam,
     getGlobalState,
     getReadyCharacters,
     selectCharacter,
-    selectedCharacter,
-    setGlobalState,
 } from "./action.js";
 import {
     assert,
@@ -51,26 +49,22 @@ export function worldClickHandler(evt) {
         return;
     }
 
-    function afterPlayerMove() {
-        Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
-        setGlobalState(StateEnum.DEFAULT);
-        endCharacter(selectedCharacter);
-    }
+    let target = evt.target;
 
     if (evt.mouseButton === Crafty.mouseButtons.LEFT) {
         debugLog(`You clicked at: (${x}, ${y})`);
         if (getGlobalState() === StateEnum.DEFAULT) {
-            doSelectCharacter(evt, x, y);
+            doSelectCharacter(target, x, y);
         } else if (getGlobalState() === StateEnum.CHARACTER_SELECTED) {
-            doAutoCharacterAction(evt, x, y, afterPlayerMove);
+            doAutoCharacterAction(target, x, y, afterPlayerMove);
         } else if (getGlobalState() === StateEnum.CHARACTER_MOVE) {
-            doMove(evt, x, y, afterPlayerMove);
+            doMove(target, x, y, afterPlayerMove);
         } else if (getGlobalState() === StateEnum.CHARACTER_SWAP) {
-            doSwap(evt, x, y, afterPlayerMove);
+            doSwap(target, x, y, afterPlayerMove);
         } else if (getGlobalState() === StateEnum.CHARACTER_ATTACK) {
-            doAttack(evt, x, y, afterPlayerMove);
+            doAttack(target, x, y, afterPlayerMove);
         } else if (getGlobalState() === StateEnum.CHARACTER_INTERACT) {
-            doInteract(evt, x, y, afterPlayerMove);
+            doInteract(target, x, y, afterPlayerMove);
         } else {
             internalError("Unknown state value.");
             assert(false);
@@ -82,21 +76,21 @@ export function worldClickHandler(evt) {
 
 // Automagically choose the right action for the character to do (corresponds
 // to state "CHARACTER_SELECTED").
-function doAutoCharacterAction(evt, x, y, callback) {
-    if (!doSelectCharacter(evt, x, y)) {
-        if (!(evt.target && evt.target.has("GridObject"))) {
+function doAutoCharacterAction(target, x, y, callback) {
+    if (!doSelectCharacter(target, x, y)) {
+        if (!(target && target.has("GridObject"))) {
             userError("There's nothing there!");
             return;
         }
-        switch (evt.target.autoAction) {
+        switch (target.autoAction) {
             case AutoActionEnum.MOVE:
-                doMove(evt, x, y, callback);
+                doMove(target, x, y, callback);
                 break;
             case AutoActionEnum.ATTACK:
-                doAttack(evt, x, y, callback);
+                doAttack(target, x, y, callback);
                 break;
             case AutoActionEnum.INTERACT:
-                doInteract(evt, x, y, callback);
+                doInteract(target, x, y, callback);
                 break;
             case AutoActionEnum.NONE:
                 userError("No auto-action defined for that target.");
@@ -108,23 +102,23 @@ function doAutoCharacterAction(evt, x, y, callback) {
     }
 }
 
-function doSelectCharacter(evt, x, y) {
+function doSelectCharacter(target, x, y) {
     assert(getGlobalState() === StateEnum.DEFAULT ||
            getGlobalState() === StateEnum.CHARACTER_SELECTED);
 
-    if (!(evt.target && evt.target.has("Character"))) {
+    if (!(target && target.has("Character"))) {
         return false;
     }
-    if (evt.target.team !== getCurrentTeam()) {
+    if (target.team !== getCurrentTeam()) {
         userError("Character is on another team");
         return false;
     }
-    if (getReadyCharacters().indexOf(evt.target) === -1) {
+    if (getReadyCharacters().indexOf(target) === -1) {
         userError("Character has already acted");
         return false;
     }
 
-    selectCharacter(evt.target);
+    selectCharacter(target);
     // TODO: Also setFocusOn? Or even call out to startCharacter?
     doMenu("topMenu");
     return true;
