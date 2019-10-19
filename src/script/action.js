@@ -26,6 +26,7 @@ import {
     isAdjacent,
     isReachable,
     midpoint,
+    getDist,
 } from "./geometry.js";
 import {
     doAnimate,
@@ -203,12 +204,18 @@ export function doAttack(evt, x, y, callback) {
     } else if (!evt.target.has("Character")) {
         userError("Can't attack non-character.");
         return;
-    } else if (evt.target.team === currentTeam) {
+    }
+    attack(evt.target);
+    callback();
+}
+
+function attack(target) {
+    if (target.team === currentTeam) {
         userError("Can't attack friendly unit.");
         return;
     }
     let theMap = findPaths(selectedCharacter.getPos(), MOVE_RANGE);
-    let destPos = {x: x, y: y};
+    let destPos = {x: target.getPos().x, y: target.getPos().y};
     let path = getPath(theMap, selectedCharacter.getPos(), destPos);
     if (path === null) {
         userError("Can't reach that to attack it.");
@@ -224,7 +231,7 @@ export function doAttack(evt, x, y, callback) {
 
     userMessage(`${selectedCharacter.name_} moved to ` +
         `(${moveToPos.x}, ${moveToPos.y})`);
-    userMessage(`${selectedCharacter.name_} attacked ${evt.target.name_}`);
+    userMessage(`${selectedCharacter.name_} attacked ${target.name_}`);
 
     // TODO: Refactor with doMove.
     let anims = [];
@@ -240,7 +247,7 @@ export function doAttack(evt, x, y, callback) {
     }
 
     // Add the attack animation, regardless.
-    let halfPos = midpoint(moveToPos, evt.target.getPos());
+    let halfPos = midpoint(moveToPos, target.getPos());
     anims = anims.concat([
         tweenAnimation(selectedCharacter, function() {
             selectedCharacter.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
@@ -250,18 +257,11 @@ export function doAttack(evt, x, y, callback) {
         }),
     ]);
 
-    // Close over a copy of evt.target so we can destroy it at the end of the
-    // animation. Empirically if we simply close over evt, sometimes its
-    // .target gets set to null by the time we want to destroy it, which was
-    // causing the destroy() call to fail.
-    let target  = evt.target;
-
     setGlobalState(StateEnum.ANIMATING);
     highlightPath(path);
     doAnimate(
         seriesAnimations(anims), function() {
             target.takeDamage(randInt(ATTACK_DAMAGE_MIN, ATTACK_DAMAGE_MAX));
-            callback();
         }
     );
 }
@@ -451,6 +451,31 @@ export function updateAutoActions(character) {
             this.autoAction = AutoActionEnum.NONE;
         }
     });
+}
+
+export function doAutoAttack(character) {
+    let characterPos = character.getPos();
+    let theMap = findPaths(characterPos, MOVE_RANGE);
+    let nearestTarget = null;
+    let bestDist = Infinity;
+    let dist = null;
+    Crafty("Character").each(function() {
+        if (this.team === character.team) {
+            return;
+        }
+        dist = getDist(theMap, characterPos, this.getPos());
+        if (dist < bestDist) {
+            bestDist = dist;
+            nearestTarget = this;
+        }
+    });
+    if (nearestTarget === null) {
+        setGlobalState(StateEnum.DEFAULT);
+        endCharacter(character);
+    } else if (getDist(theMap, characterPos, nearestTarget.getPos()) <=
+               MOVE_RANGE) {
+        attack(nearestTarget);
+    }
 }
 
 export function clearAutoActions() {

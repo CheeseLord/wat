@@ -11,11 +11,11 @@ import {
     deselectCharacter,
     specialAttack,
     endTeam,
+    doAutoAttack,
 } from  "./action.js";
 import {
     debugLog,
     internalError,
-    userError,
 } from "./message.js";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,10 +43,8 @@ var menuTable = {
             ["Swap places", "swapPlaces", doNothing],
             ["Attack",      "attack",     doNothing],
             ["Interact",    "interact",   doNothing],
-            ["Auto Attack", "topMenu",    () => {
-                // TODO call auto attack afeter we implement it
-                //      and change menu
-                userError("Auto attack is currently unimplemented");
+            ["Auto Attack", CLEAR_MENU,    () => {
+                doAutoAttack(selectedCharacter);
             }],
             ["End Turn",    CLEAR_MENU,   () => {
                 deselectCharacter();

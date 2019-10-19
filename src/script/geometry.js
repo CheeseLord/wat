@@ -5,6 +5,9 @@
 import {
     MapGrid,
 } from  "./consts.js";
+import {
+    assert,
+} from "./message.js";
 
 // Note: This function is NOT equivalent to getDistance(pos1, pos2) <= 1,
 // because it allows diagonals.
@@ -85,6 +88,15 @@ export function findPaths(startPos, maxDistance) {
     let dynamicMap = getDynamicMap();
     computePathsOnMap(startPos, dynamicMap, maxDistance);
     return dynamicMap;
+}
+
+export function getDist(theMap, startPos, endPos) {
+    let thePath = getPath(theMap, startPos, endPos);
+    if (thePath === null) {
+        return Infinity;
+    }
+    assert(thePath.length >= 1);
+    return thePath.length - 1;
 }
 
 // Get the list of cells along a path.
