@@ -352,8 +352,12 @@ function requestMoveFromPlayer(character) {
 
 function requestMoveFromAI(character) {
     setGlobalState(StateEnum.NO_INPUT);
-    // TODO actually choose a move
-    endCharacter(character);
+    // TODO this creates the movement grid, don't want that.
+    // TODO sometimes this goes into an infinite loop.
+    selectCharacter(character);
+    doAutoAttack(character, () => {
+        endCharacter(character);
+    });
 }
 
 ///////////////////////////////////////////////////////////////////////////////
