@@ -63,7 +63,7 @@ export function getCurrentTeam() { return currentTeam; }
 ///////////////////////////////////////////////////////////////////////////////
 // Action handlers
 
-export function doMove(evt, x, y) {
+export function doMove(evt, x, y, callback) {
     assert(getGlobalState() === StateEnum.CHARACTER_MOVE ||
            getGlobalState() === StateEnum.CHARACTER_SELECTED);
     if (!selectedCharacter) {
@@ -95,11 +95,7 @@ export function doMove(evt, x, y) {
             selectedCharacter.animateTo(path[i], ANIM_DUR_STEP);
         }));
     }
-    doAnimate(seriesAnimations(anims), function() {
-        Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
-        setGlobalState(StateEnum.DEFAULT);
-        endCharacter(selectedCharacter);
-    });
+    doAnimate(seriesAnimations(anims), callback);
 }
 
 function highlightPath(path) {
@@ -117,7 +113,7 @@ function highlightPath(path) {
     }
 }
 
-export function doSwap(evt, x, y) {
+export function doSwap(evt, x, y, callback) {
     assert(getGlobalState() === StateEnum.CHARACTER_SWAP);
     if (!selectedCharacter) {
         assert(false);
@@ -140,9 +136,6 @@ export function doSwap(evt, x, y) {
     }
 
     // Swap positions of clicked character and selectedCharacter.
-    Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
-    setGlobalState(StateEnum.DEFAULT);
-
     let selectPos = selectedCharacter.getPos();
     let clickPos  = evt.target.getPos();
     doAnimate(
@@ -154,11 +147,11 @@ export function doSwap(evt, x, y) {
                 evt.target.animateTo(selectPos, ANIM_DUR_MOVE);
             }),
         ]),
-        function() { endCharacter(selectedCharacter); }
+        callback
     );
 }
 
-export function doInteract(evt, x, y) {
+export function doInteract(evt, x, y, callback) {
     if (!selectedCharacter) {
         assert(false);
         return;
@@ -196,14 +189,11 @@ export function doInteract(evt, x, y) {
     // TODO some sort of animation for the interaction itself?
     doAnimate(seriesAnimations(anims), function() {
         target.interact(selectedCharacter);
-
-        Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
-        setGlobalState(StateEnum.DEFAULT);
-        endCharacter(selectedCharacter);
+        callback();
     });
 }
 
-export function doAttack(evt, x, y) {
+export function doAttack(evt, x, y, callback) {
     if (!selectedCharacter) {
         assert(false);
         return;
@@ -271,10 +261,7 @@ export function doAttack(evt, x, y) {
     doAnimate(
         seriesAnimations(anims), function() {
             target.takeDamage(randInt(ATTACK_DAMAGE_MIN, ATTACK_DAMAGE_MAX));
-
-            Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
-            setGlobalState(StateEnum.DEFAULT);
-            endCharacter(selectedCharacter);
+            callback();
         }
     );
 }

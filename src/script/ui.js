@@ -15,10 +15,13 @@ import {
     doInteract,
     doMove,
     doSwap,
+    endCharacter,
     getCurrentTeam,
     getGlobalState,
     getReadyCharacters,
     selectCharacter,
+    selectedCharacter,
+    setGlobalState,
 } from "./action.js";
 import {
     assert,
@@ -47,20 +50,27 @@ export function worldClickHandler(evt) {
         debugLog(`Ignoring click (${x}, ${y}) because it's out of bounds.`);
         return;
     }
+
+    function afterPlayerMove() {
+        Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
+        setGlobalState(StateEnum.DEFAULT);
+        endCharacter(selectedCharacter);
+    }
+
     if (evt.mouseButton === Crafty.mouseButtons.LEFT) {
         debugLog(`You clicked at: (${x}, ${y})`);
         if (getGlobalState() === StateEnum.DEFAULT) {
             doSelectCharacter(evt, x, y);
         } else if (getGlobalState() === StateEnum.CHARACTER_SELECTED) {
-            doAutoCharacterAction(evt, x, y);
+            doAutoCharacterAction(evt, x, y, afterPlayerMove);
         } else if (getGlobalState() === StateEnum.CHARACTER_MOVE) {
-            doMove(evt, x, y);
+            doMove(evt, x, y, afterPlayerMove);
         } else if (getGlobalState() === StateEnum.CHARACTER_SWAP) {
-            doSwap(evt, x, y);
+            doSwap(evt, x, y, afterPlayerMove);
         } else if (getGlobalState() === StateEnum.CHARACTER_ATTACK) {
-            doAttack(evt, x, y);
+            doAttack(evt, x, y, afterPlayerMove);
         } else if (getGlobalState() === StateEnum.CHARACTER_INTERACT) {
-            doInteract(evt, x, y);
+            doInteract(evt, x, y, afterPlayerMove);
         } else {
             internalError("Unknown state value.");
             assert(false);
@@ -72,7 +82,7 @@ export function worldClickHandler(evt) {
 
 // Automagically choose the right action for the character to do (corresponds
 // to state "CHARACTER_SELECTED").
-function doAutoCharacterAction(evt, x, y) {
+function doAutoCharacterAction(evt, x, y, callback) {
     if (!doSelectCharacter(evt, x, y)) {
         if (!(evt.target && evt.target.has("GridObject"))) {
             userError("There's nothing there!");
@@ -80,13 +90,13 @@ function doAutoCharacterAction(evt, x, y) {
         }
         switch (evt.target.autoAction) {
             case AutoActionEnum.MOVE:
-                doMove(evt, x, y);
+                doMove(evt, x, y, callback);
                 break;
             case AutoActionEnum.ATTACK:
-                doAttack(evt, x, y);
+                doAttack(evt, x, y, callback);
                 break;
             case AutoActionEnum.INTERACT:
-                doInteract(evt, x, y);
+                doInteract(evt, x, y, callback);
                 break;
             case AutoActionEnum.NONE:
                 userError("No auto-action defined for that target.");
