@@ -284,14 +284,20 @@ function startCharacter(character) {
         readyCharacters[i].enableHighlight(Highlight.AVAILABLE_CHARACTER);
     }
 
-    // TODO refactor this. Have a real concept of teams, probably with some
-    // sort of callback tied to each one specifying how it chooses its turns.
-    if (currentTeam === 0) {
-        // Player team
-        requestMoveFromPlayer(character);
-    } else {
-        requestMoveFromAI(character);
-    }
+    // TODO: Why does startCharacter not call selectCharacter? Who calls it
+    // instead?
+    // TODO: Should we select them, too?
+    setFocusOn(character, function() {
+        // TODO refactor this. Have a real concept of teams, probably with some
+        // sort of callback tied to each one specifying how it chooses its
+        // turns.
+        if (currentTeam === 0) {
+            // Player team
+            requestMoveFromPlayer(character);
+        } else {
+            requestMoveFromAI(character);
+        }
+    });
 }
 
 export function endCharacter(character) {
@@ -344,10 +350,8 @@ export function endTeam() {
 // Requesting moves (TODO maybe put in different module?)
 
 function requestMoveFromPlayer(character) {
-    // TODO: Why does startCharacter not call selectCharacter? Who calls it
-    // instead?
-    setFocusOn(character);
-    // TODO: Should we select them, too?
+    // TODO anything at all?
+    // Shouldn't there be state/highlight logic tied to this function?
 }
 
 function requestMoveFromAI(character) {
@@ -404,12 +408,12 @@ function clearAllHighlights() {
     });
 }
 
-function setFocusOn(character) {
+function setFocusOn(character, callback) {
     Crafty.viewport.clampToEntities = false;
-    centerCameraOn(character, ANIM_DUR_CENTER_TURN);
+    centerCameraOn(character, ANIM_DUR_CENTER_TURN, callback);
 }
 
-function centerCameraOn(target, time) {
+function centerCameraOn(target, time, callback) {
     var x = target.x + Crafty.viewport.x;
     var y = target.y + Crafty.viewport.y;
     // TODO Do we want to camera center based on the grid
@@ -424,6 +428,7 @@ function centerCameraOn(target, time) {
     var newY = y + midY - centY;
 
     Crafty.viewport.pan(newX, newY, time);
+    Crafty.one("CameraAnimationDone", callback);
 }
 
 function createMovementGrid(character) {
