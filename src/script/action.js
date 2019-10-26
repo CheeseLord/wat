@@ -17,6 +17,7 @@ import {
     MOVE_RANGE,
     NUM_TEAMS,
     MENU_WIDTH,
+    PLAYER_TEAM,
     StateEnum,
 } from "./consts.js";
 import {
@@ -291,8 +292,7 @@ function startCharacter(character) {
         // TODO refactor this. Have a real concept of teams, probably with some
         // sort of callback tied to each one specifying how it chooses its
         // turns.
-        if (currentTeam === 0) {
-            // Player team
+        if (currentTeam === PLAYER_TEAM) {
             requestMoveFromPlayer(character);
         } else {
             requestMoveFromAI(character);
@@ -313,7 +313,11 @@ export function endCharacter(character) {
         readyCharacters.splice(index, 1);
     }
 
-    if (readyCharacters.length > 0) {
+    if (checkForGameEnd()) {
+        // Don't continue the game loop.
+        // checkForGameEnd already did whatever's appropriate to signal to the
+        // player that the game is over.
+    } else if (readyCharacters.length > 0) {
         // There are still more characters to move.
         startCharacter(readyCharacters[0]);
     } else {
@@ -344,6 +348,44 @@ export function endTeam() {
         // actually happening in-game. (Maybe a game-over screen since your
         // whole team is dead?)
         internalError("There's no one left to act.");
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Game over stuff
+
+function checkForGameEnd() {
+    let isDefeat  = true;
+    let isVictory = true;
+    Crafty("Character").each(function() {
+        if (this.team === PLAYER_TEAM) {
+            // He that hath a character left on Team 0 is more than a loss.
+            isDefeat  = false;
+        } else {
+            // He that hath a character left on Team nonzero is less than a
+            // victory.
+            isVictory = false;
+        }
+    });
+
+    if (isDefeat) {
+        // He that is more than a loss is not for me.
+        userMessage("You have lost.");
+    } else if (isVictory) {
+        // He that is less than a victory, I am not for him.
+        userMessage("You have won.");
+    }
+
+    if (isDefeat || isVictory) {
+        Crafty.s("ButtonMenu").setMenu("Game Over", [[
+            "Restart",
+            // Hack to restart. Just refresh the page.
+            // TODO: Actually reset the state ourselves.
+            () => { window.location.reload(); },
+        ]]);
+        return true;
+    } else {
+        return false;
     }
 }
 

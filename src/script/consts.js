@@ -2,7 +2,8 @@
 
 export const MENU_WIDTH = 240;
 
-export const NUM_TEAMS = 2;
+export const NUM_TEAMS   = 2;
+export const PLAYER_TEAM = 0;
 
 // TODO - This should depend on which player is moving.
 export const MOVE_RANGE = 4;
