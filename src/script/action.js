@@ -67,7 +67,6 @@ export function getCurrentTeam() { return currentTeam; }
 
 export function doMove(target, x, y, callback) {
     if (!selectedCharacter) {
-        assert(false);
         internalError("No character selected.");
         return;
     }
@@ -114,9 +113,7 @@ function highlightPath(path) {
 }
 
 export function doSwap(target, x, y, callback) {
-    assert(getGlobalState() === StateEnum.CHARACTER_SWAP);
     if (!selectedCharacter) {
-        assert(false);
         internalError("No character selected.");
         return;
     }
@@ -153,7 +150,7 @@ export function doSwap(target, x, y, callback) {
 
 export function doInteract(target, x, y, callback) {
     if (!selectedCharacter) {
-        assert(false);
+        internalError("No character selected.");
         return;
     } else if (target === null) {
         userError("Nothing there to interact with.");
@@ -193,7 +190,7 @@ export function doInteract(target, x, y, callback) {
 
 export function doAttack(target, x, y, callback) {
     if (!selectedCharacter) {
-        assert(false);
+        internalError("No character selected.");
         return;
     } else if (target === null) {
         userError("No enemy there.");
