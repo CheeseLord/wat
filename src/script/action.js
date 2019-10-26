@@ -521,7 +521,7 @@ export function updateAutoActions(character) {
 
 export function doAutoAttack(character, callback) {
     let characterPos = character.getPos();
-    let theMap = findPaths(characterPos, MOVE_RANGE);
+    let theMap = findPaths(characterPos, 2 * MOVE_RANGE);
     let nearestTarget = null;
     let bestDist = Infinity;
     let dist = null;
@@ -541,6 +541,25 @@ export function doAutoAttack(character, callback) {
                MOVE_RANGE) {
         let pos = nearestTarget.getPos();
         doAttack(nearestTarget, pos.x, pos.y, callback);
+    } else {
+        let path = getPath(
+            theMap,
+            character.getPos(),
+            nearestTarget.getPos()
+        );
+        let target = null;
+        let x = path[MOVE_RANGE].x;
+        let y = path[MOVE_RANGE].y;
+        Crafty("Ground").each(function() {
+            if (this.getPos().x === x && this.getPos().y === y) {
+                target = this;
+            }
+        });
+        if (target === null) {
+            endCharacter(character);
+        } else {
+            doMove(target, x, y, callback);
+        }
     }
 }
 
