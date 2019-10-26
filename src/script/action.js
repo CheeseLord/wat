@@ -66,8 +66,6 @@ export function getCurrentTeam() { return currentTeam; }
 // Action handlers
 
 export function doMove(target, x, y, callback) {
-    assert(getGlobalState() === StateEnum.CHARACTER_MOVE ||
-           getGlobalState() === StateEnum.CHARACTER_SELECTED);
     if (!selectedCharacter) {
         assert(false);
         internalError("No character selected.");
