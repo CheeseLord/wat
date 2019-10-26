@@ -25,6 +25,8 @@ import {
 const CLEAR_MENU  = {};
 const PARENT_MENU = {};
 
+const clearMenuState = StateEnum.DEFAULT;
+
 // menuStack - list of menus that would be transitioned to if you click a
 //     "back" button. Does not include the current menu.
 // currMenuName - the name of the currently-displayed menu, or null if there is
@@ -113,6 +115,7 @@ export function doMenu(menuName) {
 
 function transitionToMenu(menuName, isTop) {
     if (menuName === CLEAR_MENU) {
+        setGlobalState(clearMenuState);
         Crafty.s("ButtonMenu").clearMenu();
     } else if (menuName === PARENT_MENU) {
         // Pop menu

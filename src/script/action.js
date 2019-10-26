@@ -301,6 +301,7 @@ function startCharacter(character) {
 }
 
 export function endCharacter(character) {
+    setGlobalState(StateEnum.NO_INPUT);
     deselectCharacter();
 
     // Unready the current character.
@@ -350,12 +351,10 @@ export function endTeam() {
 // Requesting moves (TODO maybe put in different module?)
 
 function requestMoveFromPlayer(character) {
-    // TODO anything at all?
-    // Shouldn't there be state/highlight logic tied to this function?
+    setGlobalState(StateEnum.DEFAULT);
 }
 
 function requestMoveFromAI(character) {
-    setGlobalState(StateEnum.NO_INPUT);
     // TODO this creates the movement grid, don't want that.
     // TODO sometimes this goes into an infinite loop.
     selectCharacter(character);
@@ -369,7 +368,6 @@ function requestMoveFromAI(character) {
 
 export function afterPlayerMove() {
     Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
-    setGlobalState(StateEnum.DEFAULT);
     endCharacter(selectedCharacter);
 }
 
@@ -387,9 +385,6 @@ export function deselectCharacter() {
     if (selectedCharacter) {
         selectedCharacter.disableHighlight(Highlight.SELECTED_CHARACTER);
         selectedCharacter = null;
-        // TODO: Probably the menu table should instead define the state we
-        // transition to on CLEAR_MENU?
-        setGlobalState(StateEnum.DEFAULT);
     }
     // Clear movement grid.
     clearHighlightType(Highlight.CAN_MOVE);
@@ -499,7 +494,6 @@ export function doAutoAttack(character, callback) {
         }
     });
     if (nearestTarget === null) {
-        setGlobalState(StateEnum.DEFAULT);
         endCharacter(character);
     } else if (getDist(theMap, characterPos, nearestTarget.getPos()) <=
                MOVE_RANGE) {
