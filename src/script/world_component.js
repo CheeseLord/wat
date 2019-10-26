@@ -302,14 +302,20 @@ Crafty.c("Health", {
                 .color("#800000")
                 .attr({
                     x: x - 1 + 0.01,
-                    y: y - 1,
+                    y: y - 1 + 0.01,
                     w: w + 2,
                     h: h + 2,
                     z: Z_WORLD_UI,
                 });
         this.healthBarForeground_ = Crafty.e("2D, DOM, Color")
                 .color("#008000")
-                .attr({x: x + 0.01, y: y, w: w, h: h, z: Z_WORLD_UI + 1});
+                .attr({
+                    x: x + 0.01,
+                    y: y + 0.01,
+                    w: w,
+                    h: h,
+                    z: Z_WORLD_UI + 1,
+                });
         this.healthBarBackground_.css({
             "box-sizing": "border-box",
             "border":     "1px solid white",
