@@ -2,7 +2,7 @@
 
 export const MENU_WIDTH = 240;
 
-export const NUM_TEAMS   = 2;
+export const NUM_TEAMS   = 3;
 export const PLAYER_TEAM = 0;
 
 // TODO - This should depend on which player is moving.
@@ -93,6 +93,8 @@ export const HL_RADIUS = 2;
 // Main Game object definition
 // TODO Can these just be top-level globals named in ALL_CAPS?
 export const MapGrid = {
+    // TODO: These control the dimensions of the _viewscreen_. Is that a useful
+    // thing to do?
     width:  25,
     height: 17,
     // TODO: "grid" vs. "tile"

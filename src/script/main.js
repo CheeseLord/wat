@@ -152,57 +152,70 @@ export function doTheThing() {
 }
 
 function loadLevel1() {
-    // The ground
-    for (let y = 0; y < MapGrid.height; y++) {
-        for (let x = 0; x < MapGrid.width; x++) {
-            if (x === 6 && y === 7) {
-                Crafty.e("Tree").initPos({x: x, y: y});
-            } else if (x === 9 && y === 6) {
+    // Ground et al.
+    for (let y = 0; y < 11; y++) {
+        for (let x = 0; x < 17; x++) {
+            if (x === 8 && y === 6) {
                 Crafty.e("Lever").initPos({x: x, y: y});
+            } else if (x === 9 && y === 5) {
+                // TODO: Door.
+            } else if (x === 0 || x === 9 || x === 16 || y === 0 || y === 10) {
+                // TODO: Some other sort of walls?
+                Crafty.e("Tree").initPos({x: x, y: y});
             }
             Crafty.e("Ground").initPos({x: x, y: y});
         }
     }
 
-    // Static enemies
-    Crafty.e("Enemy").initPos({x: 11, y:  3}).maxHealth(10);
-    Crafty.e("Enemy").initPos({x: 19, y: 11}).maxHealth(10);
-    Crafty.e("Enemy").initPos({x:  8, y: 11}).maxHealth(10);
-    Crafty.e("Enemy").initPos({x: 11, y: 12}).maxHealth(10);
-    Crafty.e("Enemy").initPos({x: 14, y:  9}).maxHealth(10);
-    Crafty.e("Enemy").initPos({x: 21, y:  5}).maxHealth(10);
-    Crafty.e("Enemy").initPos({x: 17, y: 13}).maxHealth(10);
-    Crafty.e("Enemy").initPos({x:  2, y: 13}).maxHealth(10);
-    Crafty.e("Enemy").initPos({x:  2, y:  9}).maxHealth(10);
-
-    // Characters
+    // Player characters
     Crafty.e("SpriteCharacter, anim_start")
-            .initPos({x: 5, y: 3})
+            .initPos({x: 2, y: 2})
             .setName_("Not Greg")
             .maxHealth(15)
             .setTeam(0)
             .setAnimation(0, 4);
 
     Crafty.e("SpriteCharacter, anim_start")
-            .initPos({x: 7, y: 3})
+            .initPos({x: 2, y: 4})
             .setName_("Also Not Greg")
             .maxHealth(15)
             .setTeam(0)
             .setAnimation(1, 4);
 
     Crafty.e("SpriteCharacter, anim_start")
-            .initPos({x: 5, y: 5})
+            .initPos({x: 2, y: 6})
             .setName_("Not Joel")
             .maxHealth(15)
-            .setTeam(1)
+            .setTeam(0)
             .setAnimation(2, 4);
 
     Crafty.e("SpriteCharacter, anim_start")
-            .initPos({x: 7, y: 5})
+            .initPos({x: 2, y: 8})
             .setName_("Samson")
             .maxHealth(15)
-            .setTeam(1)
+            .setTeam(0)
             .setAnimation(3, 4);
+
+    // Enemies
+    let ENEMY_POSITIONS = [
+        {team: 1, pos: {x:  6, y:  3}},
+        {team: 1, pos: {x:  6, y:  5}},
+        {team: 1, pos: {x:  6, y:  7}},
+        {team: 2, pos: {x: 12, y:  2}},
+        {team: 2, pos: {x: 14, y:  3}},
+        {team: 2, pos: {x: 12, y:  4}},
+        {team: 2, pos: {x: 12, y:  6}},
+        {team: 2, pos: {x: 14, y:  7}},
+        {team: 2, pos: {x: 12, y:  8}},
+    ];
+    for (let i = 0; i < ENEMY_POSITIONS.length; i++) {
+        let team = ENEMY_POSITIONS[i].team;
+        let pos  = ENEMY_POSITIONS[i].pos;
+        Crafty.e("Enemy")
+                .initPos(pos)
+                .setTeam(team)
+                .maxHealth(10);
+    }
 
     // Finish up.
     updateMapForNewLevel();
