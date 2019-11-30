@@ -137,6 +137,14 @@ export function doTheThing() {
                         tree_anim: [0, 0],
                     },
                 },
+                "door.png": {
+                    tile:     32,
+                    tileh:    32,
+                    map:      {
+                        closed_door: [0, 0],
+                        open_door:   [1, 0],
+                    },
+                },
                 "lever.png": {
                     tile:     32,
                     tileh:    32,
@@ -164,7 +172,13 @@ function loadLevel1() {
                 // A second lever, which doesn't open the door.
                 Crafty.e("Lever").initPos({x: x, y: y});
             } else if (x === 9 && y === 5) {
-                // TODO: Door.
+                Crafty.e("Door")
+                        .initPos({x: x, y: y})
+                        .bind("Interact", function(evtData) {
+                            if (evtData.idString === "DoorControl") {
+                                this.toggle();
+                            }
+                        });
             } else if (x === 0 || x === 9 || x === 16 || y === 0 || y === 10) {
                 // TODO: Some other sort of walls?
                 Crafty.e("Tree").initPos({x: x, y: y});

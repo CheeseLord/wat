@@ -423,6 +423,20 @@ Crafty.c("Tree", {
     },
 });
 
+Crafty.c("Door", {
+    required: "DynamicObject, door_closed",
+
+    init: function() {
+        this.attr({z: Z_SCENERY});
+        this.attr({blocksMovement: true});
+    },
+
+    toggle: function() {
+        this.blocksMovement = !this.blocksMovement;
+        // TODO We should toggle the sprite as well.
+    },
+});
+
 Crafty.c("Interactable", {
     required: "DynamicObject",
 
