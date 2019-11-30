@@ -8,4 +8,15 @@ cd "$(dirname "${BASH_SOURCE[0]}")"/..
 echo "To view the game, connect to:"
 echo "    http://localhost:8000/"
 
-python -m SimpleHTTPServer
+# Figure out which version of python we have.
+python -c 'import sys; sys.exit(sys.version_info.major)'
+PYTHON_VERSION="$?"
+
+if [ "$PYTHON_VERSION" -eq 2 ]; then
+    python -m SimpleHTTPServer
+elif [ "$PYTHON_VERSION" -eq 3 ]; then
+    python -m http.server
+else
+    echo "Error: unrecognized Python version: $PYTHON_VERSION"
+    exit 1
+fi
