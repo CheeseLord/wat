@@ -4,3 +4,6 @@
 
 # nodejs files, for the linter
 node_modules
+
+# VisualStudio Code creates this
+.vscode
