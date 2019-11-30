@@ -426,11 +426,28 @@ Crafty.c("Tree", {
 Crafty.c("Interactable", {
     required: "DynamicObject",
 
-    // Note: subclasses should define an interact() method.
-    // Apparetly I can't define it in the superclass because then the
-    // superclass method gets called instead??
-    // TODO: Maybe a better mechanism would be to have an interact() function
-    // in Interactable itself, and a way to register callbacks?
+    init: function() {
+        this.attr({idString: null});
+    },
+
+    setIdString: function(string) {
+        this.attr({idString: string});
+    },
+
+    interact: function(user) {
+        // Subclasses can optionally define an onInteract() method, which will
+        // be called whenever they are interacted with.
+        if (this.onInteract !== undefined) {
+            this.onInteract(user);
+        }
+        let evtData = {
+            idString: this.idString,
+            // TODO better names for these two.
+            subject:  user,
+            object:   this,
+        };
+        Crafty.trigger("Interact", evtData);
+    },
 });
 
 Crafty.c("Lever", {
@@ -441,7 +458,7 @@ Crafty.c("Lever", {
         this.attr({blocksMovement: true});
     },
 
-    interact: function(user) {
+    onInteract: function(user) {
         userMessage(`${user.name_} pulled a lever.`);
     },
 });

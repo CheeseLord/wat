@@ -156,6 +156,12 @@ function loadLevel1() {
     for (let y = 0; y < 11; y++) {
         for (let x = 0; x < 17; x++) {
             if (x === 8 && y === 6) {
+                // The lever that opens the door.
+                Crafty.e("Lever")
+                        .initPos({x: x, y: y})
+                        .setIdString("DoorControl");
+            } else if (x === 1 && y === 1) {
+                // A second lever, which doesn't open the door.
                 Crafty.e("Lever").initPos({x: x, y: y});
             } else if (x === 9 && y === 5) {
                 // TODO: Door.
