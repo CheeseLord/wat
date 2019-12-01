@@ -465,13 +465,13 @@ Crafty.c("Interactable", {
 });
 
 Crafty.c("Lever", {
-    required: "Interactable, SpriteAnimation",
+    required: "Interactable, SpriteAnimation, unpulled_lever",
 
     init: function() {
         this.attr({z: Z_SCENERY});
         this.attr({blocksMovement: true});
-        this.reel("unpulled_lever", 0, 0, 0, 0);
-        this.reel("pulled_lever",   0, 1, 0, 0);
+        this.reel("unpulled_lever", 1, [0, 0]);
+        this.reel("pulled_lever",   1, [1, 0]);
         this.setUnpulled();
     },
 
