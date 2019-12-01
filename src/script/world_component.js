@@ -424,7 +424,7 @@ Crafty.c("Tree", {
 });
 
 Crafty.c("Door", {
-    required: "DynamicObject, door_closed",
+    required: "DynamicObject, closed_door",
 
     init: function() {
         this.attr({z: Z_SCENERY});
