@@ -470,8 +470,8 @@ Crafty.c("Lever", {
     init: function() {
         this.attr({z: Z_SCENERY});
         this.attr({blocksMovement: true});
-        this.reel("unpulled_lever", 1, [0, 0]);
-        this.reel("pulled_lever",   1, [1, 0]);
+        this.reel("unpulled_lever", SPRITE_DUR_PER_FRAME, [[0, 0]]);
+        this.reel("pulled_lever",   SPRITE_DUR_PER_FRAME, [[1, 0]]);
         this.setUnpulled();
     },
 
