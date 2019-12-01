@@ -465,15 +465,35 @@ Crafty.c("Interactable", {
 });
 
 Crafty.c("Lever", {
-    required: "Interactable, unpulled_lever",
+    required: "Interactable, SpriteAnimation",
 
     init: function() {
         this.attr({z: Z_SCENERY});
         this.attr({blocksMovement: true});
+        this.reel("unpulled_lever", 0, 0, 0, 0);
+        this.reel("pulled_lever",   0, 1, 0, 0);
+        this.setUnpulled();
     },
 
     onInteract: function(user) {
         userMessage(`${user.name_} pulled a lever.`);
+        this.togglePulled();
+    },
+
+    togglePulled: function() {
+        if (this.isPulled) {
+            this.setUnpulled();
+        } else {
+            this.setPulled();
+        }
+    },
+    setUnpulled: function() {
+        this.animate("unpulled_lever", -1);
+        this.attr({isPulled: false});
+    },
+    setPulled: function() {
+        this.animate("pulled_lever", -1);
+        this.attr({isPulled: true});
     },
 });
 
