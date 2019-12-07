@@ -13,7 +13,6 @@ import {
     SPECIAL_ATTACK_DAMAGE_MIN,
     SPECIAL_ATTACK_DAMAGE_MAX,
     Highlight,
-    MOVE_RANGE,
     NUM_TEAMS,
     PLAYER_TEAM,
     StateEnum,
@@ -67,7 +66,10 @@ export function getCurrentTeam() { return currentTeam; }
 // Action handlers
 
 export function checkMove(target, x, y) {
-    let theMap = findPaths(selectedCharacter.getPos(), MOVE_RANGE);
+    let theMap = findPaths(
+        selectedCharacter.getPos(),
+        selectedCharacter.speed,
+    );
     let destPos = {x: x, y: y};
 
     if (target && target.blocksMovement) {
@@ -87,7 +89,10 @@ export function doMove(target, x, y, callback) {
 
     assert(checkMove(target, x, y).valid);
 
-    let theMap = findPaths(selectedCharacter.getPos(), MOVE_RANGE);
+    let theMap = findPaths(
+        selectedCharacter.getPos(),
+        selectedCharacter.speed,
+    );
     let destPos = {x: x, y: y};
     let path = getPath(theMap, selectedCharacter.getPos(), destPos);
 
@@ -160,7 +165,10 @@ export function doInteract(target, x, y, callback) {
 
     // Do a move-and-interact.
     // TODO: Wait, we really don't already have a map?
-    let theMap = findPaths(selectedCharacter.getPos(), MOVE_RANGE);
+    let theMap = findPaths(
+        selectedCharacter.getPos(),
+        selectedCharacter.speed,
+    );
     let destPos = {x: x, y: y};
     let path = getPath(theMap, selectedCharacter.getPos(), destPos);
     if (path === null) {
@@ -206,7 +214,10 @@ export function doAttack(target, x, y, callback) {
 
     assert(checkAttack(target, x, y).valid);
 
-    let theMap = findPaths(selectedCharacter.getPos(), MOVE_RANGE);
+    let theMap = findPaths(
+        selectedCharacter.getPos(),
+        selectedCharacter.speed,
+    );
     let destPos = {x: x, y: y};
     let path = getPath(theMap, selectedCharacter.getPos(), destPos);
     if (path === null) {
@@ -508,7 +519,7 @@ export function canInteract(character, target) {
 
 export function updateAutoActions(character) {
     let characterPos = character.getPos();
-    let theMap = findPaths(characterPos, MOVE_RANGE);
+    let theMap = findPaths(characterPos, character.speed);
     Crafty("GridObject").each(function() {
         let canReach = isReachable(theMap, this.getPos());
         if (canReach && canInteract(character, this)) {
@@ -525,7 +536,7 @@ export function updateAutoActions(character) {
 
 export function doAutoAttack(character, callback) {
     let characterPos = character.getPos();
-    let theMap = findPaths(characterPos, 2 * MOVE_RANGE);
+    let theMap = findPaths(characterPos, 2 * character.speed);
     let nearestTarget = null;
     let bestDist = Infinity;
     let dist = null;
@@ -542,7 +553,7 @@ export function doAutoAttack(character, callback) {
     if (nearestTarget === null) {
         endCharacter(character);
     } else if (getDist(theMap, characterPos, nearestTarget.getPos()) <=
-               MOVE_RANGE) {
+               character.speed) {
         let pos = nearestTarget.getPos();
         doAttack(nearestTarget, pos.x, pos.y, callback);
     } else {
@@ -552,8 +563,8 @@ export function doAutoAttack(character, callback) {
             nearestTarget.getPos()
         );
         let target = null;
-        let x = path[MOVE_RANGE].x;
-        let y = path[MOVE_RANGE].y;
+        let x = path[character.speed].x;
+        let y = path[character.speed].y;
         Crafty("Ground").each(function() {
             if (this.getPos().x === x && this.getPos().y === y) {
                 target = this;

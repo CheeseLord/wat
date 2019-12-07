@@ -5,9 +5,6 @@ export const MENU_WIDTH = 240;
 export const NUM_TEAMS   = 3;
 export const PLAYER_TEAM = 0;
 
-// TODO - This should depend on which player is moving.
-export const MOVE_RANGE = 4;
-
 export const Z_BACKGROUND  =  0; // Probably no entities here?
 export const Z_GROUND      = 10;
 export const Z_SCENERY     = 20; // Walls, doodads

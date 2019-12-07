@@ -7,7 +7,6 @@ import {
     Highlight,
     MapGrid,
     HL_RADIUS,
-    MOVE_RANGE,
     SPRITE_DUR_PER_FRAME,
     StateEnum,
     Z_CHARACTER,
@@ -359,14 +358,22 @@ Crafty.c("Character", {
     required: "DynamicObject, Health",
 
     init: function() {
-        this.name_ = "Steve";
-        this.team = -1;
-        this.attr({z: Z_CHARACTER});
+        this.attr({
+            name_: "Steve",
+            speed: 4,
+            team: -1,
+            z: Z_CHARACTER,
+        });
         // inherit blocksMovement=true from DynamicObject
     },
 
     setName_: function(name) {
         this.name_ = name;
+        return this;
+    },
+
+    setSpeed: function(speed) {
+        this.speed = speed;
         return this;
     },
 
@@ -523,7 +530,10 @@ function hoverHighlightObj(obj) {
         return;
     }
 
-    let theMap  = findPaths(selectedCharacter.getPos(), MOVE_RANGE);
+    let theMap  = findPaths(
+        selectedCharacter.getPos(),
+        selectedCharacter.speed,
+    );
     let destPos = obj.getPos();
     let path    = getPath(theMap, selectedCharacter.getPos(), destPos);
 

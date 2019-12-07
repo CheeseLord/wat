@@ -183,6 +183,7 @@ function loadLevel1() {
             .initPos({x: 2, y: 2})
             .setName_("Not Greg")
             .maxHealth(15)
+            .setSpeed(2)
             .setTeam(0)
             .setAnimation(0, 4);
 
@@ -190,6 +191,7 @@ function loadLevel1() {
             .initPos({x: 2, y: 4})
             .setName_("Also Not Greg")
             .maxHealth(15)
+            .setSpeed(4)
             .setTeam(0)
             .setAnimation(1, 4);
 
@@ -197,6 +199,7 @@ function loadLevel1() {
             .initPos({x: 2, y: 6})
             .setName_("Not Joel")
             .maxHealth(15)
+            .setSpeed(4)
             .setTeam(0)
             .setAnimation(2, 4);
 
@@ -204,6 +207,7 @@ function loadLevel1() {
             .initPos({x: 2, y: 8})
             .setName_("Samson")
             .maxHealth(15)
+            .setSpeed(8)
             .setTeam(0)
             .setAnimation(3, 4);
 
