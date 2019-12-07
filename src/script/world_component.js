@@ -474,7 +474,7 @@ Crafty.c("Interactable", {
             idString: this.idString,
             // TODO better names for these two.
             subject:  user,
-            object:   this,
+            target:   this,
         };
         Crafty.trigger("Interact", evtData);
     },

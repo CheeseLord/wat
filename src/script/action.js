@@ -66,27 +66,34 @@ export function getCurrentTeam() { return currentTeam; }
 ///////////////////////////////////////////////////////////////////////////////
 // Action handlers
 
+export function checkMove(target, x, y) {
+    let theMap = findPaths(selectedCharacter.getPos(), MOVE_RANGE);
+    let destPos = {x: x, y: y};
+
+    if (target && target.blocksMovement) {
+        return failCheck("Can't move there; something's in the way.");
+    } else if (!canMoveTo(theMap, destPos)) {
+        return failCheck("You can't move that far.");
+    } else if (!(target && target.has("Ground"))) {
+        // TODO this is wrong for open doors.
+        return failCheck("That's not a tile.");
+    } else {
+        return passCheck();
+    }
+}
+
 export function doMove(target, x, y, callback) {
     if (!selectedCharacter) {
         internalError("No character selected.");
         return;
     }
 
+    assert(checkMove(target, x, y).valid);
+
     let theMap = findPaths(selectedCharacter.getPos(), MOVE_RANGE);
     let destPos = {x: x, y: y};
-
-    if (target && target.blocksMovement) {
-        userError("Can't move there; something's in the way.");
-        return;
-    } else if (!canMoveTo(theMap, destPos)) {
-        userError("You can't move that far.");
-        return;
-    } else if (!(target && target.has("Ground"))) {
-        userError("That's not a tile.");
-        return;
-    }
-
     let path = getPath(theMap, selectedCharacter.getPos(), destPos);
+
     setGlobalState(StateEnum.ANIMATING);
     highlightPath(path);
     let anims = [];
@@ -98,18 +105,17 @@ export function doMove(target, x, y, callback) {
     doAnimate(seriesAnimations(anims), callback);
 }
 
-function highlightPath(path) {
-    for (var i = 0; i < path.length; i++) {
-        Crafty("Ground").each(function() {
-            if (this.getPos().x === path[i].x &&
-                    this.getPos().y === path[i].y) {
-                if (i === path.length - 1) {
-                    this.enableHighlight(Highlight.ANIM_MOVE_END);
-                } else {
-                    this.enableHighlight(Highlight.ANIM_MOVE_MIDDLE);
-                }
-            }
-        });
+export function checkSwap(target, x, y) {
+    if (target === null) {
+        return failCheck("There's nothing there to swap with.");
+    } else if (!target.has("Character")) {
+        return failCheck("Can't swap with non-character.");
+    } else if (target.team !== currentTeam) {
+        return failCheck("Cannot swap with other player's unit.");
+    } else if (target === selectedCharacter) {
+        return failCheck("Cannot swap character with self.");
+    } else {
+        return passCheck();
     }
 }
 
@@ -119,19 +125,7 @@ export function doSwap(target, x, y, callback) {
         return;
     }
 
-    if (target === null) {
-        userError("There's nothing there to swap with.");
-        return;
-    } else if (!target.has("Character")) {
-        userError("Can't swap with non-character.");
-        return;
-    } else if (target.team !== currentTeam) {
-        userError("Cannot swap with other player's unit.");
-        return;
-    } else if (target === selectedCharacter) {
-        userError("Cannot swap character with self.");
-        return;
-    }
+    assert(checkSwap(target, x, y).valid);
 
     // Swap positions of clicked character and selectedCharacter.
     let selectPos = selectedCharacter.getPos();
@@ -149,17 +143,23 @@ export function doSwap(target, x, y, callback) {
     );
 }
 
+export function checkInteract(target, x, y) {
+    if (target === null) {
+        return failCheck("Nothing there to interact with.");
+    } else if (!target.has("Interactable")) {
+        return failCheck("Can't interact with that.");
+    } else {
+        return passCheck();
+    }
+}
+
 export function doInteract(target, x, y, callback) {
     if (!selectedCharacter) {
         internalError("No character selected.");
         return;
-    } else if (target === null) {
-        userError("Nothing there to interact with.");
-        return;
-    } else if (!target.has("Interactable")) {
-        userError("Can't interact with that.");
-        return;
     }
+
+    assert(checkInteract(target, x, y).valid);
 
     // Do a move-and-interact.
     // TODO: Wait, we really don't already have a map?
@@ -189,20 +189,26 @@ export function doInteract(target, x, y, callback) {
     });
 }
 
+export function checkAttack(target, x, y) {
+    if (target === null) {
+        return failCheck("No enemy there.");
+    } else if (!target.has("Character")) {
+        return failCheck("Can't attack non-character.");
+    } else if (target.team === currentTeam) {
+        return failCheck("Can't attack friendly unit.");
+    } else {
+        return passCheck();
+    }
+}
+
 export function doAttack(target, x, y, callback) {
     if (!selectedCharacter) {
         internalError("No character selected.");
         return;
-    } else if (target === null) {
-        userError("No enemy there.");
-        return;
-    } else if (!target.has("Character")) {
-        userError("Can't attack non-character.");
-        return;
-    } else if (target.team === currentTeam) {
-        userError("Can't attack friendly unit.");
-        return;
     }
+
+    assert(checkAttack(target, x, y).valid);
+
     let theMap = findPaths(selectedCharacter.getPos(), MOVE_RANGE);
     let destPos = {x: x, y: y};
     let path = getPath(theMap, selectedCharacter.getPos(), destPos);
@@ -254,6 +260,19 @@ export function doAttack(target, x, y, callback) {
             callback();
         }
     );
+}
+
+// All check* functions return either:
+//   - { valid: true }                     if the action is allowed
+//   - { valid: false, reason: <string> }  if not
+//     (where .reason is a string suitable for displaying to the user).
+// These are helper functions for generating those objects, to avoid writing a
+// whole bunch of object literals.
+function passCheck() {
+    return {valid: true};
+}
+function failCheck(reason) {
+    return {valid: false, reason: reason};
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -428,6 +447,21 @@ export function deselectCharacter() {
     clearHighlightType(Highlight.CAN_MOVE);
     clearHighlightType(Highlight.CAN_ATTACK);
     clearHighlightType(Highlight.CAN_INTERACT);
+}
+
+function highlightPath(path) {
+    for (var i = 0; i < path.length; i++) {
+        Crafty("Ground").each(function() {
+            if (this.getPos().x === path[i].x &&
+                    this.getPos().y === path[i].y) {
+                if (i === path.length - 1) {
+                    this.enableHighlight(Highlight.ANIM_MOVE_END);
+                } else {
+                    this.enableHighlight(Highlight.ANIM_MOVE_MIDDLE);
+                }
+            }
+        });
+    }
 }
 
 function clearHighlightType(hlType) {
