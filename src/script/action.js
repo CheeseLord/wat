@@ -3,7 +3,6 @@
 "use strict";
 
 import {
-    ANIM_DUR_CENTER_TURN,
     ANIM_DUR_HALF_ATTACK,
     ANIM_DUR_MOVE,
     ANIM_DUR_PAUSE_BW_MOV_ATK,
@@ -16,7 +15,6 @@ import {
     Highlight,
     MOVE_RANGE,
     NUM_TEAMS,
-    MENU_WIDTH,
     PLAYER_TEAM,
     StateEnum,
 } from "./consts.js";
@@ -46,6 +44,9 @@ import {
 import {
     randInt,
 } from "./util.js";
+import {
+    setFocusOn,
+} from "./view.js";
 
 export var selectedCharacter;
 
@@ -438,29 +439,6 @@ function clearAllHighlights() {
     Crafty("GridObject").each(function() {
         this.clearHighlights();
     });
-}
-
-function setFocusOn(character, callback) {
-    Crafty.viewport.clampToEntities = false;
-    centerCameraOn(character, ANIM_DUR_CENTER_TURN, callback);
-}
-
-function centerCameraOn(target, time, callback) {
-    var x = target.x + Crafty.viewport.x;
-    var y = target.y + Crafty.viewport.y;
-    // TODO Do we want to camera center based on the grid
-    //      or based on the center of characters
-    var midX = target.w / 2;
-    var midY = target.h / 2;
-
-    var centX = ((Crafty.viewport.width + MENU_WIDTH) / 2) /
-        Crafty.viewport._scale;
-    var centY = Crafty.viewport.height / 2 / Crafty.viewport._scale;
-    var newX = x + midX - centX;
-    var newY = y + midY - centY;
-
-    Crafty.viewport.pan(newX, newY, time);
-    Crafty.one("CameraAnimationDone", callback);
 }
 
 function createMovementGrid(character) {
