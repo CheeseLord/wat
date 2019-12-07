@@ -361,8 +361,8 @@ Crafty.c("Character", {
         this.attr({
             name_: "Steve",
             speed: 4,
-            team: -1,
-            z: Z_CHARACTER,
+            team:  -1,
+            z:     Z_CHARACTER,
         });
         // inherit blocksMovement=true from DynamicObject
     },
