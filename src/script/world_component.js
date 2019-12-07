@@ -424,16 +424,32 @@ Crafty.c("Tree", {
 });
 
 Crafty.c("Door", {
-    required: "DynamicObject, closed_door",
+    required: "DynamicObject, SpriteAnimation, closed_door",
 
     init: function() {
         this.attr({z: Z_SCENERY});
         this.attr({blocksMovement: true});
+        this.reel("closed_door", SPRITE_DUR_PER_FRAME, [[0, 0]]);
+        this.reel("open_door", SPRITE_DUR_PER_FRAME, [[1, 0]]);
+        this.setClosed();
     },
 
-    toggle: function() {
-        this.blocksMovement = !this.blocksMovement;
-        // TODO We should toggle the sprite as well.
+    toggleOpen: function() {
+        if (this.isOpen) {
+            this.setClosed();
+        } else {
+            this.setOpen();
+        }
+    },
+
+    setOpen: function() {
+        this.animate("open_door", -1);
+        this.attr({isOpen: true, blocksMovement: false});
+    },
+
+    setClosed: function() {
+        this.animate("closed_door", -1);
+        this.attr({isOpen: false, blocksMovement: true});
     },
 });
 
