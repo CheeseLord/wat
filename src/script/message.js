@@ -43,6 +43,10 @@ export function debugLog(message) {
     Crafty.log(message);
 }
 
+export function internalWarning(message) {
+    Crafty.error("Warning: " + message);
+}
+
 export function internalError(message) {
     Crafty.error(message);
 }

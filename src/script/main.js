@@ -23,8 +23,9 @@ import {
     assert,
     // TODO why does this not fail linting?
     // displayMessage,
-    userMessage,
     initMessageDisplay,
+    internalWarning,
+    userMessage,
 } from "./message.js";
 import {
     moveViewOnKeyDown,
@@ -32,9 +33,19 @@ import {
 
 
 export function doTheThing() {
-    // Initialize Crafty.
-    Crafty.init(Game.width, Game.height,
-        document.getElementById("game"));
+    // Initialize Crafty on the div with id "game". Check that this isn't
+    // changing the size of that div, since that causes the page elements to
+    // jump around.
+    let gameNode = document.getElementById("game");
+    if (gameNode.clientWidth !== Game.width) {
+        internalWarning(`"game" div has width ${gameNode.clientWidth}, ` +
+            `should be ${Game.width}.`);
+    }
+    if (gameNode.clientHeight !== Game.height) {
+        internalWarning(`"game" div has height ${gameNode.clientHeight}, ` +
+            `should be ${Game.height}.`);
+    }
+    Crafty.init(Game.width, Game.height, gameNode);
 
     // Initialize background stuff
     Crafty.background("#ccc");
