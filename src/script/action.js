@@ -74,9 +74,6 @@ export function checkMove(target, x, y) {
         return failCheck("Can't move there; something's in the way.");
     } else if (!canMoveTo(theMap, destPos)) {
         return failCheck("You can't move that far.");
-    } else if (!(target && target.has("Ground"))) {
-        // TODO this is wrong for open doors.
-        return failCheck("That's not a tile.");
     } else {
         return passCheck();
     }
