@@ -176,7 +176,7 @@ function loadLevel1() {
                         .initPos({x: x, y: y})
                         .bind("Interact", function(evtData) {
                             if (evtData.idString === "DoorControl") {
-                                this.toggle();
+                                this.toggleOpen();
                             }
                         });
             } else if (x === 0 || x === 9 || x === 16 || y === 0 || y === 10) {
