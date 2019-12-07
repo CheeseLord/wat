@@ -3,10 +3,8 @@
 "use strict";
 
 import {
-    ANIM_DUR_SCROLL,
     MENU_WIDTH,
     Game,
-    MapGrid,
     Z_UI,
 } from "./consts.js";
 import "./button.js";
@@ -28,6 +26,9 @@ import {
     userMessage,
     initMessageDisplay,
 } from "./message.js";
+import {
+    moveViewOnKeyDown,
+} from "./view.js";
 
 
 export function doTheThing() {
@@ -86,17 +87,7 @@ export function doTheThing() {
         worldClickHandler(evt);
     });
 
-    Crafty.s("Keyboard").bind("KeyDown", function(e) {
-        if (e.key === Crafty.keys.LEFT_ARROW) {
-            Crafty.viewport.pan(-MapGrid.tile.width, 0, ANIM_DUR_SCROLL);
-        } else if (e.key === Crafty.keys.RIGHT_ARROW) {
-            Crafty.viewport.pan(MapGrid.tile.width, 0, ANIM_DUR_SCROLL);
-        } else if (e.key === Crafty.keys.UP_ARROW) {
-            Crafty.viewport.pan(0, -MapGrid.tile.height, ANIM_DUR_SCROLL);
-        } else if (e.key === Crafty.keys.DOWN_ARROW) {
-            Crafty.viewport.pan(0, MapGrid.tile.height, ANIM_DUR_SCROLL);
-        }
-    });
+    Crafty.s("Keyboard").bind("KeyDown", moveViewOnKeyDown);
 
     // Request sprite assets. Once they arrive, we'll load the level.
     // Based on the example from:

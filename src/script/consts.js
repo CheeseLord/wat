@@ -108,6 +108,9 @@ export const MapGrid = {
     },
 };
 
+// TODO: What are these supposed to mean? They don't account for
+// tile.[hv]space, and the viewscreen makes it unnecessary to size the game
+// pane based on the world size anyway.
 export const Game = {
     width:  MapGrid.width * MapGrid.tile.width,
     height: MapGrid.height * MapGrid.tile.height,
