@@ -1,9 +1,28 @@
 "use strict";
 
+///////////////////////////////////////////////////////////////////////////////
+// Viewscreen stuff
+
+export const TILE_WIDTH  = 32;
+export const TILE_HEIGHT = 32;
+export const TILE_HGAP   = 4;
+export const TILE_VGAP   = 4;
+
+// Total dimensions of the game pane.
+// TODO: There's no real reason for 25/17.
+// TODO: If we're going to do this in terms of TILE_{WIDTH,HEIGHT}, at least
+// also account for TILE_HGAP/TILE_VGAP and MENU_WIDTH.
+export const VIEW_WIDTH  = 25 * TILE_WIDTH;
+export const VIEW_HEIGHT = 17 * TILE_HEIGHT;
+
 export const MENU_WIDTH = 240;
 
-export const NUM_TEAMS   = 3;
-export const PLAYER_TEAM = 0;
+// TODO: Maybe separate horiz. and vert.? Should probably in general be
+// MapGrid.tile.[hv]space/2, or something like that.
+export const HL_RADIUS = 2;
+
+///////////////////////////////////////////////////////////////////////////////
+// Misc graphics stuff
 
 export const Z_BACKGROUND  =  0; // Probably no entities here?
 export const Z_GROUND      = 10;
@@ -19,6 +38,12 @@ export const ANIM_DUR_MOVE             = 200;
 export const ANIM_DUR_STEP             = 100;
 export const ANIM_DUR_HALF_ATTACK      = 100;
 export const ANIM_DUR_PAUSE_BW_MOV_ATK = 80;
+
+///////////////////////////////////////////////////////////////////////////////
+// Other stuff (actual gameplay?)
+
+export const NUM_TEAMS   = 3;
+export const PLAYER_TEAM = 0;
 
 // 1d4 + 3
 export const ATTACK_DAMAGE_MIN = 4;
@@ -81,20 +106,4 @@ export const Highlight = Object.freeze({
 
     NUM_VALS:              17, // For sizing arrays of flag values
 });
-
-// TODO: Maybe separate horiz. and vert.? Should probably in general be
-// MapGrid.tile.[hv]space/2, or something like that.
-export const HL_RADIUS = 2;
-
-export const TILE_WIDTH  = 32;
-export const TILE_HEIGHT = 32;
-
-export const TILE_HGAP = 4;
-export const TILE_VGAP = 4;
-
-// TODO: There's no real reason for 25/17.
-// TODO: If we're going to do this in terms of TILE_{WIDTH,HEIGHT}, at least
-// also account for TILE_HGAP/TILE_VGAP and MENU_WIDTH.
-export const VIEW_WIDTH  = 25 * TILE_WIDTH;
-export const VIEW_HEIGHT = 17 * TILE_HEIGHT;
 
