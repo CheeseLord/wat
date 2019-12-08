@@ -24,8 +24,6 @@ import {
 } from "./geometry.js";
 import {
     assert,
-    // TODO why does this not fail linting?
-    // displayMessage,
     initMessageDisplay,
     internalWarning,
     userMessage,
