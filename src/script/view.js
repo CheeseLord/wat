@@ -5,13 +5,16 @@
 import {
     ANIM_DUR_CENTER_TURN,
     ANIM_DUR_SCROLL,
-    MapGrid,
     MENU_WIDTH,
+    TILE_HEIGHT,
+    TILE_HGAP,
+    TILE_VGAP,
+    TILE_WIDTH,
 } from "./consts.js";
 
 // TODO The underlying values maybe belong in consts.js?
-const VIEW_HSTEP = MapGrid.tile.width  + MapGrid.tile.hspace;
-const VIEW_VSTEP = MapGrid.tile.height + MapGrid.tile.vspace;
+const VIEW_HSTEP = TILE_WIDTH  + TILE_HGAP;
+const VIEW_VSTEP = TILE_HEIGHT + TILE_VGAP;
 
 export function moveViewOnKeyDown(evt) {
     if (evt.key === Crafty.keys.LEFT_ARROW) {

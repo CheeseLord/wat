@@ -86,29 +86,15 @@ export const Highlight = Object.freeze({
 // MapGrid.tile.[hv]space/2, or something like that.
 export const HL_RADIUS = 2;
 
-///////////////////////////////////////////////////////////////////////////////
-// Main Game object definition
-// TODO Can these just be top-level globals named in ALL_CAPS?
-export const MapGrid = {
-    // TODO: These control the dimensions of the _viewscreen_. Is that a useful
-    // thing to do?
-    width:  25,
-    height: 17,
-    // TODO: "grid" vs. "tile"
-    tile:   {
-        // Dimensions of a tile
-        width:  32,
-        height: 32,
-        // Amount of space between two tiles
-        hspace: 4,
-        vspace: 4,
-    },
-};
+export const TILE_WIDTH  = 32;
+export const TILE_HEIGHT = 32;
 
-// TODO: What are these supposed to mean? They don't account for
-// tile.[hv]space, and the viewscreen makes it unnecessary to size the game
-// pane based on the world size anyway.
-export const Game = {
-    width:  MapGrid.width * MapGrid.tile.width,
-    height: MapGrid.height * MapGrid.tile.height,
-};
+export const TILE_HGAP = 4;
+export const TILE_VGAP = 4;
+
+// TODO: There's no real reason for 25/17.
+// TODO: If we're going to do this in terms of TILE_{WIDTH,HEIGHT}, at least
+// also account for TILE_HGAP/TILE_VGAP and MENU_WIDTH.
+export const VIEW_WIDTH  = 25 * TILE_WIDTH;
+export const VIEW_HEIGHT = 17 * TILE_HEIGHT;
+

@@ -3,7 +3,10 @@
 "use strict";
 
 import {
-    MapGrid,
+    TILE_HEIGHT,
+    TILE_HGAP,
+    TILE_VGAP,
+    TILE_WIDTH,
 } from  "./consts.js";
 import {
     assert,
@@ -23,8 +26,8 @@ export function midpoint(pos1, pos2) {
 
 export function gridPosToGraphics(gridPos) {
     return {
-        x: gridPos.x * (MapGrid.tile.width  + MapGrid.tile.hspace),
-        y: gridPos.y * (MapGrid.tile.height + MapGrid.tile.vspace),
+        x: gridPos.x * (TILE_WIDTH  + TILE_HGAP),
+        y: gridPos.y * (TILE_HEIGHT + TILE_VGAP),
     };
 }
 

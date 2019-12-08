@@ -5,10 +5,11 @@
 import {
     AutoActionEnum,
     Highlight,
-    MapGrid,
     HL_RADIUS,
     SPRITE_DUR_PER_FRAME,
     StateEnum,
+    TILE_HEIGHT,
+    TILE_WIDTH,
     Z_CHARACTER,
     Z_GROUND,
     Z_SCENERY,
@@ -54,7 +55,7 @@ Crafty.c("GridObject", {
     required: "2D, DOM, Mouse",
 
     init: function() {
-        this.attr({w: MapGrid.tile.width, h: MapGrid.tile.height});
+        this.attr({w: TILE_WIDTH, h: TILE_HEIGHT});
         this.attr({blocksMovement: false});
 
         this.autoAction = AutoActionEnum.NONE;

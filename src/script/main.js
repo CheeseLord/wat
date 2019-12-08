@@ -4,7 +4,8 @@
 
 import {
     MENU_WIDTH,
-    Game,
+    VIEW_HEIGHT,
+    VIEW_WIDTH,
     Z_UI,
 } from "./consts.js";
 import "./button.js";
@@ -37,15 +38,15 @@ export function doTheThing() {
     // changing the size of that div, since that causes the page elements to
     // jump around.
     let gameNode = document.getElementById("game");
-    if (gameNode.clientWidth !== Game.width) {
+    if (gameNode.clientWidth !== VIEW_WIDTH) {
         internalWarning(`"game" div has width ${gameNode.clientWidth}, ` +
-            `should be ${Game.width}.`);
+            `should be ${VIEW_WIDTH}.`);
     }
-    if (gameNode.clientHeight !== Game.height) {
+    if (gameNode.clientHeight !== VIEW_HEIGHT) {
         internalWarning(`"game" div has height ${gameNode.clientHeight}, ` +
-            `should be ${Game.height}.`);
+            `should be ${VIEW_HEIGHT}.`);
     }
-    Crafty.init(Game.width, Game.height, gameNode);
+    Crafty.init(VIEW_WIDTH, VIEW_HEIGHT, gameNode);
 
     // Initialize background stuff
     Crafty.background("#ccc");
@@ -62,14 +63,14 @@ export function doTheThing() {
 
     // Background for the buttons
     Crafty.e("2D, UILayer, Color, Mouse")
-            .attr({x: 0, y: 0, w: MENU_WIDTH, h: Game.height})
+            .attr({x: 0, y: 0, w: MENU_WIDTH, h: VIEW_HEIGHT})
             .color("#eee");
 
     // Initialize message log. This has to go after creating the UILayer
     // because the message log is on the UILayer.
     initMessageDisplay(
         {
-            x: MENU_WIDTH + (Game.width - MENU_WIDTH) / 2 - 150,
+            x: MENU_WIDTH + (VIEW_WIDTH - MENU_WIDTH) / 2 - 150,
             y: 50,
             w: 300,
             h: 25,
@@ -87,7 +88,7 @@ export function doTheThing() {
         // manually do the viewport calculation to transform it.
         let worldX = e.realX;
         let viewRect = Crafty.viewport.rect();
-        let screenX = (worldX - viewRect._x) * Game.width / viewRect._w;
+        let screenX = (worldX - viewRect._x) * VIEW_WIDTH / viewRect._w;
 
         if (screenX >= MENU_WIDTH) {
             Crafty.trigger("WorldClick", e);

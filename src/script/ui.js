@@ -4,8 +4,11 @@
 
 import {
     AutoActionEnum,
-    MapGrid,
     StateEnum,
+    TILE_HEIGHT,
+    TILE_HGAP,
+    TILE_VGAP,
+    TILE_WIDTH,
 } from "./consts.js";
 import {
     doMenu,
@@ -49,13 +52,11 @@ export function worldClickHandler(evt) {
 
     // TODO: Can't we just use evt.target.getPos()? If there's no target, we
     // sholdn't be doing anything anyway...
-    let x = Math.floor(evt.realX / (MapGrid.tile.width + MapGrid.tile.hspace));
-    let y = Math.floor(evt.realY /
-            (MapGrid.tile.height + MapGrid.tile.vspace));
-    if (x < 0 || x >= MapGrid.width || y < 0 || y >= MapGrid.height) {
-        debugLog(`Ignoring click (${x}, ${y}) because it's out of bounds.`);
-        return;
-    }
+    let x = Math.floor(evt.realX / (TILE_WIDTH  + TILE_HGAP));
+    let y = Math.floor(evt.realY / (TILE_HEIGHT + TILE_VGAP));
+
+    // TODO: Check the map or level object to get the dimensions of the level,
+    // quit out here if the click is out of bounds.
 
     let target = evt.target;
 
