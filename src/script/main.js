@@ -3,9 +3,11 @@
 "use strict";
 
 import {
+    GAME_HEIGHT,
+    GAME_WIDTH,
+    MENU_HEIGHT,
     MENU_WIDTH,
-    VIEW_HEIGHT,
-    VIEW_WIDTH,
+    WORLDVIEW_WIDTH,
     Z_UI,
 } from "./consts.js";
 import "./button.js";
@@ -38,15 +40,15 @@ export function doTheThing() {
     // changing the size of that div, since that causes the page elements to
     // jump around.
     let gameNode = document.getElementById("game");
-    if (gameNode.clientWidth !== VIEW_WIDTH) {
+    if (gameNode.clientWidth !== GAME_WIDTH) {
         internalWarning(`"game" div has width ${gameNode.clientWidth}, ` +
-            `should be ${VIEW_WIDTH}.`);
+            `should be ${GAME_WIDTH}.`);
     }
-    if (gameNode.clientHeight !== VIEW_HEIGHT) {
+    if (gameNode.clientHeight !== GAME_HEIGHT) {
         internalWarning(`"game" div has height ${gameNode.clientHeight}, ` +
-            `should be ${VIEW_HEIGHT}.`);
+            `should be ${GAME_HEIGHT}.`);
     }
-    Crafty.init(VIEW_WIDTH, VIEW_HEIGHT, gameNode);
+    Crafty.init(GAME_WIDTH, GAME_HEIGHT, gameNode);
 
     // Initialize background stuff
     Crafty.background("#ccc");
@@ -63,14 +65,14 @@ export function doTheThing() {
 
     // Background for the buttons
     Crafty.e("2D, UILayer, Color, Mouse")
-            .attr({x: 0, y: 0, w: MENU_WIDTH, h: VIEW_HEIGHT})
+            .attr({x: 0, y: 0, w: MENU_WIDTH, h: MENU_HEIGHT})
             .color("#eee");
 
     // Initialize message log. This has to go after creating the UILayer
     // because the message log is on the UILayer.
     initMessageDisplay(
         {
-            x: MENU_WIDTH + (VIEW_WIDTH - MENU_WIDTH) / 2 - 150,
+            x: MENU_WIDTH + WORLDVIEW_WIDTH / 2 - 150,
             y: 50,
             w: 300,
             h: 25,
@@ -88,7 +90,7 @@ export function doTheThing() {
         // manually do the viewport calculation to transform it.
         let worldX = e.realX;
         let viewRect = Crafty.viewport.rect();
-        let screenX = (worldX - viewRect._x) * VIEW_WIDTH / viewRect._w;
+        let screenX = (worldX - viewRect._x) * GAME_WIDTH / viewRect._w;
 
         if (screenX >= MENU_WIDTH) {
             Crafty.trigger("WorldClick", e);

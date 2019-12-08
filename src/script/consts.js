@@ -12,10 +12,14 @@ export const TILE_VGAP   = 4;
 // TODO: There's no real reason for 25/17.
 // TODO: If we're going to do this in terms of TILE_{WIDTH,HEIGHT}, at least
 // also account for TILE_HGAP/TILE_VGAP and MENU_WIDTH.
-export const VIEW_WIDTH  = 25 * TILE_WIDTH;
-export const VIEW_HEIGHT = 17 * TILE_HEIGHT;
+export const GAME_WIDTH  = 25 * TILE_WIDTH;
+export const GAME_HEIGHT = 17 * TILE_HEIGHT;
 
-export const MENU_WIDTH = 240;
+export const MENU_WIDTH  = 240;
+export const MENU_HEIGHT = GAME_HEIGHT;
+
+export const WORLDVIEW_WIDTH  = GAME_WIDTH - MENU_WIDTH;
+export const WORLDVIEW_HEIGHT = GAME_HEIGHT;
 
 // TODO: Maybe separate horiz. and vert.? Should probably in general be
 // MapGrid.tile.[hv]space/2, or something like that.
