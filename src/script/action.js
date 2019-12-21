@@ -46,6 +46,9 @@ import {
 import {
     setFocusOn,
 } from "./view.js";
+import {
+    loadLevel1,
+} from "./levels.js";
 
 export var selectedCharacter;
 
@@ -404,7 +407,7 @@ function checkForGameEnd() {
             "Restart",
             // Hack to restart. Just refresh the page.
             // TODO: Actually reset the state ourselves.
-            () => { window.location.reload(); },
+            () => { loadLevel1(); },
         ]]);
         return true;
     } else {
