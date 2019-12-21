@@ -63,6 +63,69 @@ export function getReadyCharacters() { return readyCharacters; }
 export function getCurrentTeam() { return currentTeam; }
 
 ///////////////////////////////////////////////////////////////////////////////
+// "Janky class" ActionDesc -- describes an action that will be taken.
+// Type identified by the 'type' field, a member of ActionType.
+// Other fields based on type, see factory functions below.
+
+export const ActionType = Object.freeze({
+    MOVE:           {},
+    ATTACK:         {},
+    INTERACT:       {},
+    SWAP_PLACES:    {},
+    SPECIAL_ATTACK: {},
+    AUTO_ATTACK:    {},
+    END_TURN:       {},
+});
+
+export function moveAction(subject, path) {
+    return actionWithPath(ActionType.MOVE, subject, path);
+}
+
+export function attackAction(subject, path) {
+    return actionWithPath(ActionType.ATTACK, subject, path);
+}
+
+export function interactAction(subject, path) {
+    return actionWithPath(ActionType.INTERACT, subject, path);
+}
+
+export function swapPlacesAction(subject, target) {
+    return {
+        type:    ActionType.SWAP_PLACES,
+        subject: subject,
+        target:  target,
+    };
+}
+
+export function specialAttackAction(subject) {
+    return nullaryAction(ActionType.SPECIAL_ATTACK, subject);
+}
+
+// TODO this shouldn't be an action type.
+export function autoAttackAction(subject) {
+    return nullaryAction(ActionType.AUTO_ATTACK, subject);
+}
+
+export function endTurnAction(subject) {
+    return nullaryAction(ActionType.END_TURN, subject);
+}
+
+function actionWithPath(type, subject, path) {
+    return {
+        type:    type,
+        subject: subject,
+        path:    path,
+    };
+}
+
+function nullaryAction(type, subject) {
+    return {
+        type:    type,
+        subject: subject,
+    };
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Action handlers
 
 export function checkMove(target, x, y) {

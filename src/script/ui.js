@@ -35,6 +35,78 @@ import {
     userError,
 } from "./message.js";
 
+///////////////////////////////////////////////////////////////////////////////
+// "Janky class" UserInputDesc -- describes a raw input from the user (at the
+// level of "clicked on X").
+// .type is a UserInputType.
+
+export const UserInputType = Object.freeze({
+    WORLD_CLICK:    {},
+    SWAP_PLACES:    {},
+    SPECIAL_ATTACK: {},
+    AUTO_ATTACK:    {},
+    END_TURN:       {},
+});
+
+export function worldClickInput(pos) {
+    return {
+        type: UserInputType.WORLD_CLICK,
+        pos:  pos,
+    };
+}
+
+export function swapPlacesInput() {
+    return {type: UserInputType.SWAP_PLACES};
+}
+
+export function specialAttackInput() {
+    return {type: UserInputType.SPECIAL_ATTACK};
+}
+
+export function autoAttackInput() {
+    return {type: UserInputType.AUTO_ATTACK};
+}
+
+export function endTurnInput() {
+    return {type: UserInputType.END_TURN};
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// "Janky class" UserDisambig -- answers the question "what did the user mean?"
+// Typically this is just a wrapper around an ActionDesc. But it can also be an
+// "error" object which says "the user tried to do something invalid, here's
+// the message to show them". Or some more special cases, like changing the
+// selected character.
+// .type is a UserDisambigType.
+
+export const UserDisambigType = Object.freeze({
+    ERROR:  {},
+    ACTION: {},
+    SELECT: {},
+});
+
+export function disambigError(message) {
+    return {
+        type:    UserDisambigType.ERROR,
+        message: message,
+    };
+}
+
+// action is an ActionDesc
+export function disambigAction(action) {
+    return {
+        type:   UserDisambigType.ACTION,
+        action: action,
+    };
+}
+
+export function disambigSelect(target) {
+    return {
+        type:   UserDisambigType.SELECT,
+        target: target,
+    };
+}
+
 ///////////////////////////////////////////////////////////////////////
 
 // Generic handler for clicks on the world view.
