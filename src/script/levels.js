@@ -11,7 +11,10 @@ import {
     assert,
 } from "./message.js";
 
+// TODO: Don't build the level in code.
 export function loadLevel1() {
+    clearLevel();
+
     // Ground et al.
     for (let y = 0; y < 11; y++) {
         for (let x = 0; x < 17; x++) {
@@ -22,7 +25,8 @@ export function loadLevel1() {
                         .setIdString("DoorControl");
             } else if (x === 1 && y === 1) {
                 // A second lever, which doesn't open the door.
-                Crafty.e("Lever").initPos({x: x, y: y});
+                Crafty.e("Lever")
+                        .initPos({x: x, y: y});
             } else if (x === 9 && y === 5) {
                 Crafty.e("Door")
                         .initPos({x: x, y: y})
@@ -98,3 +102,11 @@ export function loadLevel1() {
     startTeam(0);
     assert(readyCharacters.length > 0);
 }
+
+function clearLevel() {
+    // TODO: Make a component for things that need cleaning.
+    Crafty("GridObject").each(function() {
+        this.destroy();
+    });
+}
+

@@ -153,6 +153,6 @@ export function doTheThing() {
                 },
             },
         },
-        loadLevel1
+        loadLevel1,
     );
 }

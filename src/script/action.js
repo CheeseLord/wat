@@ -405,9 +405,9 @@ function checkForGameEnd() {
     if (isDefeat || isVictory) {
         Crafty.s("ButtonMenu").setMenu("Game Over", [[
             "Restart",
-            // Hack to restart. Just refresh the page.
-            // TODO: Actually reset the state ourselves.
-            () => { loadLevel1(); },
+            function() {
+                loadLevel1();
+            },
         ]]);
         return true;
     } else {
