@@ -113,10 +113,14 @@ export function doMenu(menuName) {
     transitionToMenu(menuName, /* isTop = */true);
 }
 
+export function clearMenu() {
+    setGlobalState(clearMenuState);
+    Crafty.s("ButtonMenu").clearMenu();
+}
+
 function transitionToMenu(menuName, isTop) {
     if (menuName === CLEAR_MENU) {
-        setGlobalState(clearMenuState);
-        Crafty.s("ButtonMenu").clearMenu();
+        clearMenu();
     } else if (menuName === PARENT_MENU) {
         // Pop menu
         if (menuStack.length === 0) {
