@@ -14,7 +14,10 @@ import {
     doMenu,
 } from "./menu.js";
 import {
+    ActionType,
     afterPlayerMove,
+    attackAction,
+    autoAttackAction,
     checkAttack,
     checkInteract,
     checkMove,
@@ -23,10 +26,16 @@ import {
     doInteract,
     doMove,
     doSwap,
+    endTurnAction,
     getCurrentTeam,
     getGlobalState,
     getReadyCharacters,
+    interactAction,
+    moveAction,
     selectCharacter,
+    selectedCharacter,
+    specialAttackAction,
+    swapPlacesAction,
 } from "./action.js";
 import {
     assert,
@@ -34,6 +43,10 @@ import {
     internalError,
     userError,
 } from "./message.js";
+import {
+    findPaths,
+    getPath,
+} from "./geometry.js";
 
 ///////////////////////////////////////////////////////////////////////////////
 // "Janky class" UserInputDesc -- describes a raw input from the user (at the
@@ -42,7 +55,6 @@ import {
 
 export const UserInputType = Object.freeze({
     WORLD_CLICK:    {},
-    SWAP_PLACES:    {},
     SPECIAL_ATTACK: {},
     AUTO_ATTACK:    {},
     END_TURN:       {},
@@ -53,10 +65,6 @@ export function worldClickInput(pos) {
         type: UserInputType.WORLD_CLICK,
         pos:  pos,
     };
-}
-
-export function swapPlacesInput() {
-    return {type: UserInputType.SWAP_PLACES};
 }
 
 export function specialAttackInput() {
@@ -80,9 +88,10 @@ export function endTurnInput() {
 // .type is a UserDisambigType.
 
 export const UserDisambigType = Object.freeze({
-    ERROR:  {},
-    ACTION: {},
-    SELECT: {},
+    ERROR:   {},
+    ACTION:  {},
+    NOTHING: {},
+    SELECT:  {},
 });
 
 export function disambigError(message) {
@@ -100,6 +109,10 @@ export function disambigAction(action) {
     };
 }
 
+export function disambigNothing() {
+    return {type: UserDisambigType.NOTHING};
+}
+
 export function disambigSelect(target) {
     return {
         type:   UserDisambigType.SELECT,
@@ -111,117 +124,221 @@ export function disambigSelect(target) {
 
 // Generic handler for clicks on the world view.
 export function worldClickHandler(evt) {
-    if (getGlobalState() === StateEnum.ANIMATING) {
-        // Never try to handle a click if we're in the middle of an animation.
-        // That's just asking for the game to wind up in an inconsistent state
-        // where things get weirdly messed up.
-        return;
-    } else if (getGlobalState() === StateEnum.NO_INPUT) {
-        // Ditto if we're not accepting input.
-        // TODO merge these two states.
-        return;
-    }
-
-    // TODO: Can't we just use evt.target.getPos()? If there's no target, we
-    // sholdn't be doing anything anyway...
     let x = Math.floor(evt.realX / (TILE_WIDTH  + TILE_HGAP));
     let y = Math.floor(evt.realY / (TILE_HEIGHT + TILE_VGAP));
-
-    // TODO: Check the map or level object to get the dimensions of the level,
-    // quit out here if the click is out of bounds.
-
-    let target = evt.target;
+    let targetPos = {x: x, y: y};
 
     if (evt.mouseButton === Crafty.mouseButtons.LEFT) {
         debugLog(`You clicked at: (${x}, ${y})`);
-        if (getGlobalState() === StateEnum.DEFAULT) {
-            // No character selected yet. Try to select one, or just silently
-            // do nothing if the target isn't selectable.
-            doSelectCharacter(target, x, y);
-        } else {
-            if (!(target && target.has("GridObject"))) {
-                userError("There's nothing there!");
+        let disambig = figureOutWhatTheUserMeant(worldClickInput(targetPos));
+        switch (disambig.type) {
+            case UserDisambigType.NOTHING:
                 return;
-            }
+            case UserDisambigType.ERROR:
+                userError(disambig.message);
+                return;
+            case UserDisambigType.SELECT:
+                selectCharacter(disambig.target);
+                // TODO: Also setFocusOn? Or even call out to startCharacter?
+                doMenu("topMenu");
+                return;
+            case UserDisambigType.ACTION:
+                // Handled below
+                break;
+            default:
+                internalError("Unknown UserDisambigType");
+                return;
+        }
 
-            let action = null;
-            switch (getGlobalState()) {
-                case StateEnum.CHARACTER_SELECTED:
-                    if (doSelectCharacter(target, x, y)) {
-                        return;
-                    } else {
-                        action = getAutoCharacterAction(target, x, y);
-                        break;
-                    }
-                case StateEnum.CHARACTER_MOVE:
-                    action = {checkIt: checkMove, doIt: doMove};
-                    break;
-                case StateEnum.CHARACTER_SWAP:
-                    action = {checkIt: checkSwap, doIt: doSwap};
-                    break;
-                case StateEnum.CHARACTER_ATTACK:
-                    action = {checkIt: checkAttack, doIt: doAttack};
-                    break;
-                case StateEnum.CHARACTER_INTERACT:
-                    action = {checkIt: checkInteract, doIt: doInteract};
-                    break;
-                default:
-                    internalError("Unknown state value.");
-                    assert(false);
-                    return;
-            }
-            if (action === null) {
-                userError("No auto-action defined for that target.");
+        // Handle actions.
+        // FIXME HACK: Should pass the action object to a unified "do action"
+        // function. For now, just unwrap it and call the old code.
+        let action  = disambig.action;
+        let checkDo = null;
+        switch (action.type) {
+            case ActionType.MOVE:
+                checkDo = {checkIt: checkMove, doIt: doMove};
+                break;
+            case ActionType.ATTACK:
+                checkDo = {checkIt: checkAttack, doIt: doAttack};
+                break;
+            case ActionType.INTERACT:
+                checkDo = {checkIt: checkInteract, doIt: doInteract};
+                break;
+            case ActionType.SWAP_PLACES:
+                checkDo = {checkIt: checkSwap, doIt: doSwap};
+                break;
+
+            case ActionType.SPECIAL_ATTACK:
+            case ActionType.AUTO_ATTACK:
+            case ActionType.END_TURN:
+                internalError("Shouldn't happen in world click");
                 return;
-            }
-            let checkVal = action.checkIt(target, x, y);
-            if (checkVal.valid) {
-                action.doIt(target, x, y, afterPlayerMove);
-            } else {
-                userError(checkVal.reason);
-            }
+            default:
+                internalError("Unknown ActionType");
+                return;
+        }
+
+        // All these actions have targets.
+        let target = action.target;
+
+        let checkVal = checkDo.checkIt(target, x, y);
+        if (checkVal.valid) {
+            checkDo.doIt(target, x, y, afterPlayerMove);
+        } else {
+            userError(checkVal.reason);
         }
     } else if (evt.mouseButton === Crafty.mouseButtons.RIGHT) {
         debugLog("AAAAAAAAAA");
     }
 }
 
-// Automagically choose the right action for the character to do.
-function getAutoCharacterAction(target, x, y) {
-    switch (target.autoAction) {
-        case AutoActionEnum.MOVE:
-            return {checkIt: checkMove, doIt: doMove};
-        case AutoActionEnum.ATTACK:
-            return {checkIt: checkAttack, doIt: doAttack};
-        case AutoActionEnum.INTERACT:
-            return {checkIt: checkInteract, doIt: doInteract};
-        case AutoActionEnum.NONE:
-            return null;
+///////////////////////////////////////////////////////////////////////////////
+
+// Figure out what the users input actually means. Return a UserDisambig. This
+// function should be free of side effects, but may query the world state.
+function figureOutWhatTheUserMeant(inputDesc) {
+    if (getGlobalState() === StateEnum.ANIMATING) {
+        // Never try to handle a click if we're in the middle of an animation.
+        // That's just asking for the game to wind up in an inconsistent state
+        // where things get weirdly messed up.
+        return disambigNothing();
+    } else if (getGlobalState() === StateEnum.NO_INPUT) {
+        // Ditto if we're not accepting input.
+        // TODO merge these two states.
+        return disambigNothing();
+    }
+
+    let subject = selectedCharacter;
+
+    switch (inputDesc.type) {
+        // WORLD_CLICK handled below.
+        case UserInputType.WORLD_CLICK:
+            break;
+        // These are trivial wrappers.
+        case UserInputType.SPECIAL_ATTACK:
+            return specialAttackAction(subject);
+        case UserInputType.AUTO_ATTACK:
+            return autoAttackAction(subject);
+        case UserInputType.END_TURN:
+            return endTurnAction(subject);
         default:
-            assert(false);
-            return null;
+            internalError("Unknown UserInputType");
+            return;
+    }
+
+    // Disambiguate a WORLD_CLICK.
+
+    // TODO: Check the map or level object to get the dimensions of the level,
+    // quit out here if the click is out of bounds.
+
+    let targetPos = inputDesc.pos;
+
+    // FIXME Hack: recreate target, since that's how the old code worked :/
+    let maxZ   = -Infinity;
+    let target = null;
+    Crafty("GridObject").each(function() {
+        if (this.z > maxZ) {
+            target = this;
+            maxZ   = this.z;
+        }
+    });
+
+    if (!target) {
+        return disambigError("There's nothing there!");
+    }
+    assert(target.has("GridObject"));
+
+    if (getGlobalState() === StateEnum.DEFAULT ||
+            getGlobalState() === StateEnum.CHARACTER_SELECTED) {
+        // If we can select the target, favor that over any other action.
+        let disambig = checkSelectCharacter(target);
+
+        // For StateEnum.DEFAULT, we have to select because there's no one
+        // already selected to take some other action. Propagate up any error
+        // from checkSelectCharacter. For StateEnum.CHARACTER_SELECTED, if the
+        // select failed then fall through into the code below which will try
+        // to choose another action.
+        if (disambig.type === UserDisambigType.SELECT ||
+                getGlobalState() === StateEnum.DEFAULT) {
+            return disambig;
+        }
+    }
+
+    let theMap = findPaths(subject.getPos(), subject.speed);
+    let path = getPath(theMap, subject.getPos(), targetPos);
+
+    switch (getGlobalState()) {
+        case StateEnum.CHARACTER_SELECTED:
+            return disambigFromAutoAction(subject, target, path);
+        case StateEnum.CHARACTER_MOVE:
+            return disambigActionIfPathExistsElseError(
+                path,
+                moveAction(subject, path)
+            );
+        case StateEnum.CHARACTER_ATTACK:
+            return disambigActionIfPathExistsElseError(
+                path,
+                attackAction(subject, target, path)
+            );
+        case StateEnum.CHARACTER_INTERACT:
+            return disambigActionIfPathExistsElseError(
+                path,
+                interactAction(subject, target, path)
+            );
+        case StateEnum.CHARACTER_SWAP:
+            return disambigAction(swapPlacesAction(subject, target));
+        default:
+            internalError("Unknown state value.");
+            return disambigError("An internal error occurred.");
     }
 }
 
-function doSelectCharacter(target, x, y) {
-    assert(getGlobalState() === StateEnum.DEFAULT ||
-           getGlobalState() === StateEnum.CHARACTER_SELECTED);
-
+function checkSelectCharacter(target) {
     if (!(target && target.has("Character"))) {
-        return false;
+        return disambigNothing();
     }
     if (target.team !== getCurrentTeam()) {
-        userError("Character is on another team");
-        return false;
+        return disambigError("Character is on another team");
     }
     if (getReadyCharacters().indexOf(target) === -1) {
-        userError("Character has already acted");
-        return false;
+        return disambigError("Character has already acted");
     }
 
-    selectCharacter(target);
-    // TODO: Also setFocusOn? Or even call out to startCharacter?
-    doMenu("topMenu");
-    return true;
+    return disambigSelect(target);
+}
+
+// Automagically choose the right action for the character to do.
+function disambigFromAutoAction(subject, target, path) {
+    switch (target.autoAction) {
+        case AutoActionEnum.MOVE:
+            return disambigActionIfPathExistsElseError(
+                path,
+                moveAction(subject, path)
+            );
+        case AutoActionEnum.ATTACK:
+            return disambigActionIfPathExistsElseError(
+                path,
+                attackAction(subject, target, path)
+            );
+        case AutoActionEnum.INTERACT:
+            return disambigActionIfPathExistsElseError(
+                path,
+                interactAction(subject, target, path)
+            );
+        case AutoActionEnum.NONE:
+            return disambigError("No auto-action defined for that target.");
+        default:
+            internalError("Unknown auto-action type.");
+            return disambigError("An internal error occurred.");
+    }
+}
+
+function disambigActionIfPathExistsElseError(path, action) {
+    if (path === null) {
+        return disambigError("Can't reach the target");
+    } else {
+        return action;
+    }
 }
 

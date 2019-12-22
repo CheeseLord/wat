@@ -78,15 +78,19 @@ export const ActionType = Object.freeze({
 });
 
 export function moveAction(subject, path) {
-    return actionWithPath(ActionType.MOVE, subject, path);
+    return {
+        type:    ActionType.MOVE,
+        subject: subject,
+        path:    path,
+    };
 }
 
-export function attackAction(subject, path) {
-    return actionWithPath(ActionType.ATTACK, subject, path);
+export function attackAction(subject, target, path) {
+    return actionWithPathAndTarget(ActionType.ATTACK, subject, target, path);
 }
 
-export function interactAction(subject, path) {
-    return actionWithPath(ActionType.INTERACT, subject, path);
+export function interactAction(subject, target, path) {
+    return actionWithPathAndTarget(ActionType.INTERACT, subject, target, path);
 }
 
 export function swapPlacesAction(subject, target) {
@@ -110,11 +114,12 @@ export function endTurnAction(subject) {
     return nullaryAction(ActionType.END_TURN, subject);
 }
 
-function actionWithPath(type, subject, path) {
+function actionWithPathAndTarget(type, subject, target, path) {
     return {
         type:    type,
         subject: subject,
         path:    path,
+        target:  target,
     };
 }
 
