@@ -46,6 +46,9 @@ import {
 import {
     setFocusOn,
 } from "./view.js";
+import {
+    loadLevel1,
+} from "./levels.js";
 
 export var selectedCharacter;
 
@@ -365,6 +368,7 @@ export function startTeam(team) {
         }
     });
 
+    assert(readyCharacters.length > 0);
     if (readyCharacters.length > 0) {
         startCharacter(readyCharacters[0]);
     }
@@ -470,14 +474,21 @@ function checkForGameEnd() {
     if (isDefeat || isVictory) {
         Crafty.s("ButtonMenu").setMenu("Game Over", [[
             "Restart",
-            // Hack to restart. Just refresh the page.
-            // TODO: Actually reset the state ourselves.
-            () => { window.location.reload(); },
+            function() {
+                loadLevel1();
+                beginLevel(0);
+            },
         ]]);
         return true;
     } else {
         return false;
     }
+}
+
+
+export function beginLevel(team) {
+    startTeam(team);
+    assert(readyCharacters.length > 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
