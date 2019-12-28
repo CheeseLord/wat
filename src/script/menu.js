@@ -6,13 +6,13 @@ import {StateEnum} from "./consts.js";
 
 import {
     afterPlayerMove,
+    autoAttackAction,
     deselectCharacter,
-    doAutoAttack,
-    endCharacter,
-    endTeam,
+    doAction,
+    endTurnAction,
     selectedCharacter,
     setGlobalState,
-    specialAttack,
+    specialAttackAction,
 } from  "./action.js";
 import {
     debugLog,
@@ -47,11 +47,10 @@ var menuTable = {
             ["Attack",      "attack",     doNothing],
             ["Interact",    "interact",   doNothing],
             ["Auto Attack", CLEAR_MENU,    () => {
-                doAutoAttack(selectedCharacter, afterPlayerMove);
+                doAction(autoAttackAction(selectedCharacter), afterPlayerMove);
             }],
             ["End Turn",    CLEAR_MENU,   () => {
-                deselectCharacter();
-                endTeam();
+                doAction(endTurnAction(selectedCharacter), afterPlayerMove);
             }],
             ["Cancel",      CLEAR_MENU,   () => { deselectCharacter(); }],
         ],
@@ -90,11 +89,12 @@ var menuTable = {
         buttons: [
             // Text            New Menu       Action
             ["Basic Attack",   "basicAttack", doNothing],
-            ["Special Attack", CLEAR_MENU,
-                () => {
-                    specialAttack(selectedCharacter);
-                    endCharacter(selectedCharacter);
-                }],
+            ["Special Attack", CLEAR_MENU,    () => {
+                doAction(
+                    specialAttackAction(selectedCharacter),
+                    afterPlayerMove
+                );
+            }],
             ["Back",           PARENT_MENU,   doNothing],
         ],
     },

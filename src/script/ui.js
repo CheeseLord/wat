@@ -14,15 +14,11 @@ import {
     doMenu,
 } from "./menu.js";
 import {
-    ActionType,
     afterPlayerMove,
     attackAction,
     autoAttackAction,
     checkAction,
-    doAttack,
-    doInteract,
-    doMove,
-    doSwap,
+    doAction,
     endTurnAction,
     getCurrentTeam,
     getGlobalState,
@@ -153,56 +149,9 @@ export function worldClickHandler(evt) {
         }
 
         // Handle actions.
-        // FIXME HACK: Should pass the action object to a unified "do action"
-        // function. For now, just unwrap it and call the old code.
-        let action  = disambig.action;
-        let checkDo = null;
-        let desc = "<unknown>";
-        switch (action.type) {
-            case ActionType.MOVE:
-                desc = "move";
-                checkDo = {doIt: doMove};
-                break;
-            case ActionType.ATTACK:
-                desc = "attack";
-                checkDo = {doIt: doAttack};
-                break;
-            case ActionType.INTERACT:
-                desc = "interact";
-                checkDo = {doIt: doInteract};
-                break;
-            case ActionType.SWAP_PLACES:
-                desc = "swap";
-                checkDo = {doIt: doSwap};
-                break;
-
-            case ActionType.SPECIAL_ATTACK:
-            case ActionType.AUTO_ATTACK:
-            case ActionType.END_TURN:
-                internalError("Shouldn't happen in world click");
-                return;
-            default:
-                internalError("Unknown ActionType");
-                return;
-        }
-
-        let target;
-        if (action.type !== ActionType.MOVE) {
-            // All actions but move have targets.
-            target = action.target;
-        } else {
-            // FIXME: This is a total hack, and basically defeats the purpose
-            // of the refactoring. Fix it once the other code doesn't require a
-            // target.
-            target = evt.target;
-        }
-
-        let tpos = target.getPos();
-        debugLog(`Attempting ${desc} on target at ${tpos.x}, ${tpos.y}`);
-
-        let checkVal = checkAction(action);
+        let checkVal = checkAction(disambig.action);
         if (checkVal.valid) {
-            checkDo.doIt(target, x, y, afterPlayerMove);
+            doAction(disambig.action, afterPlayerMove);
         } else {
             userError(checkVal.reason);
         }

@@ -38,7 +38,6 @@ import {
     assert,
     debugLog,
     internalError,
-    userError,
     userMessage,
 } from "./message.js";
 import {
@@ -159,12 +158,38 @@ export function checkAction(action) {
     }
 }
 
-function checkMove(action) {
+export function doAction(action, callback) {
+    switch (action.type) {
+        case ActionType.MOVE:
+            return doMove(action, callback);
+        case ActionType.ATTACK:
+            return doAttack(action, callback);
+        case ActionType.INTERACT:
+            return doInteract(action, callback);
+        case ActionType.SWAP_PLACES:
+            return doSwap(action, callback);
+        case ActionType.SPECIAL_ATTACK:
+            return doSpecialAttack(action, callback);
+        case ActionType.AUTO_ATTACK:
+            // TODO! Shouldn't be an ActionType. This is a special case.
+            return doAutoAttack(action.subject, callback);
+        case ActionType.END_TURN:
+            // TODO: Also a special case. Probably also shouldn't be handled as
+            // a regular action.
+            return doEndTurn();
+        default:
+            internalError("Unknown ActionType");
+            break;
+    }
+}
+
+function checkMove(action, callback) {
     let theMap = findPaths(
         action.subject.getPos(),
         action.subject.speed,
     );
 
+    // TODO also check the subject's speed.
     if (!isPathValid(theMap, action.subject, action.path, true)) {
         return failCheck("Can't move there: invalid path to target.");
     } else {
@@ -172,27 +197,15 @@ function checkMove(action) {
     }
 }
 
-export function doMove(target, x, y, callback) {
-    if (!selectedCharacter) {
-        internalError("No character selected.");
-        return;
-    }
-
-    // assert(checkMove(target, x, y).valid); -- TODO
-
-    let theMap = findPaths(
-        selectedCharacter.getPos(),
-        selectedCharacter.speed,
-    );
-    let destPos = {x: x, y: y};
-    let path = getPath(theMap, selectedCharacter.getPos(), destPos);
+function doMove(action, callback) {
+    assert(checkMove(action).valid);
 
     setGlobalState(StateEnum.ANIMATING);
-    highlightPath(path);
+    highlightPath(action.path);
     let anims = [];
-    for (let i = 1; i < path.length; i++) {
-        anims.push(tweenAnimation(selectedCharacter, function() {
-            selectedCharacter.animateTo(path[i], ANIM_DUR_STEP);
+    for (let i = 1; i < action.path.length; i++) {
+        anims.push(tweenAnimation(action.subject, function() {
+            action.subject.animateTo(action.path[i], ANIM_DUR_STEP);
         }));
     }
     doAnimate(seriesAnimations(anims), callback);
@@ -212,24 +225,19 @@ function checkSwap(action) {
     }
 }
 
-export function doSwap(target, x, y, callback) {
-    if (!selectedCharacter) {
-        internalError("No character selected.");
-        return;
-    }
-
-    // assert(checkSwap(target, x, y).valid); -- TODO
+function doSwap(action, callback) {
+    assert(checkSwap(action).valid);
 
     // Swap positions of clicked character and selectedCharacter.
-    let selectPos = selectedCharacter.getPos();
-    let clickPos  = target.getPos();
+    let selectPos = action.subject.getPos();
+    let clickPos  = action.target.getPos();
     doAnimate(
         parallelAnimations([
-            tweenAnimation(selectedCharacter, function() {
-                selectedCharacter.animateTo(clickPos, ANIM_DUR_MOVE);
+            tweenAnimation(action.subject, function() {
+                action.subject.animateTo(clickPos, ANIM_DUR_MOVE);
             }),
-            tweenAnimation(target, function() {
-                target.animateTo(selectPos, ANIM_DUR_MOVE);
+            tweenAnimation(action.target, function() {
+                action.target.animateTo(selectPos, ANIM_DUR_MOVE);
             }),
         ]),
         callback
@@ -254,41 +262,25 @@ function checkInteract(action) {
     }
 }
 
-export function doInteract(target, x, y, callback) {
-    if (!selectedCharacter) {
-        internalError("No character selected.");
-        return;
-    }
-
-    // assert(checkInteract(target, x, y).valid); -- TODO
+function doInteract(action, callback) {
+    assert(checkInteract(action).valid);
 
     // Do a move-and-interact.
-    // TODO: Wait, we really don't already have a map?
-    let theMap = findPaths(
-        selectedCharacter.getPos(),
-        selectedCharacter.speed,
-    );
-    let destPos = {x: x, y: y};
-    let path = getPath(theMap, selectedCharacter.getPos(), destPos);
-    if (path === null) {
-        userError("Can't reach that to interact with it.");
-        return;
-    }
-    assert(path.length > 1);
-    path.pop();
+    assert(action.path.length > 1);
+    let path = action.path.slice(0, action.path.length - 1);
 
     // TODO: Refactor with doMove.
     setGlobalState(StateEnum.ANIMATING);
     highlightPath(path);
     let anims = [];
     for (let i = 1; i < path.length; i++) {
-        anims.push(tweenAnimation(selectedCharacter, function() {
-            selectedCharacter.animateTo(path[i], ANIM_DUR_STEP);
+        anims.push(tweenAnimation(action.subject, function() {
+            action.subject.animateTo(path[i], ANIM_DUR_STEP);
         }));
     }
     // TODO some sort of animation for the interaction itself?
     doAnimate(seriesAnimations(anims), function() {
-        target.interact(selectedCharacter);
+        action.target.interact(action.subject);
         callback();
     });
 }
@@ -313,41 +305,24 @@ function checkAttack(action) {
     }
 }
 
-export function doAttack(target, x, y, callback) {
-    if (!selectedCharacter) {
-        internalError("No character selected.");
-        return;
-    }
+function doAttack(action, callback) {
+    assert(checkAttack(action).valid);
 
-    // assert(checkAttack(target, x, y).valid); -- TODO
+    // Do a move-and-attack.
+    assert(action.path.length > 1);
+    let targetPos = action.path[action.path.length - 1];
+    let moveToPos = action.path[action.path.length - 2];
+    let path = action.path.slice(0, action.path.length - 1);
 
-    let theMap = findPaths(
-        selectedCharacter.getPos(),
-        selectedCharacter.speed,
-    );
-    let destPos = {x: x, y: y};
-    let path = getPath(theMap, selectedCharacter.getPos(), destPos);
-    if (path === null) {
-        userError("Can't reach that to attack it.");
-        return;
-    }
-    let moveToPos = selectedCharacter.getPos();
-    if (path.length > 1) {
-        path.pop();
-        moveToPos = path[path.length - 1];
-    } else {
-        assert(false);
-    }
-
-    userMessage(`${selectedCharacter.name_} moved to ` +
+    userMessage(`${action.subject.name_} moved to ` +
         `(${moveToPos.x}, ${moveToPos.y})`);
-    userMessage(`${selectedCharacter.name_} attacked ${target.name_}`);
+    userMessage(`${action.subject.name_} attacked ${action.target.name_}`);
 
-    // TODO: Refactor with doMove.
+    // TODO: Refactor with doMove and doInteract.
     let anims = [];
     for (let i = 1; i < path.length; i++) {
-        anims.push(tweenAnimation(selectedCharacter, function() {
-            selectedCharacter.animateTo(path[i], ANIM_DUR_STEP);
+        anims.push(tweenAnimation(action.subject, function() {
+            action.subject.animateTo(path[i], ANIM_DUR_STEP);
         }));
     }
 
@@ -357,13 +332,13 @@ export function doAttack(target, x, y, callback) {
     }
 
     // Add the attack animation, regardless.
-    let halfPos = midpoint(moveToPos, target.getPos());
+    let halfPos = midpoint(moveToPos, targetPos);
     anims = anims.concat([
-        tweenAnimation(selectedCharacter, function() {
-            selectedCharacter.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
+        tweenAnimation(action.subject, function() {
+            action.subject.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
         }),
-        tweenAnimation(selectedCharacter, function() {
-            selectedCharacter.animateTo(moveToPos, ANIM_DUR_HALF_ATTACK);
+        tweenAnimation(action.subject, function() {
+            action.subject.animateTo(moveToPos, ANIM_DUR_HALF_ATTACK);
         }),
     ]);
 
@@ -371,10 +346,17 @@ export function doAttack(target, x, y, callback) {
     highlightPath(path);
     doAnimate(
         seriesAnimations(anims), function() {
-            target.takeDamage(randInt(ATTACK_DAMAGE_MIN, ATTACK_DAMAGE_MAX));
+            action.target.takeDamage(
+                randInt(ATTACK_DAMAGE_MIN, ATTACK_DAMAGE_MAX)
+            );
             callback();
         }
     );
+}
+
+function doEndTurn() {
+    deselectCharacter();
+    endTeam();
 }
 
 // All check* functions return either:
@@ -616,14 +598,15 @@ function createMovementGrid(character) {
     });
 }
 
-export function specialAttack(character) {
+function doSpecialAttack(action, callback) {
     Crafty("Character").each(function() {
-        if (this.team !== character.team &&
-                isAdjacent(character.getPos(), this.getPos())) {
+        if (this.team !== action.subject.team &&
+                isAdjacent(action.subject.getPos(), this.getPos())) {
             this.takeDamage(randInt(SPECIAL_ATTACK_DAMAGE_MIN,
                 SPECIAL_ATTACK_DAMAGE_MAX));
         }
     });
+    callback();
 }
 
 export function canAttack(character, target) {
@@ -651,7 +634,7 @@ export function updateAutoActions(character) {
     });
 }
 
-export function doAutoAttack(character, callback) {
+function doAutoAttack(character, callback) {
     let characterPos = character.getPos();
     let theMap = findPaths(characterPos, 2 * character.speed);
     let nearestTarget = null;
@@ -671,8 +654,13 @@ export function doAutoAttack(character, callback) {
         endCharacter(character);
     } else if (getDist(theMap, characterPos, nearestTarget.getPos()) <=
                character.speed) {
-        let pos = nearestTarget.getPos();
-        doAttack(nearestTarget, pos.x, pos.y, callback);
+        let path = getPath(
+            theMap,
+            character.getPos(),
+            nearestTarget.getPos()
+        );
+        let action = attackAction(character, nearestTarget, path);
+        doAction(action, callback);
     } else {
         let path = getPath(
             theMap,
@@ -690,7 +678,11 @@ export function doAutoAttack(character, callback) {
         if (target === null) {
             endCharacter(character);
         } else {
-            doMove(target, x, y, callback);
+            let action = moveAction(
+                character,
+                path.slice(0, character.speed + 1)
+            );
+            doAction(action, callback);
         }
     }
 }
