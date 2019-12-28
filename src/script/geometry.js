@@ -138,6 +138,41 @@ export function canMoveTo(theMap, destPos) {
     return isReachable(theMap, destPos) && !theMap[x][y].isBlocked;
 }
 
+// Check if it is possible to move along the path, stopping at:
+//   - The last cell if moveToLast
+//   - The second-to-last cell if !moveToLast
+// Even if !moveToLast, the last cell must still be reachable from the
+// second-to-last. (moveToLast represents the difference between isReachable
+// and canMoveTo).
+export function isPathValid(theMap, subject, path, moveToLast) {
+    if (path.length === 0) {
+        return true;
+    }
+
+    if (!equalPos(subject.getPos(), path[0])) {
+        return false;
+    }
+
+    let currPos = path[0];
+    // Don't check if the start pos is blocked, because they're already there.
+    for (let i = 1; i < path.length; i++) {
+        let nextPos = path[i];
+        if (theMap[nextPos.x][nextPos.y].isBlocked) {
+            if (i === path.length - 1 && !moveToLast) {
+                // Last cell doesn't need to be passable.
+            } else {
+                return false;
+            }
+        }
+        if (!isAdjacent(currPos, nextPos)) {
+            return false;
+        }
+        currPos = nextPos;
+    }
+
+    return true;
+}
+
 // Internal helpers
 
 // Compute a Map for the current state of the level, but don't do pathfinding.

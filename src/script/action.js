@@ -22,6 +22,7 @@ import {
     findPaths,
     getPath,
     isAdjacent,
+    isPathValid,
     isReachable,
     midpoint,
     getDist,
@@ -136,17 +137,36 @@ function nullaryAction(type, subject) {
 ///////////////////////////////////////////////////////////////////////////////
 // Action handlers
 
-export function checkMove(target, x, y) {
-    let theMap = findPaths(
-        selectedCharacter.getPos(),
-        selectedCharacter.speed,
-    );
-    let destPos = {x: x, y: y};
+export function checkAction(action) {
+    switch (action.type) {
+        case ActionType.MOVE:
+            return checkMove(action);
+        case ActionType.ATTACK:
+            return checkAttack(action);
+        case ActionType.INTERACT:
+            return checkInteract(action);
+        case ActionType.SWAP_PLACES:
+            return checkSwap(action);
+        case ActionType.SPECIAL_ATTACK:
+            return passCheck(); // TODO?
+        case ActionType.AUTO_ATTACK:
+            return passCheck(); // TODO! Shouldn't be an ActionType.
+        case ActionType.END_TURN:
+            return passCheck();
+        default:
+            internalError("Unknown ActionType");
+            return failCheck("An internal error occurred.");
+    }
+}
 
-    if (target && target.blocksMovement) {
-        return failCheck("Can't move there; something's in the way.");
-    } else if (!canMoveTo(theMap, destPos)) {
-        return failCheck("You can't move that far.");
+function checkMove(action) {
+    let theMap = findPaths(
+        action.subject.getPos(),
+        action.subject.speed,
+    );
+
+    if (!isPathValid(theMap, action.subject, action.path, true)) {
+        return failCheck("Can't move there: invalid path to target.");
     } else {
         return passCheck();
     }
@@ -158,7 +178,7 @@ export function doMove(target, x, y, callback) {
         return;
     }
 
-    assert(checkMove(target, x, y).valid);
+    // assert(checkMove(target, x, y).valid); -- TODO
 
     let theMap = findPaths(
         selectedCharacter.getPos(),
@@ -178,14 +198,14 @@ export function doMove(target, x, y, callback) {
     doAnimate(seriesAnimations(anims), callback);
 }
 
-export function checkSwap(target, x, y) {
-    if (target === null) {
+function checkSwap(action) {
+    if (action.target === null) {
         return failCheck("There's nothing there to swap with.");
-    } else if (!target.has("Character")) {
+    } else if (!action.target.has("Character")) {
         return failCheck("Can't swap with non-character.");
-    } else if (target.team !== currentTeam) {
+    } else if (action.target.team !== currentTeam) {
         return failCheck("Cannot swap with other player's unit.");
-    } else if (target === selectedCharacter) {
+    } else if (action.target === selectedCharacter) {
         return failCheck("Cannot swap character with self.");
     } else {
         return passCheck();
@@ -198,7 +218,7 @@ export function doSwap(target, x, y, callback) {
         return;
     }
 
-    assert(checkSwap(target, x, y).valid);
+    // assert(checkSwap(target, x, y).valid); -- TODO
 
     // Swap positions of clicked character and selectedCharacter.
     let selectPos = selectedCharacter.getPos();
@@ -216,13 +236,21 @@ export function doSwap(target, x, y, callback) {
     );
 }
 
-export function checkInteract(target, x, y) {
-    if (target === null) {
+function checkInteract(action) {
+    if (action.target === null) {
         return failCheck("Nothing there to interact with.");
-    } else if (!target.has("Interactable")) {
+    } else if (!action.target.has("Interactable")) {
         return failCheck("Can't interact with that.");
     } else {
-        return passCheck();
+        let theMap = findPaths(
+            action.subject.getPos(),
+            action.subject.speed,
+        );
+        if (!isPathValid(theMap, action.subject, action.path, false)) {
+            return failCheck("Can't interact: invalid path to target.");
+        } else {
+            return passCheck();
+        }
     }
 }
 
@@ -232,7 +260,7 @@ export function doInteract(target, x, y, callback) {
         return;
     }
 
-    assert(checkInteract(target, x, y).valid);
+    // assert(checkInteract(target, x, y).valid); -- TODO
 
     // Do a move-and-interact.
     // TODO: Wait, we really don't already have a map?
@@ -265,15 +293,23 @@ export function doInteract(target, x, y, callback) {
     });
 }
 
-export function checkAttack(target, x, y) {
-    if (target === null) {
+function checkAttack(action) {
+    if (action.target === null) {
         return failCheck("No enemy there.");
-    } else if (!target.has("Character")) {
+    } else if (!action.target.has("Character")) {
         return failCheck("Can't attack non-character.");
-    } else if (target.team === currentTeam) {
+    } else if (action.target.team === action.subject.team) {
         return failCheck("Can't attack friendly unit.");
     } else {
-        return passCheck();
+        let theMap = findPaths(
+            action.subject.getPos(),
+            action.subject.speed,
+        );
+        if (!isPathValid(theMap, action.subject, action.path, false)) {
+            return failCheck("Can't attack: invalid path to target.");
+        } else {
+            return passCheck();
+        }
     }
 }
 
@@ -283,7 +319,7 @@ export function doAttack(target, x, y, callback) {
         return;
     }
 
-    assert(checkAttack(target, x, y).valid);
+    // assert(checkAttack(target, x, y).valid); -- TODO
 
     let theMap = findPaths(
         selectedCharacter.getPos(),

@@ -18,10 +18,7 @@ import {
     afterPlayerMove,
     attackAction,
     autoAttackAction,
-    checkAttack,
-    checkInteract,
-    checkMove,
-    checkSwap,
+    checkAction,
     doAttack,
     doInteract,
     doMove,
@@ -164,19 +161,19 @@ export function worldClickHandler(evt) {
         switch (action.type) {
             case ActionType.MOVE:
                 desc = "move";
-                checkDo = {checkIt: checkMove, doIt: doMove};
+                checkDo = {doIt: doMove};
                 break;
             case ActionType.ATTACK:
                 desc = "attack";
-                checkDo = {checkIt: checkAttack, doIt: doAttack};
+                checkDo = {doIt: doAttack};
                 break;
             case ActionType.INTERACT:
                 desc = "interact";
-                checkDo = {checkIt: checkInteract, doIt: doInteract};
+                checkDo = {doIt: doInteract};
                 break;
             case ActionType.SWAP_PLACES:
                 desc = "swap";
-                checkDo = {checkIt: checkSwap, doIt: doSwap};
+                checkDo = {doIt: doSwap};
                 break;
 
             case ActionType.SPECIAL_ATTACK:
@@ -203,7 +200,7 @@ export function worldClickHandler(evt) {
         let tpos = target.getPos();
         debugLog(`Attempting ${desc} on target at ${tpos.x}, ${tpos.y}`);
 
-        let checkVal = checkDo.checkIt(target, x, y);
+        let checkVal = checkAction(action);
         if (checkVal.valid) {
             checkDo.doIt(target, x, y, afterPlayerMove);
         } else {
