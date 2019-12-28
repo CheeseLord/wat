@@ -505,6 +505,8 @@ export function afterPlayerMove() {
 }
 
 export function selectCharacter(character) {
+    assert(character.has("Character"));
+    assert(character.team === currentTeam);
     deselectCharacter();
     selectedCharacter = character;
     selectedCharacter.enableHighlight(Highlight.SELECTED_CHARACTER);

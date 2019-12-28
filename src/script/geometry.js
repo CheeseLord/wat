@@ -12,6 +12,10 @@ import {
     assert,
 } from "./message.js";
 
+export function equalPos(pos1, pos2) {
+    return pos1.x === pos2.x && pos1.y === pos2.y;
+}
+
 // Note: This function is NOT equivalent to getDistance(pos1, pos2) <= 1,
 // because it allows diagonals.
 export function isAdjacent(pos1, pos2) {

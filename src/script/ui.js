@@ -44,6 +44,7 @@ import {
     userError,
 } from "./message.js";
 import {
+    equalPos,
     findPaths,
     getPath,
 } from "./geometry.js";
@@ -133,16 +134,20 @@ export function worldClickHandler(evt) {
         let disambig = figureOutWhatTheUserMeant(worldClickInput(targetPos));
         switch (disambig.type) {
             case UserDisambigType.NOTHING:
+                debugLog("User intended NOTHING");
                 return;
             case UserDisambigType.ERROR:
+                debugLog("User intended ERROR");
                 userError(disambig.message);
                 return;
             case UserDisambigType.SELECT:
+                debugLog("User intended SELECT");
                 selectCharacter(disambig.target);
                 // TODO: Also setFocusOn? Or even call out to startCharacter?
                 doMenu("topMenu");
                 return;
             case UserDisambigType.ACTION:
+                debugLog("User intended ACTION");
                 // Handled below
                 break;
             default:
@@ -155,17 +160,22 @@ export function worldClickHandler(evt) {
         // function. For now, just unwrap it and call the old code.
         let action  = disambig.action;
         let checkDo = null;
+        let desc = "<unknown>";
         switch (action.type) {
             case ActionType.MOVE:
+                desc = "move";
                 checkDo = {checkIt: checkMove, doIt: doMove};
                 break;
             case ActionType.ATTACK:
+                desc = "attack";
                 checkDo = {checkIt: checkAttack, doIt: doAttack};
                 break;
             case ActionType.INTERACT:
+                desc = "interact";
                 checkDo = {checkIt: checkInteract, doIt: doInteract};
                 break;
             case ActionType.SWAP_PLACES:
+                desc = "swap";
                 checkDo = {checkIt: checkSwap, doIt: doSwap};
                 break;
 
@@ -179,8 +189,19 @@ export function worldClickHandler(evt) {
                 return;
         }
 
-        // All these actions have targets.
-        let target = action.target;
+        let target;
+        if (action.type !== ActionType.MOVE) {
+            // All actions but move have targets.
+            target = action.target;
+        } else {
+            // FIXME: This is a total hack, and basically defeats the purpose
+            // of the refactoring. Fix it once the other code doesn't require a
+            // target.
+            target = evt.target;
+        }
+
+        let tpos = target.getPos();
+        debugLog(`Attempting ${desc} on target at ${tpos.x}, ${tpos.y}`);
 
         let checkVal = checkDo.checkIt(target, x, y);
         if (checkVal.valid) {
@@ -217,14 +238,14 @@ function figureOutWhatTheUserMeant(inputDesc) {
             break;
         // These are trivial wrappers.
         case UserInputType.SPECIAL_ATTACK:
-            return specialAttackAction(subject);
+            return disambigAction(specialAttackAction(subject));
         case UserInputType.AUTO_ATTACK:
-            return autoAttackAction(subject);
+            return disambigAction(autoAttackAction(subject));
         case UserInputType.END_TURN:
-            return endTurnAction(subject);
+            return disambigAction(endTurnAction(subject));
         default:
             internalError("Unknown UserInputType");
-            return;
+            return disambigError("An internal error occurred.");
     }
 
     // Disambiguate a WORLD_CLICK.
@@ -238,7 +259,7 @@ function figureOutWhatTheUserMeant(inputDesc) {
     let maxZ   = -Infinity;
     let target = null;
     Crafty("GridObject").each(function() {
-        if (this.z > maxZ) {
+        if (equalPos(this.getPos(), targetPos) && this.z > maxZ) {
             target = this;
             maxZ   = this.z;
         }
@@ -338,7 +359,7 @@ function disambigActionIfPathExistsElseError(path, action) {
     if (path === null) {
         return disambigError("Can't reach the target");
     } else {
-        return action;
+        return disambigAction(action);
     }
 }
 
