@@ -63,6 +63,9 @@ rules:
           VariableDeclarator: true
           AssignmentExpression: true
           BlockStatement: true
+    import/named:
+      - error
+      - always
     import/no-unresolved:
       - error
       - always
