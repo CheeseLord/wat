@@ -26,6 +26,9 @@ import {
 import {
     loadLevel1,
 } from "./levels.js";
+import {
+    beginLevel,
+} from "./action.js";
 
 
 export function doTheThing() {
@@ -153,6 +156,9 @@ export function doTheThing() {
                 },
             },
         },
-        loadLevel1,
+        function() {
+            loadLevel1();
+            beginLevel(0);
+        },
     );
 }

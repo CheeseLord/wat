@@ -1,15 +1,8 @@
 /* global Crafty */
 
 import {
-    readyCharacters,
-    startTeam,
-} from "./action.js";
-import {
     updateMapForNewLevel,
 } from "./geometry.js";
-import {
-    assert,
-} from "./message.js";
 
 // TODO: Don't build the level in code.
 export function loadLevel1() {
@@ -99,8 +92,6 @@ export function loadLevel1() {
 
     // Finish up.
     updateMapForNewLevel();
-    startTeam(0);
-    assert(readyCharacters.length > 0);
 }
 
 function clearLevel() {

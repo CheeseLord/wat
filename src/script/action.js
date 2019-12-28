@@ -300,6 +300,7 @@ export function startTeam(team) {
         }
     });
 
+    assert(readyCharacters.length > 0);
     if (readyCharacters.length > 0) {
         startCharacter(readyCharacters[0]);
     }
@@ -407,12 +408,19 @@ function checkForGameEnd() {
             "Restart",
             function() {
                 loadLevel1();
+                beginLevel(0);
             },
         ]]);
         return true;
     } else {
         return false;
     }
+}
+
+
+export function beginLevel(team) {
+    startTeam(team);
+    assert(readyCharacters.length > 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
