@@ -525,7 +525,7 @@ Crafty.c("Lever", {
 });
 
 ///////////////////////////////////////////////////////////////////////////////
-// TODO find a better place to put these functions
+// TODO move to highlight.js (need to resolve cyclic imports)
 
 function hoverHighlightObj(obj) {
     // TODO hover-highlight in other states (but only for actions that would
