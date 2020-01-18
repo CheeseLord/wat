@@ -174,9 +174,9 @@ export function doAction(action, callback) {
             // TODO! Shouldn't be an ActionType. This is a special case.
             return doAutoAttack(action.subject, callback);
         case ActionType.END_TURN:
-            // TODO: Also a special case. Probably also shouldn't be handled as
-            // a regular action.
-            return doEndTurn();
+            // Special case: do nothing at all.
+            callback();
+            break;
         default:
             internalError("Unknown ActionType");
             break;
@@ -352,11 +352,6 @@ function doAttack(action, callback) {
             callback();
         }
     );
-}
-
-function doEndTurn() {
-    deselectCharacter();
-    endTeam();
 }
 
 // All check* functions return either:
