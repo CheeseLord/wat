@@ -14,19 +14,14 @@ import {
     doMenu,
 } from "./menu.js";
 import {
-    afterPlayerMove,
     attackAction,
     autoAttackAction,
     checkAction,
     doAction,
     endTurnAction,
-    getCurrentTeam,
     getGlobalState,
-    getReadyCharacters,
     interactAction,
     moveAction,
-    selectCharacter,
-    selectedCharacter,
     specialAttackAction,
     swapPlacesAction,
 } from "./action.js";
@@ -41,6 +36,14 @@ import {
     findPaths,
     getPath,
 } from "./geometry.js";
+import {
+    afterPlayerMove,
+    getCurrentTeam,
+    getReadyCharacters,
+    selectCharacter,
+    // TODO: Does this work??
+    selectedCharacter,
+} from "./turn_order.js";
 
 ///////////////////////////////////////////////////////////////////////////////
 // "Janky class" UserInputDesc -- describes a raw input from the user (at the

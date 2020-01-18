@@ -24,7 +24,6 @@ import {
 
 import {
     getGlobalState,
-    selectedCharacter,
 } from "./action.js";
 
 import {
@@ -32,6 +31,10 @@ import {
     internalError,
     userMessage,
 } from "./message.js";
+
+import {
+    selectedCharacter,
+} from "./turn_order.js";
 
 import {
     getProportion,

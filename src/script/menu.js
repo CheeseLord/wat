@@ -5,12 +5,9 @@
 import {StateEnum} from "./consts.js";
 
 import {
-    afterPlayerMove,
     autoAttackAction,
-    deselectCharacter,
     doAction,
     endTurnAction,
-    selectedCharacter,
     setGlobalState,
     specialAttackAction,
 } from  "./action.js";
@@ -18,6 +15,12 @@ import {
     debugLog,
     internalError,
 } from "./message.js";
+import {
+    afterPlayerMove,
+    deselectCharacter,
+    // TODO: Does this work??
+    selectedCharacter,
+} from "./turn_order.js";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Menu table handling
