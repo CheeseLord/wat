@@ -62,7 +62,6 @@ export const ActionType = Object.freeze({
     INTERACT:       {},
     SWAP_PLACES:    {},
     SPECIAL_ATTACK: {},
-    AUTO_ATTACK:    {},
     END_TURN:       {},
 });
 
@@ -92,11 +91,6 @@ export function swapPlacesAction(subject, target) {
 
 export function specialAttackAction(subject) {
     return nullaryAction(ActionType.SPECIAL_ATTACK, subject);
-}
-
-// TODO this shouldn't be an action type.
-export function autoAttackAction(subject) {
-    return nullaryAction(ActionType.AUTO_ATTACK, subject);
 }
 
 export function endTurnAction(subject) {
@@ -134,8 +128,6 @@ export function checkAction(action) {
             return checkSwap(action);
         case ActionType.SPECIAL_ATTACK:
             return passCheck(); // TODO?
-        case ActionType.AUTO_ATTACK:
-            return passCheck(); // TODO! Shouldn't be an ActionType.
         case ActionType.END_TURN:
             return passCheck();
         default:
@@ -156,9 +148,6 @@ export function doAction(action, callback) {
             return doSwap(action, callback);
         case ActionType.SPECIAL_ATTACK:
             return doSpecialAttack(action, callback);
-        case ActionType.AUTO_ATTACK:
-            // TODO! Shouldn't be an ActionType. This is a special case.
-            return doAutoAttack(action.subject, callback);
         case ActionType.END_TURN:
             // Special case: do nothing at all.
             callback();
@@ -389,7 +378,12 @@ export function updateAutoActions(character) {
     });
 }
 
-export function doAutoAttack(character, callback) {
+// TODO: Move to ai.js (resolve cyclic imports)
+//   - Probably want to split action.js in two:
+//       - Definitions of action types (pure data, no imports)
+//       - Everything else
+//     Is that enough?
+export function chooseAiAction(character) {
     let characterPos = character.getPos();
     let theMap = findPaths(characterPos, 2 * character.speed);
     let nearestTarget = null;
@@ -406,7 +400,7 @@ export function doAutoAttack(character, callback) {
         }
     });
     if (nearestTarget === null) {
-        callback();
+        return endTurnAction(character);
     } else if (getDist(theMap, characterPos, nearestTarget.getPos()) <=
                character.speed) {
         let path = getPath(
@@ -414,8 +408,7 @@ export function doAutoAttack(character, callback) {
             character.getPos(),
             nearestTarget.getPos()
         );
-        let action = attackAction(character, nearestTarget, path);
-        doAction(action, callback);
+        return attackAction(character, nearestTarget, path);
     } else {
         let path = getPath(
             theMap,
@@ -425,19 +418,16 @@ export function doAutoAttack(character, callback) {
         let target = null;
         let x = path[character.speed].x;
         let y = path[character.speed].y;
+        // FIXME: Don't reference "Ground" by name.
         Crafty("Ground").each(function() {
             if (this.getPos().x === x && this.getPos().y === y) {
                 target = this;
             }
         });
         if (target === null) {
-            callback();
+            return endTurnAction(character);
         } else {
-            let action = moveAction(
-                character,
-                path.slice(0, character.speed + 1)
-            );
-            doAction(action, callback);
+            return moveAction(character, path.slice(0, character.speed + 1));
         }
     }
 }

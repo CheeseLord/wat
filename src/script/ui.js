@@ -15,8 +15,8 @@ import {
 } from "./menu.js";
 import {
     attackAction,
-    autoAttackAction,
     checkAction,
+    chooseAiAction,
     doAction,
     endTurnAction,
     getGlobalState,
@@ -189,7 +189,7 @@ function figureOutWhatTheUserMeant(inputDesc) {
         case UserInputType.SPECIAL_ATTACK:
             return disambigAction(specialAttackAction(subject));
         case UserInputType.AUTO_ATTACK:
-            return disambigAction(autoAttackAction(subject));
+            return disambigAction(chooseAiAction(subject));
         case UserInputType.END_TURN:
             return disambigAction(endTurnAction(subject));
         default:

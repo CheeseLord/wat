@@ -5,7 +5,7 @@
 import {StateEnum} from "./consts.js";
 
 import {
-    autoAttackAction,
+    chooseAiAction,
     doAction,
     endTurnAction,
     setGlobalState,
@@ -50,7 +50,7 @@ var menuTable = {
             ["Attack",      "attack",     doNothing],
             ["Interact",    "interact",   doNothing],
             ["Auto Attack", CLEAR_MENU,    () => {
-                doAction(autoAttackAction(selectedCharacter), afterPlayerMove);
+                doAction(chooseAiAction(selectedCharacter), afterPlayerMove);
             }],
             ["End Turn",    CLEAR_MENU,   () => {
                 doAction(endTurnAction(selectedCharacter), afterPlayerMove);

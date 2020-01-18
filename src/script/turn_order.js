@@ -3,8 +3,9 @@
 "use strict";
 
 import {
+    chooseAiAction,
     clearAutoActions,
-    doAutoAttack,
+    doAction,
     setGlobalState,
     updateAutoActions,
 } from "./action.js";
@@ -185,9 +186,8 @@ function requestMoveFromPlayer(character) {
 
 function requestMoveFromAI(character) {
     // TODO this creates the movement grid, don't want that.
-    // TODO sometimes this goes into an infinite loop.
     selectCharacter(character);
-    doAutoAttack(character, () => {
+    doAction(chooseAiAction(character), () => {
         endCharacter(character);
     });
 }
