@@ -420,7 +420,7 @@ function doAutoAttack(character, callback) {
         }
     });
     if (nearestTarget === null) {
-        endCharacter(character);
+        callback();
     } else if (getDist(theMap, characterPos, nearestTarget.getPos()) <=
                character.speed) {
         let path = getPath(
@@ -445,7 +445,7 @@ function doAutoAttack(character, callback) {
             }
         });
         if (target === null) {
-            endCharacter(character);
+            callback();
         } else {
             let action = moveAction(
                 character,
