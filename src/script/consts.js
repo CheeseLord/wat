@@ -36,7 +36,6 @@ export const Z_WORLD_UI    = 40; // UI stuff in the world itself
 export const Z_UI          = 50; // Separate UI layer - above all world stuff
 
 export const SPRITE_DUR_PER_FRAME      = 250;
-export const ANIM_DUR_SCROLL           = 50;
 export const ANIM_DUR_CENTER_TURN      = 200;
 export const ANIM_DUR_MOVE             = 200;
 export const ANIM_DUR_STEP             = 100;

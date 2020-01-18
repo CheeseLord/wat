@@ -21,7 +21,7 @@ import {
     userMessage,
 } from "./message.js";
 import {
-    moveViewOnKeyDown,
+    initCamera,
 } from "./view.js";
 import {
     loadLevel1,
@@ -64,6 +64,8 @@ export function doTheThing() {
             .attr({x: 0, y: 0, w: MENU_WIDTH, h: MENU_HEIGHT})
             .color("#eee");
 
+    initCamera();
+
     // Initialize message log. This has to go after creating the UILayer
     // because the message log is on the UILayer.
     initMessageDisplay(
@@ -96,8 +98,6 @@ export function doTheThing() {
     Crafty.bind("WorldClick", function(evt) {
         worldClickHandler(evt);
     });
-
-    Crafty.s("Keyboard").bind("KeyDown", moveViewOnKeyDown);
 
     // Request sprite assets. Once they arrive, we'll load the level.
     // Based on the example from:
