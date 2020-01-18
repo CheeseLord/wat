@@ -3,6 +3,13 @@
 "use strict";
 
 import {
+    doAnimate,
+    parallelAnimations,
+    pauseAnimation,
+    seriesAnimations,
+    tweenAnimation,
+} from "./animation.js";
+import {
     ANIM_DUR_HALF_ATTACK,
     ANIM_DUR_MOVE,
     ANIM_DUR_PAUSE_BW_MOV_ATK,
@@ -28,12 +35,8 @@ import {
     getDist,
 } from "./geometry.js";
 import {
-    doAnimate,
-    parallelAnimations,
-    pauseAnimation,
-    seriesAnimations,
-    tweenAnimation,
-} from "./animation.js";
+    loadLevel1,
+} from "./levels.js";
 import {
     assert,
     debugLog,
@@ -46,9 +49,6 @@ import {
 import {
     setFocusOn,
 } from "./view.js";
-import {
-    loadLevel1,
-} from "./levels.js";
 
 export var selectedCharacter;
 
@@ -372,6 +372,108 @@ function failCheck(reason) {
     return {valid: false, reason: reason};
 }
 
+function doSpecialAttack(action, callback) {
+    Crafty("Character").each(function() {
+        if (this.team !== action.subject.team &&
+                isAdjacent(action.subject.getPos(), this.getPos())) {
+            this.takeDamage(randInt(SPECIAL_ATTACK_DAMAGE_MIN,
+                SPECIAL_ATTACK_DAMAGE_MAX));
+        }
+    });
+    callback();
+}
+
+export function canAttack(character, target) {
+    return target.has("Character") && target.team !== character.team;
+}
+
+export function canInteract(character, target) {
+    return target.has("Interactable");
+}
+
+export function updateAutoActions(character) {
+    let characterPos = character.getPos();
+    let theMap = findPaths(characterPos, character.speed);
+    Crafty("GridObject").each(function() {
+        let canReach = isReachable(theMap, this.getPos());
+        if (canReach && canInteract(character, this)) {
+            this.autoAction = AutoActionEnum.INTERACT;
+        } else if (canReach && canAttack(character, this)) {
+            this.autoAction = AutoActionEnum.ATTACK;
+        } else if (canMoveTo(theMap, this.getPos())) {
+            this.autoAction = AutoActionEnum.MOVE;
+        } else {
+            this.autoAction = AutoActionEnum.NONE;
+        }
+    });
+}
+
+function doAutoAttack(character, callback) {
+    let characterPos = character.getPos();
+    let theMap = findPaths(characterPos, 2 * character.speed);
+    let nearestTarget = null;
+    let bestDist = Infinity;
+    let dist = null;
+    Crafty("Character").each(function() {
+        if (this.team === character.team) {
+            return;
+        }
+        dist = getDist(theMap, characterPos, this.getPos());
+        if (dist < bestDist) {
+            bestDist = dist;
+            nearestTarget = this;
+        }
+    });
+    if (nearestTarget === null) {
+        endCharacter(character);
+    } else if (getDist(theMap, characterPos, nearestTarget.getPos()) <=
+               character.speed) {
+        let path = getPath(
+            theMap,
+            character.getPos(),
+            nearestTarget.getPos()
+        );
+        let action = attackAction(character, nearestTarget, path);
+        doAction(action, callback);
+    } else {
+        let path = getPath(
+            theMap,
+            character.getPos(),
+            nearestTarget.getPos()
+        );
+        let target = null;
+        let x = path[character.speed].x;
+        let y = path[character.speed].y;
+        Crafty("Ground").each(function() {
+            if (this.getPos().x === x && this.getPos().y === y) {
+                target = this;
+            }
+        });
+        if (target === null) {
+            endCharacter(character);
+        } else {
+            let action = moveAction(
+                character,
+                path.slice(0, character.speed + 1)
+            );
+            doAction(action, callback);
+        }
+    }
+}
+
+export function clearAutoActions() {
+    Crafty("GridObject").each(function() {
+        this.autoAction = AutoActionEnum.NONE;
+    });
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//    THIS GOES IN turn_order.js
+//
+///////////////////////////////////////////////////////////////////////////////
+
 ///////////////////////////////////////////////////////////////////////////////
 // "Milestones" in turn order
 
@@ -556,7 +658,14 @@ export function deselectCharacter() {
     clearHighlightType(Highlight.CAN_INTERACT);
 }
 
-function highlightPath(path) {
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//    THIS GOES IN highlight.js
+//
+///////////////////////////////////////////////////////////////////////////////
+
+export function highlightPath(path) {
     for (var i = 0; i < path.length; i++) {
         Crafty("Ground").each(function() {
             if (this.getPos().x === path[i].x &&
@@ -595,101 +704,6 @@ function createMovementGrid(character) {
         } else if (this.autoAction !== AutoActionEnum.NONE) {
             assert(false);
         }
-    });
-}
-
-function doSpecialAttack(action, callback) {
-    Crafty("Character").each(function() {
-        if (this.team !== action.subject.team &&
-                isAdjacent(action.subject.getPos(), this.getPos())) {
-            this.takeDamage(randInt(SPECIAL_ATTACK_DAMAGE_MIN,
-                SPECIAL_ATTACK_DAMAGE_MAX));
-        }
-    });
-    callback();
-}
-
-export function canAttack(character, target) {
-    return target.has("Character") && target.team !== character.team;
-}
-
-export function canInteract(character, target) {
-    return target.has("Interactable");
-}
-
-export function updateAutoActions(character) {
-    let characterPos = character.getPos();
-    let theMap = findPaths(characterPos, character.speed);
-    Crafty("GridObject").each(function() {
-        let canReach = isReachable(theMap, this.getPos());
-        if (canReach && canInteract(character, this)) {
-            this.autoAction = AutoActionEnum.INTERACT;
-        } else if (canReach && canAttack(character, this)) {
-            this.autoAction = AutoActionEnum.ATTACK;
-        } else if (canMoveTo(theMap, this.getPos())) {
-            this.autoAction = AutoActionEnum.MOVE;
-        } else {
-            this.autoAction = AutoActionEnum.NONE;
-        }
-    });
-}
-
-function doAutoAttack(character, callback) {
-    let characterPos = character.getPos();
-    let theMap = findPaths(characterPos, 2 * character.speed);
-    let nearestTarget = null;
-    let bestDist = Infinity;
-    let dist = null;
-    Crafty("Character").each(function() {
-        if (this.team === character.team) {
-            return;
-        }
-        dist = getDist(theMap, characterPos, this.getPos());
-        if (dist < bestDist) {
-            bestDist = dist;
-            nearestTarget = this;
-        }
-    });
-    if (nearestTarget === null) {
-        endCharacter(character);
-    } else if (getDist(theMap, characterPos, nearestTarget.getPos()) <=
-               character.speed) {
-        let path = getPath(
-            theMap,
-            character.getPos(),
-            nearestTarget.getPos()
-        );
-        let action = attackAction(character, nearestTarget, path);
-        doAction(action, callback);
-    } else {
-        let path = getPath(
-            theMap,
-            character.getPos(),
-            nearestTarget.getPos()
-        );
-        let target = null;
-        let x = path[character.speed].x;
-        let y = path[character.speed].y;
-        Crafty("Ground").each(function() {
-            if (this.getPos().x === x && this.getPos().y === y) {
-                target = this;
-            }
-        });
-        if (target === null) {
-            endCharacter(character);
-        } else {
-            let action = moveAction(
-                character,
-                path.slice(0, character.speed + 1)
-            );
-            doAction(action, callback);
-        }
-    }
-}
-
-export function clearAutoActions() {
-    Crafty("GridObject").each(function() {
-        this.autoAction = AutoActionEnum.NONE;
     });
 }
 
