@@ -216,9 +216,9 @@ function checkSwap(action) {
         return failCheck("There's nothing there to swap with.");
     } else if (!action.target.has("Character")) {
         return failCheck("Can't swap with non-character.");
-    } else if (action.target.team !== currentTeam) {
+    } else if (action.target.team !== action.subject.team) {
         return failCheck("Cannot swap with other player's unit.");
-    } else if (action.target === selectedCharacter) {
+    } else if (action.target === action.subject) {
         return failCheck("Cannot swap character with self.");
     } else {
         return passCheck();
@@ -228,7 +228,7 @@ function checkSwap(action) {
 function doSwap(action, callback) {
     assert(checkSwap(action).valid);
 
-    // Swap positions of clicked character and selectedCharacter.
+    // Swap positions of subject and target.
     let selectPos = action.subject.getPos();
     let clickPos  = action.target.getPos();
     doAnimate(
