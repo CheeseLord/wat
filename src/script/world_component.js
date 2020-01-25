@@ -385,6 +385,10 @@ Crafty.c("Character", {
         this.team = team;
         return this;
     },
+
+    readyActions: function() {
+        this.actionPoints = 2;
+    },
 });
 
 Crafty.c("SpriteCharacter", {

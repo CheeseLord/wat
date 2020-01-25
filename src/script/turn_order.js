@@ -50,6 +50,7 @@ export function startTeam(team) {
     readyCharacters = [];
     Crafty("Character").each(function() {
         if (this.team === team) {
+            this.readyActions();
             readyCharacters.push(this);
         }
     });
@@ -85,13 +86,17 @@ export function endCharacter(character) {
     setGlobalState(StateEnum.NO_INPUT);
     deselectCharacter();
 
+    character.actionPoints -= 1;
+
     // Unready the current character.
-    let index = readyCharacters.indexOf(character);
-    if (index === -1) {
-        // TODO: We should never get here, but handle it better anyway.
-        return;
-    } else {
-        readyCharacters.splice(index, 1);
+    if (character.actionPoints <= 0) {
+        let index = readyCharacters.indexOf(character);
+        if (index === -1) {
+            // TODO: We should never get here, but handle it better anyway.
+            return;
+        } else {
+            readyCharacters.splice(index, 1);
+        }
     }
 
     if (checkForGameEnd()) {
