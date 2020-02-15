@@ -65,6 +65,10 @@ export const ActionType = Object.freeze({
     END_TURN:       {},
 });
 
+function isValidActionType(actionType) {
+    return ActionType.hasOwnProperty(actionType);
+}
+
 export function moveAction(subject, path) {
     return {
         type:    ActionType.MOVE,
@@ -147,7 +151,13 @@ export function checkAction(action) {
 }
 
 export function doAction(action, callback) {
-    action.subject.actionPoints -= getActionPointCost(action);
+    assert(isValidActionType(action.type));
+
+    doActionAnimation(action, function() {
+        updateState(action);
+        callback();
+    });
+
     switch (action.type) {
         case ActionType.MOVE:
             return doMove(action, callback);
@@ -163,10 +173,14 @@ export function doAction(action, callback) {
             // Special case: do nothing at all.
             callback();
             break;
-        default:
-            internalError("Unknown ActionType");
-            break;
     }
+}
+
+function doActionAnimation(action, callback) {
+}
+
+function updateState(action) {
+    action.subject.actionPoints -= getActionPointCost(action);
 }
 
 function checkMove(action, callback) {
