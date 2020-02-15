@@ -34,8 +34,8 @@ const clearMenuState = StateEnum.DEFAULT;
 //     "back" button. Does not include the current menu.
 // currMenuName - the name of the currently-displayed menu, or null if there is
 //     no menu displayed.
-export var menuStack    = [];
-export var currMenuName = null;
+var menuStack    = [];
+var currMenuName = null;
 
 function doNothing() {}
 

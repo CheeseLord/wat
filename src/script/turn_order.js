@@ -33,10 +33,11 @@ import {
     setFocusOn,
 } from "./view.js";
 
+// TODO can we not export this? Or make it a UI-only thing?
 export var selectedCharacter;
 
-export var readyCharacters = [];
-export var currentTeam = 0;
+var readyCharacters = [];
+var currentTeam = 0;
 export function getReadyCharacters() { return readyCharacters; }
 export function getCurrentTeam() { return currentTeam; }
 
