@@ -38,8 +38,8 @@ import {
 } from "./geometry.js";
 import {
     afterPlayerMove,
-    getCurrentTeam,
-    getReadyCharacters,
+    canMoveThisTurn,
+    isOnCurrentTeam,
     selectCharacter,
     // TODO: Does this work??
     selectedCharacter,
@@ -268,11 +268,12 @@ function checkSelectCharacter(target) {
     if (!(target && target.has("Character"))) {
         return disambigNothing();
     }
-    if (target.team !== getCurrentTeam()) {
-        return disambigError("Character is on another team");
-    }
-    if (getReadyCharacters().indexOf(target) === -1) {
-        return disambigError("Character has already acted");
+    if (!canMoveThisTurn(target)) {
+        if (!isOnCurrentTeam(target)) {
+            return disambigError("Character is on another team");
+        } else {
+            return disambigError("Character has already acted");
+        }
     }
 
     return disambigSelect(target);

@@ -34,12 +34,48 @@ import {
 } from "./view.js";
 
 // TODO can we not export this? Or make it a UI-only thing?
+// At the very least, selectedCharacter and checkSelectCharacter should be in
+// the same file.
 export var selectedCharacter;
 
-var readyCharacters = [];
-var currentTeam = 0;
-export function getReadyCharacters() { return readyCharacters; }
-export function getCurrentTeam() { return currentTeam; }
+///////////////////////////////////////////////////////////////////////////////
+// Whose turn is it, anyway?
+
+var currentTeamIndex   = 0;
+var currentTeamMembers = [];
+
+// TODO these functions are only used by checkSelectCharacter.
+export function isOnCurrentTeam(character) {
+    return (character.team === currentTeamIndex);
+}
+export function canMoveThisTurn(character) {
+    return (isOnCurrentTeam(character) && character.actionPoints > 0);
+}
+
+function anyCharactersReady() {
+    return (getFirstReadyCharacter() !== null);
+}
+
+// Return the first character on the current team who can still move, or null
+// if the whole team has finished moving.
+function getFirstReadyCharacter() {
+    for (let i = 0; i < currentTeamMembers.length; i++) {
+        if (currentTeamMembers[i].actionPoints > 0) {
+            return currentTeamMembers[i];
+        }
+    }
+    return null;
+}
+
+function getAllReadyCharacters() {
+    let ret = [];
+    for (let i = 0; i < currentTeamMembers.length; i++) {
+        if (currentTeamMembers[i].actionPoints > 0) {
+            ret.push(currentTeamMembers[i]);
+        }
+    }
+    return ret;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // "Milestones" in turn order
@@ -47,25 +83,31 @@ export function getCurrentTeam() { return currentTeam; }
 export function startTeam(team) {
     debugLog(`Starting turn for team ${team}.`);
 
-    currentTeam = team;
-    readyCharacters = [];
+    currentTeamIndex = team;
+    currentTeamMembers = [];
     Crafty("Character").each(function() {
         if (this.team === team) {
             this.readyActions();
-            readyCharacters.push(this);
+            currentTeamMembers.push(this);
         }
     });
 
-    assert(readyCharacters.length > 0);
-    if (readyCharacters.length > 0) {
-        startCharacter(readyCharacters[0]);
+    let nextCharacter = getFirstReadyCharacter();
+    if (nextCharacter !== null) {
+        startCharacter(nextCharacter);
     }
+    // Otherwise, intentionally don't ready anyone. This comes up because
+    // endTeam calls startTeam speculatively on each subsequent team, searching
+    // for one that has someone left on it to move.
+    // TODO: This logic is somewhat confusing. Can we do it a different way?
 }
 
 function startCharacter(character) {
+    // TODO Move this to requestMoveFromPlayer.
     clearAllHighlights();
-    for (let i = 0; i < readyCharacters.length; i++) {
-        readyCharacters[i].enableHighlight(Highlight.AVAILABLE_CHARACTER);
+    let availCharacters = getAllReadyCharacters();
+    for (let i = 0; i < availCharacters.length; i++) {
+        availCharacters[i].enableHighlight(Highlight.AVAILABLE_CHARACTER);
     }
 
     // TODO: Why does startCharacter not call selectCharacter? Who calls it
@@ -75,7 +117,7 @@ function startCharacter(character) {
         // TODO refactor this. Have a real concept of teams, probably with some
         // sort of callback tied to each one specifying how it chooses its
         // turns.
-        if (currentTeam === PLAYER_TEAM) {
+        if (currentTeamIndex === PLAYER_TEAM) {
             requestMoveFromPlayer(character);
         } else {
             requestMoveFromAI(character);
@@ -89,34 +131,26 @@ export function endCharacter(character) {
 
     character.actionPoints -= 1;
 
-    // Unready the current character.
-    if (character.actionPoints <= 0) {
-        let index = readyCharacters.indexOf(character);
-        if (index === -1) {
-            // TODO: We should never get here, but handle it better anyway.
-            return;
-        } else {
-            readyCharacters.splice(index, 1);
-        }
-    }
-
     if (checkForGameEnd()) {
         // Don't continue the game loop.
         // checkForGameEnd already did whatever's appropriate to signal to the
         // player that the game is over.
-    } else if (readyCharacters.length > 0) {
-        // There are still more characters to move.
-        startCharacter(readyCharacters[0]);
     } else {
-        // This was the last character on the team; end the team's turn.
-        endTeam();
+        let nextCharacter = getFirstReadyCharacter();
+        if (nextCharacter !== null) {
+            // There are still more characters to move.
+            startCharacter(nextCharacter);
+        } else {
+            // This was the last character on the team; end the team's turn.
+            endTeam();
+        }
     }
 }
 
 export function endTeam() {
-    debugLog(`Reached end of turn for team ${currentTeam}.`);
+    debugLog(`Reached end of turn for team ${currentTeamIndex}.`);
 
-    let team = currentTeam;
+    let team = currentTeamIndex;
     let maxTries = NUM_TEAMS;
     // If the next team has no one on it to act, skip over them. Repeat until
     // we find a team that has someone ready to act, or until we've tried all
@@ -127,9 +161,9 @@ export function endTeam() {
         // put this loop in startTeam?
         startTeam(team);
         maxTries--;
-    } while (readyCharacters.length === 0 && maxTries > 0);
+    } while (!anyCharactersReady() && maxTries > 0);
 
-    if (readyCharacters.length === 0) {
+    if (!anyCharactersReady()) {
         assert(maxTries === 0);
         // Eventually, this should probably be detected and result in something
         // actually happening in-game. (Maybe a game-over screen since your
@@ -180,7 +214,7 @@ function checkForGameEnd() {
 
 export function beginLevel(team) {
     startTeam(team);
-    assert(readyCharacters.length > 0);
+    assert(anyCharactersReady());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -208,7 +242,7 @@ export function afterPlayerMove() {
 
 export function selectCharacter(character) {
     assert(character.has("Character"));
-    assert(character.team === currentTeam);
+    assert(isOnCurrentTeam(character));
     deselectCharacter();
     selectedCharacter = character;
     selectedCharacter.enableHighlight(Highlight.SELECTED_CHARACTER);
