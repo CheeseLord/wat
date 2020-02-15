@@ -129,8 +129,6 @@ export function endCharacter(character) {
     setGlobalState(StateEnum.NO_INPUT);
     deselectCharacter();
 
-    character.actionPoints -= 1;
-
     if (checkForGameEnd()) {
         // Don't continue the game loop.
         // checkForGameEnd already did whatever's appropriate to signal to the

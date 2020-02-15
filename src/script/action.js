@@ -114,9 +114,19 @@ function nullaryAction(type, subject) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Action-related queries
+
+function getActionPointCost(action) {
+    return 1;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Action handlers
 
 export function checkAction(action) {
+    if (action.subject.actionPoints < getActionPointCost(action)) {
+        return failCheck("Not enough action points");
+    }
     switch (action.type) {
         case ActionType.MOVE:
             return checkMove(action);
@@ -137,6 +147,7 @@ export function checkAction(action) {
 }
 
 export function doAction(action, callback) {
+    action.subject.actionPoints -= getActionPointCost(action);
     switch (action.type) {
         case ActionType.MOVE:
             return doMove(action, callback);
