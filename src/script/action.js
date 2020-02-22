@@ -97,6 +97,8 @@ export function endTurnAction(subject) {
     return nullaryAction(ActionType.END_TURN, subject);
 }
 
+// Note: path includes the target. These actions consist of moving to path[-2]
+// and then interacting with the target, which is presumably at path[-1].
 function actionWithPathAndTarget(type, subject, target, path) {
     return {
         type:    type,
@@ -117,7 +119,33 @@ function nullaryAction(type, subject) {
 // Action-related queries
 
 function getActionPointCost(action) {
-    return 1;
+    switch (action.type) {
+        case ActionType.MOVE:
+        case ActionType.ATTACK:
+        case ActionType.INTERACT:
+            // Path length must at least include starting point
+            assert(action.path.length >= 1);
+            let cost = action.path.length - 1;
+            // For move, action.path.length - 1 is the number of squares of
+            // movement, which equals the AP cost, so we're done.
+            // For interact/attack, it's one more than the number of squares of
+            // movement because it includes the target. So currently cost is 1
+            // per square of movement plus 1 for the final action.
+            // For (move-and-)attack, add 1 because the attack itself costs 2.
+            if (action.type === ActionType.ATTACK) {
+                cost += 1;
+            }
+            return cost;
+        case ActionType.SWAP_PLACES:
+            return 2;
+        case ActionType.SPECIAL_ATTACK:
+            return 3;
+        case ActionType.END_TURN:
+            return action.subject.actionPoints;
+        default:
+            internalError("Unknown ActionType");
+            return Infinity;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -374,7 +402,7 @@ export function canInteract(character, target) {
 
 export function updateAutoActions(character) {
     let characterPos = character.getPos();
-    let theMap = findPaths(characterPos, character.speed);
+    let theMap = findPaths(characterPos, character.actionPoints);
     Crafty("GridObject").each(function() {
         let canReach = isReachable(theMap, this.getPos());
         if (canReach && canInteract(character, this)) {

@@ -387,7 +387,7 @@ Crafty.c("Character", {
     },
 
     readyActions: function() {
-        this.actionPoints = 2;
+        this.actionPoints = this.speed;
     },
 });
 
@@ -540,7 +540,7 @@ function hoverHighlightObj(obj) {
 
     let theMap  = findPaths(
         selectedCharacter.getPos(),
-        selectedCharacter.speed,
+        selectedCharacter.actionPoints,
     );
     let destPos = obj.getPos();
     let path    = getPath(theMap, selectedCharacter.getPos(), destPos);
