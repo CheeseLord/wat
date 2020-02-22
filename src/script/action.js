@@ -22,12 +22,10 @@ import {
     StateEnum,
 } from "./consts.js";
 import {
-    canMoveTo,
     findPaths,
     getPath,
     isAdjacent,
     isPathValid,
-    isReachable,
     midpoint,
     getDist,
 } from "./geometry.js";
@@ -392,24 +390,27 @@ function doSpecialAttack(action, callback) {
     callback();
 }
 
-export function canAttack(character, target) {
-    return target.has("Character") && target.team !== character.team;
-}
-
-export function canInteract(character, target) {
-    return target.has("Interactable");
-}
-
-export function updateAutoActions(character) {
-    let characterPos = character.getPos();
-    let theMap = findPaths(characterPos, character.actionPoints);
+export function updateAutoActions(subject) {
+    let subjectPos = subject.getPos();
+    let theMap = findPaths(subjectPos, subject.actionPoints);
     Crafty("GridObject").each(function() {
-        let canReach = isReachable(theMap, this.getPos());
-        if (canReach && canInteract(character, this)) {
+        let target = this;
+        let path = getPath(theMap, subjectPos, target.getPos());
+        if (path === null) {
+            this.autoAction = AutoActionEnum.NONE;
+            return;
+        }
+        // TODO: Make a list and loop over it. Store the ActionDesc instead of
+        // a separate AutoActionEnum value, and then reuse that ActionDesc for
+        // highlighting and resolving the action.
+        let action1 = interactAction(subject, target, path);
+        let action2 = attackAction(subject, target, path);
+        let action3 = moveAction(subject, path);
+        if (checkAction(action1).valid) {
             this.autoAction = AutoActionEnum.INTERACT;
-        } else if (canReach && canAttack(character, this)) {
+        } else if (checkAction(action2).valid) {
             this.autoAction = AutoActionEnum.ATTACK;
-        } else if (canMoveTo(theMap, this.getPos())) {
+        } else if (checkAction(action3).valid) {
             this.autoAction = AutoActionEnum.MOVE;
         } else {
             this.autoAction = AutoActionEnum.NONE;
