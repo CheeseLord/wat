@@ -389,11 +389,15 @@ export function updateAutoActions(character) {
     });
 }
 
-// TODO: Move to ai.js (resolve cyclic imports)
+///////////////////////////////////////////////////////////////////////////////
+// TODO: Move this section to ai.js
+//
+// Will need to resolve cyclic imports.
 //   - Probably want to split action.js in two:
 //       - Definitions of action types (pure data, no imports)
 //       - Everything else
 //     Is that enough?
+
 export function chooseAiAction(character) {
     let characterPos = character.getPos();
     let theMap = findPaths(characterPos, 2 * character.speed);
@@ -442,6 +446,8 @@ export function chooseAiAction(character) {
         }
     }
 }
+
+///////////////////////////////////////////////////////////////////////////////
 
 export function clearAutoActions() {
     Crafty("GridObject").each(function() {
