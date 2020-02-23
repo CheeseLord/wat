@@ -22,12 +22,10 @@ import {
     StateEnum,
 } from "./consts.js";
 import {
-    canMoveTo,
     findPaths,
     getPath,
     isAdjacent,
     isPathValid,
-    isReachable,
     midpoint,
     getDist,
 } from "./geometry.js";
@@ -101,6 +99,8 @@ export function endTurnAction(subject) {
     return nullaryAction(ActionType.END_TURN, subject);
 }
 
+// Note: path includes the target. These actions consist of moving to path[-2]
+// and then interacting with the target, which is presumably at path[-1].
 function actionWithPathAndTarget(type, subject, target, path) {
     return {
         type:    type,
@@ -121,7 +121,33 @@ function nullaryAction(type, subject) {
 // Action-related queries
 
 function getActionPointCost(action) {
-    return 1;
+    switch (action.type) {
+        case ActionType.MOVE:
+        case ActionType.ATTACK:
+        case ActionType.INTERACT:
+            // Path length must at least include starting point
+            assert(action.path.length >= 1);
+            let cost = action.path.length - 1;
+            // For move, action.path.length - 1 is the number of squares of
+            // movement, which equals the AP cost, so we're done.
+            // For interact/attack, it's one more than the number of squares of
+            // movement because it includes the target. So currently cost is 1
+            // per square of movement plus 1 for the final action.
+            // For (move-and-)attack, add 1 because the attack itself costs 2.
+            if (action.type === ActionType.ATTACK) {
+                cost += 1;
+            }
+            return cost;
+        case ActionType.SWAP_PLACES:
+            return 2;
+        case ActionType.SPECIAL_ATTACK:
+            return 3;
+        case ActionType.END_TURN:
+            return action.subject.actionPoints;
+        default:
+            internalError("Unknown ActionType");
+            return Infinity;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -369,24 +395,27 @@ function failCheck(reason) {
     return {valid: false, reason: reason};
 }
 
-export function canAttack(character, target) {
-    return target.has("Character") && target.team !== character.team;
-}
-
-export function canInteract(character, target) {
-    return target.has("Interactable");
-}
-
-export function updateAutoActions(character) {
-    let characterPos = character.getPos();
-    let theMap = findPaths(characterPos, character.speed);
+export function updateAutoActions(subject) {
+    let subjectPos = subject.getPos();
+    let theMap = findPaths(subjectPos, subject.actionPoints);
     Crafty("GridObject").each(function() {
-        let canReach = isReachable(theMap, this.getPos());
-        if (canReach && canInteract(character, this)) {
+        let target = this;
+        let path = getPath(theMap, subjectPos, target.getPos());
+        if (path === null) {
+            this.autoAction = AutoActionEnum.NONE;
+            return;
+        }
+        // TODO: Make a list and loop over it. Store the ActionDesc instead of
+        // a separate AutoActionEnum value, and then reuse that ActionDesc for
+        // highlighting and resolving the action.
+        let action1 = interactAction(subject, target, path);
+        let action2 = attackAction(subject, target, path);
+        let action3 = moveAction(subject, path);
+        if (checkAction(action1).valid) {
             this.autoAction = AutoActionEnum.INTERACT;
-        } else if (canReach && canAttack(character, this)) {
+        } else if (checkAction(action2).valid) {
             this.autoAction = AutoActionEnum.ATTACK;
-        } else if (canMoveTo(theMap, this.getPos())) {
+        } else if (checkAction(action3).valid) {
             this.autoAction = AutoActionEnum.MOVE;
         } else {
             this.autoAction = AutoActionEnum.NONE;
@@ -394,11 +423,15 @@ export function updateAutoActions(character) {
     });
 }
 
-// TODO: Move to ai.js (resolve cyclic imports)
+///////////////////////////////////////////////////////////////////////////////
+// TODO: Move this section to ai.js
+//
+// Will need to resolve cyclic imports.
 //   - Probably want to split action.js in two:
 //       - Definitions of action types (pure data, no imports)
 //       - Everything else
 //     Is that enough?
+
 export function chooseAiAction(character) {
     let characterPos = character.getPos();
     let theMap = findPaths(characterPos, 2 * character.speed);
@@ -447,6 +480,8 @@ export function chooseAiAction(character) {
         }
     }
 }
+
+///////////////////////////////////////////////////////////////////////////////
 
 export function clearAutoActions() {
     Crafty("GridObject").each(function() {
