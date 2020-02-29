@@ -269,13 +269,12 @@ function doActionAnimation(action, callback) {
                     ANIM_DUR_STEP,
                 );
             }),
-            pauseAnimation(2 * ANIM_DUR_STEP),
             tweenAnimation(damageText, function() {
                 damageText.tween(
                     {
                         alpha: 0.0,
                     },
-                    ANIM_DUR_STEP,
+                    ANIM_DUR_STEP * 3,
                 );
             }),
         ]);
