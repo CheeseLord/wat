@@ -254,13 +254,8 @@ function doActionAnimation(action, callback) {
 
         // Add the attack animation, regardless.
         let halfPos = midpoint(moveToPos, targetPos);
-        anims = anims.concat([
-            tweenAnimation(action.subject, function() {
-                action.subject.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
-            }),
-            tweenAnimation(action.subject, function() {
-                action.subject.animateTo(moveToPos, ANIM_DUR_HALF_ATTACK);
-            }),
+
+        let textAnim = seriesAnimations([
             tweenAnimation(damageText, function() {
                 damageText.tween(
                     {
@@ -278,6 +273,18 @@ function doActionAnimation(action, callback) {
                     ANIM_DUR_STEP * 3,
                 );
             }),
+        ]);
+
+        anims = anims.concat([
+            tweenAnimation(action.subject, function() {
+                action.subject.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
+            }),
+            parallelAnimations([
+                tweenAnimation(action.subject, function() {
+                    action.subject.animateTo(moveToPos, ANIM_DUR_HALF_ATTACK);
+                }),
+                textAnim,
+            ]),
         ]);
 
         anims = seriesAnimations(anims);
