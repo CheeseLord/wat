@@ -20,6 +20,7 @@ import {
     SPECIAL_ATTACK_DAMAGE_MIN,
     SPECIAL_ATTACK_DAMAGE_MAX,
     StateEnum,
+    Z_WORLD_UI,
 } from "./consts.js";
 import {
     findPaths,
@@ -238,6 +239,18 @@ function doActionAnimation(action, callback) {
             anims.push(pauseAnimation(ANIM_DUR_PAUSE_BW_MOV_ATK));
         }
 
+        let damageText = Crafty.e("2D, DOM, Text, Tween")
+                .attr({
+                    x:     action.target.x,
+                    y:     action.target.y,
+                    z:     Z_WORLD_UI + 2,  // TODO: Make this less awful.
+                    alpha: 0.00,
+                })
+                .textColor("rgba(255, 0, 0)")
+                .textAlign("center")
+                .textFont({size: "30px"})
+                .text("" + action.damage);
+
         // Add the attack animation, regardless.
         let halfPos = midpoint(moveToPos, targetPos);
         anims = anims.concat([
@@ -246,6 +259,25 @@ function doActionAnimation(action, callback) {
             }),
             tweenAnimation(action.subject, function() {
                 action.subject.animateTo(moveToPos, ANIM_DUR_HALF_ATTACK);
+            }),
+            tweenAnimation(damageText, function() {
+                damageText.tween(
+                    {
+                        alpha: 1.0,
+                        y:     action.target.y - 20,
+                    },
+                    ANIM_DUR_STEP,
+                );
+            }),
+            pauseAnimation(2 * ANIM_DUR_STEP),
+            tweenAnimation(damageText, function() {
+                damageText.tween(
+                    {
+                        alpha: 0.0,
+                        y:     action.target.y - 30,
+                    },
+                    ANIM_DUR_STEP,
+                );
             }),
         ]);
 
