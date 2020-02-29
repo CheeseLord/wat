@@ -264,7 +264,7 @@ function doActionAnimation(action, callback) {
                 damageText.tween(
                     {
                         alpha: 1.0,
-                        y:     action.target.y - 20,
+                        y:     action.target.y - 30,
                     },
                     ANIM_DUR_STEP,
                 );
@@ -274,7 +274,6 @@ function doActionAnimation(action, callback) {
                 damageText.tween(
                     {
                         alpha: 0.0,
-                        y:     action.target.y - 30,
                     },
                     ANIM_DUR_STEP,
                 );
