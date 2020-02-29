@@ -3,6 +3,10 @@
 "use strict";
 
 import {
+    getGlobalState,
+} from "./action.js";
+
+import {
     AutoActionEnum,
     Highlight,
     HL_RADIUS,
@@ -17,17 +21,15 @@ import {
 } from  "./consts.js";
 
 import {
-    findPaths,
-    getPath,
     gridPosToGraphics,
 } from "./geometry.js";
 
 import {
-    getGlobalState,
-} from "./action.js";
+    hoverHighlightObj,
+    clearHoverHighlights,
+} from "./highlight.js";
 
 import {
-    assert,
     internalError,
     userMessage,
 } from "./message.js";
@@ -69,7 +71,15 @@ Crafty.c("GridObject", {
     },
 
     events: {
-        "MouseOver": function() { hoverHighlightObj(this); },
+        "MouseOver": function() {
+            // TODO hover-highlight in other states (but only for actions that
+            // would actually be performed).
+            // TODO: Move this logic... somewhere else. Seems like maybe a UI
+            // question to me.
+            if (getGlobalState() === StateEnum.CHARACTER_SELECTED) {
+                hoverHighlightObj(this, selectedCharacter);
+            }
+        },
         "MouseOut":  function() { clearHoverHighlights();  },
     },
 
@@ -528,72 +538,3 @@ Crafty.c("Lever", {
     },
 });
 
-///////////////////////////////////////////////////////////////////////////////
-// TODO move to highlight.js (need to resolve cyclic imports)
-
-function hoverHighlightObj(obj) {
-    // TODO hover-highlight in other states (but only for actions that would
-    // actually be performed).
-    if (getGlobalState() !== StateEnum.CHARACTER_SELECTED) {
-        return;
-    }
-
-    let theMap  = findPaths(
-        selectedCharacter.getPos(),
-        selectedCharacter.actionPoints,
-    );
-    let destPos = obj.getPos();
-    let path    = getPath(theMap, selectedCharacter.getPos(), destPos);
-
-    if (obj.autoAction === AutoActionEnum.NONE) {
-        return;
-    } else if (path === null) {
-        assert(false);
-        return;
-    }
-
-    let endHighlight  = null;
-    let pathHighlight = null;
-
-    if (obj.autoAction === AutoActionEnum.MOVE) {
-        endHighlight  = Highlight.HOVER_MOVE_END;
-        pathHighlight = Highlight.HOVER_MOVE_MIDDLE;
-    } else if (obj.autoAction === AutoActionEnum.ATTACK) {
-        endHighlight  = Highlight.HOVER_ATTACK_END;
-        pathHighlight = Highlight.HOVER_ATTACK_MIDDLE;
-    } else if (obj.autoAction === AutoActionEnum.INTERACT) {
-        endHighlight  = Highlight.HOVER_INTERACT_END;
-        pathHighlight = Highlight.HOVER_INTERACT_MIDDLE;
-    } else {
-        assert(false);
-        // Should never happen, but I guess this is as good a default as any?
-        endHighlight  = Highlight.HOVER_MOVE_END;
-        pathHighlight = Highlight.HOVER_MOVE_MIDDLE;
-    }
-
-    obj.enableHighlight(endHighlight);
-
-    // Start at 1 because 0 is the ground under the character that's moving,
-    // and that character is probably already highlighted as "selected".
-    // End before length-1 because length-1 is the target, which was separately
-    // highlighted above with endHighlight.
-    for (let i = 1; i < path.length - 1; i++) {
-        Crafty("GridObject").each(function() {
-            if (this.getPos().x === path[i].x &&
-                    this.getPos().y === path[i].y) {
-                this.enableHighlight(pathHighlight);
-            }
-        });
-    }
-}
-
-function clearHoverHighlights() {
-    Crafty("GridObject").each(function() {
-        this.disableHighlight(Highlight.HOVER_INTERACT_END);
-        this.disableHighlight(Highlight.HOVER_INTERACT_MIDDLE);
-        this.disableHighlight(Highlight.HOVER_ATTACK_END);
-        this.disableHighlight(Highlight.HOVER_ATTACK_MIDDLE);
-        this.disableHighlight(Highlight.HOVER_MOVE_END);
-        this.disableHighlight(Highlight.HOVER_MOVE_MIDDLE);
-    });
-}
