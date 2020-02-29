@@ -20,6 +20,7 @@ import {
     SPECIAL_ATTACK_DAMAGE_MIN,
     SPECIAL_ATTACK_DAMAGE_MAX,
     StateEnum,
+    Z_WORLD_UI,
 } from "./consts.js";
 import {
     findPaths,
@@ -196,6 +197,7 @@ function doActionAnimation(action, callback) {
     setGlobalState(StateEnum.ANIMATING);
 
     let anims = seriesAnimations([]);
+    let cleanupCallback = callback;
 
     if (action.type === ActionType.MOVE) {
         let path = action.path;
@@ -238,18 +240,58 @@ function doActionAnimation(action, callback) {
             anims.push(pauseAnimation(ANIM_DUR_PAUSE_BW_MOV_ATK));
         }
 
+        let damageText = Crafty.e("2D, DOM, Text, Tween")
+                .attr({
+                    x:     action.target.x,
+                    y:     action.target.y,
+                    z:     Z_WORLD_UI + 2,  // TODO: Make this less awful.
+                    alpha: 0.00,
+                })
+                .textColor("rgba(255, 0, 0)")
+                .textAlign("center")
+                .textFont({size: "30px"})
+                .text("" + action.damage);
+
         // Add the attack animation, regardless.
         let halfPos = midpoint(moveToPos, targetPos);
+
+        let textAnim = seriesAnimations([
+            tweenAnimation(damageText, function() {
+                damageText.tween(
+                    {
+                        alpha: 1.0,
+                        y:     action.target.y - 30,
+                    },
+                    ANIM_DUR_STEP,
+                );
+            }),
+            tweenAnimation(damageText, function() {
+                damageText.tween(
+                    {
+                        alpha: 0.0,
+                    },
+                    ANIM_DUR_STEP * 3,
+                );
+            }),
+        ]);
+
         anims = anims.concat([
             tweenAnimation(action.subject, function() {
                 action.subject.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
             }),
-            tweenAnimation(action.subject, function() {
-                action.subject.animateTo(moveToPos, ANIM_DUR_HALF_ATTACK);
-            }),
+            parallelAnimations([
+                tweenAnimation(action.subject, function() {
+                    action.subject.animateTo(moveToPos, ANIM_DUR_HALF_ATTACK);
+                }),
+                textAnim,
+            ]),
         ]);
 
         anims = seriesAnimations(anims);
+        cleanupCallback = function() {
+            damageText.destroy();
+            callback();
+        };
     } else if (action.type === ActionType.SWAP_PLACES) {
         // Swap positions of subject and target.
         let selectPos = action.subject.getPos();
@@ -283,7 +325,7 @@ function doActionAnimation(action, callback) {
         internalError(`Invalid action type: ${action.type}`);
     }
 
-    doAnimate(anims, callback);
+    doAnimate(anims, cleanupCallback);
 
     // TODO: Make sure the global state gets reset.
 }
