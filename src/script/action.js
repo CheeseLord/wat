@@ -197,6 +197,7 @@ function doActionAnimation(action, callback) {
     setGlobalState(StateEnum.ANIMATING);
 
     let anims = seriesAnimations([]);
+    let cleanupCallback = callback;
 
     if (action.type === ActionType.MOVE) {
         let path = action.path;
@@ -280,6 +281,10 @@ function doActionAnimation(action, callback) {
         ]);
 
         anims = seriesAnimations(anims);
+        cleanupCallback = function() {
+            damageText.destroy();
+            callback();
+        };
     } else if (action.type === ActionType.SWAP_PLACES) {
         // Swap positions of subject and target.
         let selectPos = action.subject.getPos();
@@ -313,7 +318,7 @@ function doActionAnimation(action, callback) {
         internalError(`Invalid action type: ${action.type}`);
     }
 
-    doAnimate(anims, callback);
+    doAnimate(anims, cleanupCallback);
 
     // TODO: Make sure the global state gets reset.
 }
