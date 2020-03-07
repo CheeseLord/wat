@@ -85,7 +85,11 @@ export function checkAction(action) {
 
 export function doAction(action, callback) {
     assert(isValidActionType(action.type));
-    assert(checkAction(action).valid);
+    if (!checkAction(action).valid) {
+        internalError("Invalid action.");
+        callback();
+        return;
+    }
 
     // TODO: Details should be handled in a resolvedAction type, and we
     // should call a resolveAction functionhere.
