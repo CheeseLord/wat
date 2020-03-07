@@ -7,7 +7,6 @@ import {
 } from "./resolve_action.js";
 
 import {
-    AutoActionEnum,
     Highlight,
     HL_RADIUS,
     SPRITE_DUR_PER_FRAME,
@@ -63,7 +62,7 @@ Crafty.c("GridObject", {
         this.attr({w: TILE_WIDTH, h: TILE_HEIGHT});
         this.attr({blocksMovement: false});
 
-        this.autoAction = AutoActionEnum.NONE;
+        this.autoAction = null;
 
         // Highlighting
         this._highlights = new Array(Highlight.NUM_VALS).fill(false);

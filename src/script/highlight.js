@@ -3,15 +3,11 @@
 "use strict";
 
 import {
-    AutoActionEnum,
+    ActionType,
+} from "./action_type.js";
+import {
     Highlight,
 } from  "./consts.js";
-
-import {
-    findPaths,
-    getPath,
-} from "./geometry.js";
-
 import {
     assert,
 } from "./message.js";
@@ -44,57 +40,46 @@ export function clearAllHighlights() {
 
 export function createMovementGrid(character) {
     Crafty("GridObject").each(function() {
-        // Note: don't need to check isReachable here, since we only set
-        // autoActions on objects that are in range.
-        if (this.autoAction === AutoActionEnum.MOVE) {
+        if (this.autoAction === null) {
+            // No highlight
+        } else if (this.autoAction.type === ActionType.MOVE) {
             this.enableHighlight(Highlight.CAN_MOVE);
-        } else if (this.autoAction === AutoActionEnum.ATTACK) {
+        } else if (this.autoAction.type === ActionType.ATTACK) {
             this.enableHighlight(Highlight.CAN_ATTACK);
-        } else if (this.autoAction === AutoActionEnum.INTERACT) {
+        } else if (this.autoAction.type === ActionType.INTERACT) {
             this.enableHighlight(Highlight.CAN_INTERACT);
-        } else if (this.autoAction !== AutoActionEnum.NONE) {
+        } else {
+            // There are other ActionTypes, but none used as auto-actions.
             assert(false);
         }
     });
 }
 
 export function hoverHighlightObj(toObj, fromObj) {
-    // TODO: Get the path from the actionDesc which will be stored with toObj,
-    // don't take in fromObj at all.
-    //   - In fact, this should just be hoverHighlightAction, not
-    //     hoverHighlightObj.
-    let theMap  = findPaths(
-        fromObj.getPos(),
-        fromObj.actionPoints,
-    );
-    let destPos = toObj.getPos();
-    let path    = getPath(theMap, fromObj.getPos(), destPos);
-
-    if (toObj.autoAction === AutoActionEnum.NONE) {
-        return;
-    } else if (path === null) {
-        assert(false);
+    // TODO: This should just be hoverHighlightAction, not hoverHighlightObj.
+    if (toObj.autoAction === null) {
         return;
     }
 
     let endHighlight  = null;
     let pathHighlight = null;
 
-    if (toObj.autoAction === AutoActionEnum.MOVE) {
+    if (toObj.autoAction.type === ActionType.MOVE) {
         endHighlight  = Highlight.HOVER_MOVE_END;
         pathHighlight = Highlight.HOVER_MOVE_MIDDLE;
-    } else if (toObj.autoAction === AutoActionEnum.ATTACK) {
+    } else if (toObj.autoAction.type === ActionType.ATTACK) {
         endHighlight  = Highlight.HOVER_ATTACK_END;
         pathHighlight = Highlight.HOVER_ATTACK_MIDDLE;
-    } else if (toObj.autoAction === AutoActionEnum.INTERACT) {
+    } else if (toObj.autoAction.type === ActionType.INTERACT) {
         endHighlight  = Highlight.HOVER_INTERACT_END;
         pathHighlight = Highlight.HOVER_INTERACT_MIDDLE;
     } else {
         assert(false);
-        // Should never happen, but I guess this is as good a default as any?
-        endHighlight  = Highlight.HOVER_MOVE_END;
-        pathHighlight = Highlight.HOVER_MOVE_MIDDLE;
+        return;
     }
+
+    let path = toObj.autoAction.path;
+    assert(path !== undefined);
 
     toObj.enableHighlight(endHighlight);
 

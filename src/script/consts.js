@@ -69,13 +69,6 @@ export const StateEnum = Object.freeze({
     CHARACTER_INTERACT: {},
 });
 
-export const AutoActionEnum = Object.freeze({
-    NONE:     {},
-    MOVE:     {},
-    ATTACK:   {},
-    INTERACT: {},
-});
-
 // List of highlighting types. Several of these can be set on a single object,
 // in which case the lowest-valued one is the one that will be displayed.
 export const Highlight = Object.freeze({

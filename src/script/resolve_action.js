@@ -25,7 +25,6 @@ import {
     ANIM_DUR_STEP,
     ATTACK_DAMAGE_MIN,
     ATTACK_DAMAGE_MAX,
-    AutoActionEnum,
     SPECIAL_ATTACK_DAMAGE_MIN,
     SPECIAL_ATTACK_DAMAGE_MAX,
     StateEnum,
@@ -416,32 +415,32 @@ export function updateAutoActions(subject) {
     let theMap = findPaths(subjectPos, subject.actionPoints);
     Crafty("GridObject").each(function() {
         let target = this;
+        this.autoAction = null;
         let path = getPath(theMap, subjectPos, target.getPos());
         if (path === null) {
-            this.autoAction = AutoActionEnum.NONE;
             return;
         }
         // TODO: Make a list and loop over it. Store the ActionDesc instead of
         // a separate AutoActionEnum value, and then reuse that ActionDesc for
         // highlighting and resolving the action.
-        let action1 = interactAction(subject, target, path);
-        let action2 = attackAction(subject, target, path);
-        let action3 = moveAction(subject, path);
-        if (checkAction(action1).valid) {
-            this.autoAction = AutoActionEnum.INTERACT;
-        } else if (checkAction(action2).valid) {
-            this.autoAction = AutoActionEnum.ATTACK;
-        } else if (checkAction(action3).valid) {
-            this.autoAction = AutoActionEnum.MOVE;
-        } else {
-            this.autoAction = AutoActionEnum.NONE;
+        let tryActions = [
+            interactAction(subject, target, path),
+            attackAction(subject, target, path),
+            moveAction(subject, path),
+        ];
+        for (let i = 0; i < tryActions.length; i++) {
+            if (checkAction(tryActions[i]).valid) {
+                this.autoAction = tryActions[i];
+                break;
+            }
         }
+        // If none were valid, we already set autoAction to null above.
     });
 }
 
 export function clearAutoActions() {
     Crafty("GridObject").each(function() {
-        this.autoAction = AutoActionEnum.NONE;
+        this.autoAction = null;
     });
 }
 

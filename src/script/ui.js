@@ -11,7 +11,6 @@ import {
     swapPlacesAction,
 } from "./action_type.js";
 import {
-    AutoActionEnum,
     StateEnum,
     TILE_HEIGHT,
     TILE_HGAP,
@@ -242,7 +241,7 @@ function figureOutWhatTheUserMeant(inputDesc) {
 
     switch (getGlobalState()) {
         case StateEnum.CHARACTER_SELECTED:
-            return disambigFromAutoAction(subject, target, path);
+            return disambigFromAutoAction(target.autoAction);
         case StateEnum.CHARACTER_MOVE:
             return disambigActionIfPathExistsElseError(
                 path,
@@ -282,28 +281,11 @@ function checkSelectCharacter(target) {
 }
 
 // Automagically choose the right action for the character to do.
-function disambigFromAutoAction(subject, target, path) {
-    switch (target.autoAction) {
-        case AutoActionEnum.MOVE:
-            return disambigActionIfPathExistsElseError(
-                path,
-                moveAction(subject, path)
-            );
-        case AutoActionEnum.ATTACK:
-            return disambigActionIfPathExistsElseError(
-                path,
-                attackAction(subject, target, path)
-            );
-        case AutoActionEnum.INTERACT:
-            return disambigActionIfPathExistsElseError(
-                path,
-                interactAction(subject, target, path)
-            );
-        case AutoActionEnum.NONE:
-            return disambigError("No auto-action defined for that target.");
-        default:
-            internalError("Unknown auto-action type.");
-            return disambigError("An internal error occurred.");
+function disambigFromAutoAction(action) {
+    if (action === null) {
+        return disambigError("No auto-action defined for that target.");
+    } else {
+        return disambigAction(action);
     }
 }
 
