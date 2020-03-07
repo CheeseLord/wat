@@ -4,7 +4,7 @@
 
 import {
     getGlobalState,
-} from "./action.js";
+} from "./resolve_action.js";
 
 import {
     AutoActionEnum,

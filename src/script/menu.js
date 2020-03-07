@@ -5,16 +5,18 @@
 import {StateEnum} from "./consts.js";
 
 import {
-    chooseAiAction,
-    doAction,
     endTurnAction,
-    setGlobalState,
     specialAttackAction,
-} from  "./action.js";
+} from "./action_type.js";
 import {
     debugLog,
     internalError,
 } from "./message.js";
+import {
+    chooseAiAction,
+    doAction,
+    setGlobalState,
+} from  "./resolve_action.js";
 import {
     afterPlayerMove,
     deselectCharacter,

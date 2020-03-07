@@ -8,7 +8,7 @@ import {
     doAction,
     setGlobalState,
     updateAutoActions,
-} from "./action.js";
+} from "./resolve_action.js";
 import {
     Highlight,
     NUM_TEAMS,

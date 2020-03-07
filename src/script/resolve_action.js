@@ -3,6 +3,15 @@
 "use strict";
 
 import {
+    ActionType,
+    attackAction,
+    endTurnAction,
+    getActionPointCost,
+    interactAction,
+    isValidActionType,
+    moveAction,
+} from "./action_type.js";
+import {
     doAnimate,
     parallelAnimations,
     pauseAnimation,
@@ -46,110 +55,10 @@ import {
 // other modules don't see the new value. Therefore, instead of allowing other
 // modules import globalState directly, have them access it through
 // {get,set}GlobalState.
+// TODO [#36]: What the heck is globalState, and why is it in action.js?
 var globalState = StateEnum.DEFAULT;
 export function getGlobalState() { return globalState; }
 export function setGlobalState(newState) { globalState = newState; }
-
-///////////////////////////////////////////////////////////////////////////////
-// "Janky class" ActionDesc -- describes an action that will be taken.
-// Type identified by the 'type' field, a member of ActionType.
-// Other fields based on type, see factory functions below.
-
-export const ActionType = Object.freeze({
-    MOVE:           "MOVE",
-    ATTACK:         "ATTACK",
-    INTERACT:       "INTERACT",
-    SWAP_PLACES:    "SWAP_PLACES",
-    SPECIAL_ATTACK: "SPECIAL_ATTACK",
-    END_TURN:       "END_TURN",
-});
-
-function isValidActionType(actionType) {
-    return ActionType.hasOwnProperty(actionType);
-}
-
-export function moveAction(subject, path) {
-    return {
-        type:    ActionType.MOVE,
-        subject: subject,
-        path:    path,
-    };
-}
-
-export function attackAction(subject, target, path) {
-    return actionWithPathAndTarget(ActionType.ATTACK, subject, target, path);
-}
-
-export function interactAction(subject, target, path) {
-    return actionWithPathAndTarget(ActionType.INTERACT, subject, target, path);
-}
-
-export function swapPlacesAction(subject, target) {
-    return {
-        type:    ActionType.SWAP_PLACES,
-        subject: subject,
-        target:  target,
-    };
-}
-
-export function specialAttackAction(subject) {
-    return nullaryAction(ActionType.SPECIAL_ATTACK, subject);
-}
-
-export function endTurnAction(subject) {
-    return nullaryAction(ActionType.END_TURN, subject);
-}
-
-// Note: path includes the target. These actions consist of moving to path[-2]
-// and then interacting with the target, which is presumably at path[-1].
-function actionWithPathAndTarget(type, subject, target, path) {
-    return {
-        type:    type,
-        subject: subject,
-        path:    path,
-        target:  target,
-    };
-}
-
-function nullaryAction(type, subject) {
-    return {
-        type:    type,
-        subject: subject,
-    };
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Action-related queries
-
-function getActionPointCost(action) {
-    switch (action.type) {
-        case ActionType.MOVE:
-        case ActionType.ATTACK:
-        case ActionType.INTERACT:
-            // Path length must at least include starting point
-            assert(action.path.length >= 1);
-            let cost = action.path.length - 1;
-            // For move, action.path.length - 1 is the number of squares of
-            // movement, which equals the AP cost, so we're done.
-            // For interact/attack, it's one more than the number of squares of
-            // movement because it includes the target. So currently cost is 1
-            // per square of movement plus 1 for the final action.
-            // For (move-and-)attack, add 1 because the attack itself costs 2.
-            if (action.type === ActionType.ATTACK) {
-                cost += 1;
-            }
-            return cost;
-        case ActionType.SWAP_PLACES:
-            return 2;
-        case ActionType.SPECIAL_ATTACK:
-            return 3;
-        case ActionType.END_TURN:
-            return action.subject.actionPoints;
-        default:
-            internalError("Unknown ActionType");
-            return Infinity;
-    }
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Action handlers
@@ -437,35 +346,9 @@ function failCheck(reason) {
     return {valid: false, reason: reason};
 }
 
-export function updateAutoActions(subject) {
-    let subjectPos = subject.getPos();
-    let theMap = findPaths(subjectPos, subject.actionPoints);
-    Crafty("GridObject").each(function() {
-        let target = this;
-        let path = getPath(theMap, subjectPos, target.getPos());
-        if (path === null) {
-            this.autoAction = AutoActionEnum.NONE;
-            return;
-        }
-        // TODO: Make a list and loop over it. Store the ActionDesc instead of
-        // a separate AutoActionEnum value, and then reuse that ActionDesc for
-        // highlighting and resolving the action.
-        let action1 = interactAction(subject, target, path);
-        let action2 = attackAction(subject, target, path);
-        let action3 = moveAction(subject, path);
-        if (checkAction(action1).valid) {
-            this.autoAction = AutoActionEnum.INTERACT;
-        } else if (checkAction(action2).valid) {
-            this.autoAction = AutoActionEnum.ATTACK;
-        } else if (checkAction(action3).valid) {
-            this.autoAction = AutoActionEnum.MOVE;
-        } else {
-            this.autoAction = AutoActionEnum.NONE;
-        }
-    });
-}
-
 ///////////////////////////////////////////////////////////////////////////////
+// AI logic
+//
 // TODO: Move this section to ai.js
 //
 // Will need to resolve cyclic imports.
@@ -524,6 +407,37 @@ export function chooseAiAction(character) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// AutoAction stuff
+//
+// TODO: Probably also doesn't belong in this file.
+
+export function updateAutoActions(subject) {
+    let subjectPos = subject.getPos();
+    let theMap = findPaths(subjectPos, subject.actionPoints);
+    Crafty("GridObject").each(function() {
+        let target = this;
+        let path = getPath(theMap, subjectPos, target.getPos());
+        if (path === null) {
+            this.autoAction = AutoActionEnum.NONE;
+            return;
+        }
+        // TODO: Make a list and loop over it. Store the ActionDesc instead of
+        // a separate AutoActionEnum value, and then reuse that ActionDesc for
+        // highlighting and resolving the action.
+        let action1 = interactAction(subject, target, path);
+        let action2 = attackAction(subject, target, path);
+        let action3 = moveAction(subject, path);
+        if (checkAction(action1).valid) {
+            this.autoAction = AutoActionEnum.INTERACT;
+        } else if (checkAction(action2).valid) {
+            this.autoAction = AutoActionEnum.ATTACK;
+        } else if (checkAction(action3).valid) {
+            this.autoAction = AutoActionEnum.MOVE;
+        } else {
+            this.autoAction = AutoActionEnum.NONE;
+        }
+    });
+}
 
 export function clearAutoActions() {
     Crafty("GridObject").each(function() {

@@ -3,6 +3,14 @@
 "use strict";
 
 import {
+    attackAction,
+    endTurnAction,
+    interactAction,
+    moveAction,
+    specialAttackAction,
+    swapPlacesAction,
+} from "./action_type.js";
+import {
     AutoActionEnum,
     StateEnum,
     TILE_HEIGHT,
@@ -11,20 +19,13 @@ import {
     TILE_WIDTH,
 } from "./consts.js";
 import {
+    equalPos,
+    findPaths,
+    getPath,
+} from "./geometry.js";
+import {
     doMenu,
 } from "./menu.js";
-import {
-    attackAction,
-    checkAction,
-    chooseAiAction,
-    doAction,
-    endTurnAction,
-    getGlobalState,
-    interactAction,
-    moveAction,
-    specialAttackAction,
-    swapPlacesAction,
-} from "./action.js";
 import {
     assert,
     debugLog,
@@ -32,10 +33,11 @@ import {
     userError,
 } from "./message.js";
 import {
-    equalPos,
-    findPaths,
-    getPath,
-} from "./geometry.js";
+    checkAction,
+    chooseAiAction,
+    doAction,
+    getGlobalState,
+} from "./resolve_action.js";
 import {
     afterPlayerMove,
     canMoveThisTurn,
