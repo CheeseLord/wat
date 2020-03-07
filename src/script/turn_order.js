@@ -4,11 +4,7 @@
 
 import {
     chooseAiAction,
-    clearAutoActions,
-    doAction,
-    setGlobalState,
-    updateAutoActions,
-} from "./resolve_action.js";
+} from  "./ai.js";
 import {
     Highlight,
     NUM_TEAMS,
@@ -29,6 +25,12 @@ import {
     internalError,
     userMessage,
 } from "./message.js";
+import {
+    clearAutoActions,
+    doAction,
+    setGlobalState,
+    updateAutoActions,
+} from "./resolve_action.js";
 import {
     setFocusOn,
 } from "./view.js";

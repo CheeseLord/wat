@@ -9,11 +9,13 @@ import {
     specialAttackAction,
 } from "./action_type.js";
 import {
+    chooseAiAction,
+} from  "./ai.js";
+import {
     debugLog,
     internalError,
 } from "./message.js";
 import {
-    chooseAiAction,
     doAction,
     setGlobalState,
 } from  "./resolve_action.js";

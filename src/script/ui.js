@@ -11,6 +11,9 @@ import {
     swapPlacesAction,
 } from "./action_type.js";
 import {
+    chooseAiAction,
+} from  "./ai.js";
+import {
     StateEnum,
     TILE_HEIGHT,
     TILE_HGAP,
@@ -33,7 +36,6 @@ import {
 } from "./message.js";
 import {
     checkAction,
-    chooseAiAction,
     doAction,
     getGlobalState,
 } from "./resolve_action.js";
