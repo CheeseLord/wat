@@ -87,8 +87,9 @@ export function doAction(action, callback) {
     assert(isValidActionType(action.type));
     if (!checkAction(action).valid) {
         internalError("Invalid action.");
-        callback();
-        return;
+        // TODO [#31]: Refuse to perform the action.
+        // callback();
+        // return;
     }
 
     // TODO: Details should be handled in a resolvedAction type, and we
