@@ -86,10 +86,19 @@ export function checkAction(action) {
 export function doAction(action, callback) {
     assert(isValidActionType(action.type));
     if (!checkAction(action).valid) {
+        // Callers are supposed to prevent this from happening, so if we get
+        // here it indicates a bug in the code. In the interest of both
+        // debugging and continuing somewhat gracefully:
+        //   - Report an internal error, so we can catch and fix the bug.
+        //   - Skip this action, so neither users nor AI can use such a bug to
+        //     cheat.
+        //   - End the current character's turn, so that if this is an AI move
+        //     we don't go into an infinite loop of trying and failing the same
+        //     invalid action over and over again.
         internalError("Invalid action.");
-        // TODO [#31]: Refuse to perform the action.
-        // callback();
-        // return;
+        action.subject.actionPoints = 0;
+        callback();
+        return;
     }
 
     // TODO: Details should be handled in a resolvedAction type, and we
