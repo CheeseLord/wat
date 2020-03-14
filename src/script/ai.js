@@ -12,18 +12,10 @@ import {
     getPath,
     getDist,
 } from "./geometry.js";
+import {
+    checkAction,
+} from "./resolve_action.js";
 
-
-///////////////////////////////////////////////////////////////////////////////
-// AI logic
-//
-// TODO: Move this section to ai.js
-//
-// Will need to resolve cyclic imports.
-//   - Probably want to split action.js in two:
-//       - Definitions of action types (pure data, no imports)
-//       - Everything else
-//     Is that enough?
 
 export function chooseAiAction(character) {
     let characterPos = character.getPos();
@@ -43,33 +35,38 @@ export function chooseAiAction(character) {
     });
     if (nearestTarget === null) {
         return endTurnAction(character);
-    } else if (getDist(theMap, characterPos, nearestTarget.getPos()) <=
-               character.speed) {
-        let path = getPath(
-            theMap,
-            character.getPos(),
-            nearestTarget.getPos()
-        );
-        return attackAction(character, nearestTarget, path);
     } else {
         let path = getPath(
             theMap,
-            character.getPos(),
+            characterPos,
             nearestTarget.getPos()
         );
-        let target = null;
-        let x = path[character.speed].x;
-        let y = path[character.speed].y;
-        // FIXME: Don't reference "Ground" by name.
-        Crafty("Ground").each(function() {
-            if (this.getPos().x === x && this.getPos().y === y) {
-                target = this;
-            }
-        });
-        if (target === null) {
+        if (path === null) {
             return endTurnAction(character);
-        } else {
-            return moveAction(character, path.slice(0, character.speed + 1));
         }
+
+        let tryAttack = attackAction(character, nearestTarget, path);
+        if (checkAction(tryAttack).valid) {
+            return tryAttack;
+        }
+
+        // Can't attack the target; instead, move toward it as far as we can.
+        // Give up once we get down to a length of 1, since that's just the
+        // starting cell (and doesn't indicate actually moving anywhere).
+        while (path.length > 1) {
+            let tryMove = moveAction(character, path);
+            if (checkAction(tryMove).valid) {
+                return tryMove;
+            }
+
+            // The move action wasn't valid; shorten it by 1 and try again.
+            path.pop();
+        }
+
+        // Even after shortening the path down to nothing, we weren't able to
+        // move. This can happen if we are adjacent to the target, but don't
+        // have enough action points to attack it. In this case, skip our turn
+        // since we have nothing useful to do.
+        return endTurnAction(character);
     }
 }
