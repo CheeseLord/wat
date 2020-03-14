@@ -47,13 +47,20 @@ export function internalWarning(message) {
     Crafty.error("Warning: " + message);
 }
 
+var haveAlertedForInternalError = false;
+
 export function internalError(message) {
     Crafty.error(message);
+    if (!haveAlertedForInternalError) {
+        window.alert("An internal error has occurred. See the console for " +
+                     "details.");
+        haveAlertedForInternalError = true;
+    }
 }
 
 export function assert(expr) {
     if (!expr) {
-        Crafty.error("Assertion failed.");
+        internalError("Assertion failed.");
     }
 }
 
