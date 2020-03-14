@@ -213,6 +213,10 @@ function checkForGameEnd() {
 
 
 export function beginLevel(team) {
+    clearAllHighlights();
+    // TODO: Call clearMenu (from menu.js) instead. Can't do that right now
+    // because of cyclic imports.
+    Crafty.s("ButtonMenu").clearMenu();
     startTeam(team);
     assert(anyCharactersReady());
 }
@@ -236,7 +240,9 @@ function requestMoveFromAI(character) {
 // Menu-related action helpers (and some misc?)
 
 export function afterPlayerMove() {
-    Crafty.s("ButtonMenu").clearMenu(); // TODO UI call instead?
+    // TODO: Call clearMenu (from menu.js) instead. Can't do that right now
+    // because of cyclic imports.
+    Crafty.s("ButtonMenu").clearMenu();
     endCharacter(selectedCharacter);
 }
 
