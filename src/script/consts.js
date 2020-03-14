@@ -51,6 +51,10 @@ export const PLAYER_TEAM = 0;
 // 1d4 + 3
 export const ATTACK_DAMAGE_MIN = 4;
 export const ATTACK_DAMAGE_MAX = 7;
+// 1d4 + 1
+export const RANGED_ATTACK_DAMAGE_MIN = 2;
+export const RANGED_ATTACK_DAMAGE_MAX = 5;
+export const RANGED_ATTACK_RANGE = 5;
 // Exactly 4 damage
 export const SPECIAL_ATTACK_DAMAGE_MIN = 4;
 export const SPECIAL_ATTACK_DAMAGE_MAX = 4;
@@ -59,14 +63,15 @@ export const SPECIAL_ATTACK_DAMAGE_MAX = 4;
 //     https://stackoverflow.com/a/5040502
 // Always use === for checking equality, otherwise always true
 export const StateEnum = Object.freeze({
-    DEFAULT:            {},
-    NO_INPUT:           {},
-    ANIMATING:          {},
-    CHARACTER_SELECTED: {},
-    CHARACTER_MOVE:     {},
-    CHARACTER_SWAP:     {},
-    CHARACTER_ATTACK:   {},
-    CHARACTER_INTERACT: {},
+    DEFAULT:                 {},
+    NO_INPUT:                {},
+    ANIMATING:               {},
+    CHARACTER_SELECTED:      {},
+    CHARACTER_MOVE:          {},
+    CHARACTER_SWAP:          {},
+    CHARACTER_ATTACK:        {},
+    CHARACTER_RANGED_ATTACK: {},
+    CHARACTER_INTERACT:      {},
 });
 
 // List of highlighting types. Several of these can be set on a single object,

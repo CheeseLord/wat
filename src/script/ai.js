@@ -10,7 +10,7 @@ import {
 import {
     findPaths,
     getPath,
-    getDist,
+    getPathLength,
 } from "./geometry.js";
 import {
     checkAction,
@@ -27,7 +27,7 @@ export function chooseAiAction(character) {
         if (this.team === character.team) {
             return;
         }
-        dist = getDist(theMap, characterPos, this.getPos());
+        dist = getPathLength(theMap, characterPos, this.getPos());
         if (dist < bestDist) {
             bestDist = dist;
             nearestTarget = this;

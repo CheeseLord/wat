@@ -24,6 +24,9 @@ import {
     ANIM_DUR_STEP,
     ATTACK_DAMAGE_MIN,
     ATTACK_DAMAGE_MAX,
+    RANGED_ATTACK_DAMAGE_MIN,
+    RANGED_ATTACK_DAMAGE_MAX,
+    RANGED_ATTACK_RANGE,
     SPECIAL_ATTACK_DAMAGE_MIN,
     SPECIAL_ATTACK_DAMAGE_MAX,
     StateEnum,
@@ -35,6 +38,7 @@ import {
     isAdjacent,
     isPathValid,
     midpoint,
+    getDistance,
 } from "./geometry.js";
 import {
     highlightPath,
@@ -73,6 +77,8 @@ export function checkAction(action) {
             return checkInteract(action);
         case ActionType.SWAP_PLACES:
             return checkSwap(action);
+        case ActionType.RANGED_ATTACK:
+            return checkRangedAttack(action);
         case ActionType.SPECIAL_ATTACK:
             return passCheck(); // TODO?
         case ActionType.END_TURN:
@@ -102,9 +108,14 @@ export function doAction(action, callback) {
     }
 
     // TODO: Details should be handled in a resolvedAction type, and we
-    // should call a resolveAction functionhere.
+    // should call a resolveAction function here.
     if (action.type === ActionType.ATTACK) {
         action.damage = randInt(ATTACK_DAMAGE_MIN, ATTACK_DAMAGE_MAX);
+    } else if (action.type === ActionType.RANGED_ATTACK) {
+        action.damage = randInt(
+            RANGED_ATTACK_DAMAGE_MIN,
+            RANGED_ATTACK_DAMAGE_MAX,
+        );
     }
 
     doActionAnimation(action, function() {
@@ -237,6 +248,8 @@ function doActionAnimation(action, callback) {
         }
 
         anims = seriesAnimations(anims);
+    } else if (action.type === ActionType.RANGED_ATTACK) {
+        // FIXME: No animation.
     } else if (action.type === ActionType.SPECIAL_ATTACK) {
         // No animation.
     } else if (action.type === ActionType.END_TURN) {
@@ -262,6 +275,9 @@ function updateState(action) {
         // State change handle by Crafty's animation.
     } else if (action.type === ActionType.INTERACT) {
         action.target.interact(action.subject);
+    } else if (action.type === ActionType.RANGED_ATTACK) {
+        // TODO: This should read damage from resolved action.
+        action.target.takeDamage(action.damage);
     } else if (action.type === ActionType.SPECIAL_ATTACK) {
         // TODO: Handle the damage in resolveAction.
         Crafty("Character").each(function() {
@@ -338,6 +354,26 @@ function checkAttack(action) {
         );
         if (!isPathValid(theMap, action.subject, action.path, false)) {
             return failCheck("Can't attack: invalid path to target.");
+        } else {
+            return passCheck();
+        }
+    }
+}
+
+function checkRangedAttack(action) {
+    if (action.target === null) {
+        return failCheck("No enemy there.");
+    } else if (!action.target.has("Character")) {
+        return failCheck("Can't attack non-character.");
+    } else if (action.target.team === action.subject.team) {
+        return failCheck("Can't attack friendly unit.");
+    } else {
+        let dist = getDistance(
+            action.subject.getPos(),
+            action.target.getPos(),
+        );
+        if (dist > RANGED_ATTACK_RANGE) {
+            return failCheck("Enemy too far away.");
         } else {
             return passCheck();
         }

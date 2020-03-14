@@ -15,6 +15,7 @@ export const ActionType = Object.freeze({
     ATTACK:         "ATTACK",
     INTERACT:       "INTERACT",
     SWAP_PLACES:    "SWAP_PLACES",
+    RANGED_ATTACK:  "RANGED_ATTACK",
     SPECIAL_ATTACK: "SPECIAL_ATTACK",
     END_TURN:       "END_TURN",
 });
@@ -40,11 +41,11 @@ export function interactAction(subject, target, path) {
 }
 
 export function swapPlacesAction(subject, target) {
-    return {
-        type:    ActionType.SWAP_PLACES,
-        subject: subject,
-        target:  target,
-    };
+    return actionWithTarget(ActionType.SWAP_PLACES, subject, target);
+}
+
+export function rangedAttackAction(subject, target) {
+    return actionWithTarget(ActionType.RANGED_ATTACK, subject, target);
 }
 
 export function specialAttackAction(subject) {
@@ -53,6 +54,14 @@ export function specialAttackAction(subject) {
 
 export function endTurnAction(subject) {
     return nullaryAction(ActionType.END_TURN, subject);
+}
+
+function actionWithTarget(type, subject, target) {
+    return {
+        type:    type,
+        subject: subject,
+        target:  target,
+    };
 }
 
 // Note: path includes the target. These actions consist of moving to path[-2]
@@ -95,6 +104,8 @@ export function getActionPointCost(action) {
             }
             return cost;
         case ActionType.SWAP_PLACES:
+            return 2;
+        case ActionType.RANGED_ATTACK:
             return 2;
         case ActionType.SPECIAL_ATTACK:
             return 3;

@@ -94,9 +94,10 @@ var menuTable = {
         title:   "Attack",
         state:   StateEnum.CHARACTER_ATTACK,
         buttons: [
-            // Text            New Menu       Action
-            ["Basic Attack",   "basicAttack", doNothing],
-            ["Special Attack", CLEAR_MENU,    () => {
+            // Text            New Menu        Action
+            ["Basic Attack",   "basicAttack",  doNothing],
+            ["Ranged Attack",  "rangedAttack", doNothing],
+            ["Special Attack", CLEAR_MENU,     () => {
                 doAction(
                     specialAttackAction(selectedCharacter),
                     afterPlayerMove
@@ -109,6 +110,15 @@ var menuTable = {
     basicAttack: {
         title:   "Basic Attack",
         state:   StateEnum.CHARACTER_ATTACK,
+        buttons: [
+            // Text  New Menu     Action
+            ["Back", PARENT_MENU, doNothing],
+        ],
+    },
+
+    rangedAttack: {
+        title:   "Ranged Attack",
+        state:   StateEnum.CHARACTER_RANGED_ATTACK,
         buttons: [
             // Text  New Menu     Action
             ["Back", PARENT_MENU, doNothing],

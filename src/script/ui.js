@@ -7,6 +7,7 @@ import {
     endTurnAction,
     interactAction,
     moveAction,
+    rangedAttackAction,
     specialAttackAction,
     swapPlacesAction,
 } from "./action_type.js";
@@ -259,6 +260,8 @@ function figureOutWhatTheUserMeant(inputDesc) {
                 path,
                 interactAction(subject, target, path)
             );
+        case StateEnum.CHARACTER_RANGED_ATTACK:
+            return disambigAction(rangedAttackAction(subject, target));
         case StateEnum.CHARACTER_SWAP:
             return disambigAction(swapPlacesAction(subject, target));
         default:

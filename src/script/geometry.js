@@ -16,8 +16,6 @@ export function equalPos(pos1, pos2) {
     return pos1.x === pos2.x && pos1.y === pos2.y;
 }
 
-// Note: This function is NOT equivalent to getDistance(pos1, pos2) <= 1,
-// because it allows diagonals.
 export function isAdjacent(pos1, pos2) {
     return (Math.abs(pos2.x - pos1.x) <= 1 && Math.abs(pos2.y - pos1.y) <= 1);
 }
@@ -95,7 +93,7 @@ export function findPaths(startPos, maxDistance) {
     return dynamicMap;
 }
 
-export function getDist(theMap, startPos, endPos) {
+export function getPathLength(theMap, startPos, endPos) {
     let thePath = getPath(theMap, startPos, endPos);
     if (thePath === null) {
         return Infinity;
@@ -252,5 +250,13 @@ function getNeighbors(theMap, pos) {
     }
 
     return neighbors;
+}
+
+// Get the distance between points, irrespective of path.
+// Assumes the square root of 2 is 1.
+export function getDistance(pos1, pos2) {
+    let xDist = Math.abs(pos1.x - pos2.x);
+    let yDist = Math.abs(pos1.y - pos2.y);
+    return Math.max(xDist, yDist);
 }
 
