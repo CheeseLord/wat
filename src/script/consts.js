@@ -32,8 +32,9 @@ export const Z_BACKGROUND  =  0; // Probably no entities here?
 export const Z_GROUND      = 10;
 export const Z_SCENERY     = 20; // Walls, doodads
 export const Z_CHARACTER   = 30; // Things that move around
-export const Z_WORLD_UI    = 40; // UI stuff in the world itself
-export const Z_UI          = 50; // Separate UI layer - above all world stuff
+export const Z_PARTICLE    = 40; // Things briefly present for animations
+export const Z_WORLD_UI    = 50; // UI stuff in the world itself
+export const Z_UI          = 60; // Separate UI layer - above all world stuff
 
 export const SPRITE_DUR_PER_FRAME      = 250;
 export const ANIM_DUR_CENTER_TURN      = 200;
@@ -41,6 +42,8 @@ export const ANIM_DUR_MOVE             = 200;
 export const ANIM_DUR_STEP             = 100;
 export const ANIM_DUR_HALF_ATTACK      = 100;
 export const ANIM_DUR_PAUSE_BW_MOV_ATK = 80;
+export const ANIM_DUR_RANGED_SHOT      = 150;
+export const ANIM_DUR_PAUSE_AFTER_SHOT = 50;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Other stuff (actual gameplay?)

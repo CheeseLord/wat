@@ -5,11 +5,12 @@ import {
 } from "./message.js";
 
 const AnimType = Object.freeze({
-    SINGLE:   {},
-    NOTHING:  {},
-    PAUSE:    {},
-    SERIES:   {},
-    PARALLEL: {},
+    SINGLE:      {},
+    NOTHING:     {},
+    SYNCHRONOUS: {},
+    PAUSE:       {},
+    SERIES:      {},
+    PARALLEL:    {},
 });
 
 export function animation(endObj, endEventName, startFunc) {
@@ -26,16 +27,33 @@ export function tweenAnimation(endObj, startFunc) {
     return animation(endObj, "TweenEnd", startFunc);
 }
 
+///////////////////////////////////////////////////////////////////////////////
 // Special cases
+
+// Do nothing
 export function nopAnimation() {
     // Note: we could also just use seriesAnimations([]). But not
     // parallelAnimations([]), at least not as it's currently implemented.
     // TODO: Maybe fix that?
+    // Note: could also be synchronousAnimation(function() {}).
     return {
         type: AnimType.NOTHING,
     };
 }
 
+// Call a function, wait for it to return. Not really an animation (since by
+// necessity, the event loop can't run while the function is running), but
+// useful for doing quick bookkeeping in the middle of a series of animations
+// (for example, to delete particle entities that are no longer wanted).
+export function synchronousAnimation(func) {
+    return {
+        type: AnimType.SYNCHRONOUS,
+        func: func,
+    };
+}
+
+// Wait for duration. Don't create any new animations, but the event loop will
+// continue on in the background.
 export function pauseAnimation(duration) {
     return {
         type:     AnimType.PAUSE,
@@ -43,7 +61,9 @@ export function pauseAnimation(duration) {
     };
 }
 
+///////////////////////////////////////////////////////////////////////////////
 // Combinators
+
 export function seriesAnimations(contents) {
     return {
         type:     AnimType.SERIES,
@@ -64,6 +84,9 @@ export function doAnimate(animDesc, callback) {
         animDesc.func();
         animDesc.obj.one(animDesc.evt, callback);
     } else if (animDesc.type === AnimType.NOTHING) {
+        callback();
+    } else if (animDesc.type === AnimType.SYNCHRONOUS) {
+        animDesc.func();
         callback();
     } else if (animDesc.type === AnimType.PAUSE) {
         setTimeout(callback, animDesc.duration);

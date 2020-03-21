@@ -154,6 +154,13 @@ export function doTheThing() {
                         pulled_lever:   [1, 0],
                     },
                 },
+                "bullet.png": {
+                    tile:     32,
+                    tileh:    32,
+                    map:      {
+                        bullet_anim: [0, 0],
+                    },
+                },
             },
         },
         function() {

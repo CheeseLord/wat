@@ -15,12 +15,15 @@ import {
     parallelAnimations,
     pauseAnimation,
     seriesAnimations,
+    synchronousAnimation,
     tweenAnimation,
 } from "./animation.js";
 import {
     ANIM_DUR_HALF_ATTACK,
     ANIM_DUR_MOVE,
+    ANIM_DUR_PAUSE_AFTER_SHOT,
     ANIM_DUR_PAUSE_BW_MOV_ATK,
+    ANIM_DUR_RANGED_SHOT,
     ANIM_DUR_STEP,
     ATTACK_DAMAGE_MIN,
     ATTACK_DAMAGE_MAX,
@@ -30,6 +33,7 @@ import {
     SPECIAL_ATTACK_DAMAGE_MIN,
     SPECIAL_ATTACK_DAMAGE_MAX,
     StateEnum,
+    Z_PARTICLE,
     Z_WORLD_UI,
 } from "./consts.js";
 import {
@@ -223,6 +227,27 @@ function doActionAnimation(action, callback) {
             damageText.destroy();
             callback();
         };
+    } else if (action.type === ActionType.RANGED_ATTACK) {
+        let bullet = Crafty.e("2D, DOM, bullet_anim, Tween")
+                .attr({
+                    x: action.subject.x,
+                    y: action.subject.y,
+                    z: Z_PARTICLE,
+                });
+        // TODO: The duration for this tween should be dependent on the
+        // distance. Have a bullet speed, not a fixed bullet duration.
+        anims = seriesAnimations([
+            tweenAnimation(bullet, function() {
+                bullet.tween({
+                    x: action.target.x,
+                    y: action.target.y,
+                }, ANIM_DUR_RANGED_SHOT);
+            }),
+            synchronousAnimation(function() {
+                bullet.destroy();
+            }),
+            pauseAnimation(ANIM_DUR_PAUSE_AFTER_SHOT),
+        ]);
     } else if (action.type === ActionType.SWAP_PLACES) {
         // Swap positions of subject and target.
         let selectPos = action.subject.getPos();
