@@ -7,7 +7,6 @@ import {
 } from "./resolve_action.js";
 
 import {
-    Highlight,
     SPRITE_DUR_PER_FRAME,
     StateEnum,
     TILE_HEIGHT,
@@ -28,7 +27,6 @@ import {
 } from "./highlight.js";
 
 import {
-    internalError,
     userMessage,
 } from "./message.js";
 
@@ -51,7 +49,6 @@ Crafty.c("GridObject", {
         this.autoAction = null;
 
         // Highlighting
-        this._highlights = new Array(Highlight.NUM_VALS).fill(false);
         this._bgColor          = null;
         this._defaultHighlight = null;
         this._hoverHighlight   = null;
@@ -126,7 +123,7 @@ Crafty.c("GridObject", {
 
     _redraw: function() {
         // Find the first highlight category which is set.
-        let displayHlType = null;
+        let hlColor = null;
         let hlToTry = [
             this._animHighlight,
             this._hoverHighlight,
@@ -134,68 +131,17 @@ Crafty.c("GridObject", {
         ];
         for (let i = 0; i < hlToTry.length; i++) {
             if (hlToTry[i] !== null) {
-                displayHlType = hlToTry[i];
+                hlColor = hlToTry[i];
                 break;
             }
         }
 
-        if (displayHlType === null)  {
-            // No highlight flags set.
+        if (hlColor !== null)  {
+            return this._setHighlight(hlColor);
+        } else {
+            // No highlight set.
             return this._clearHighlight();
         }
-
-        // Map each highlight flag to a border color.
-        // TODO: Better colors.
-        // TODO: Make the colors the named constants, avoid this switch.
-        let hlColor = null;
-        switch (displayHlType) {
-            // TODO proper rgba handling
-            // TODO: these colors still need tweaking.
-            case Highlight.SELECTED_CHARACTER:
-                hlColor = "#ffff00bb"; break;
-            case Highlight.AVAILABLE_CHARACTER:
-                hlColor = "#ffff0066"; break;
-
-            case Highlight.CAN_MOVE:
-                hlColor = "#9f6900ff"; break;
-            case Highlight.CAN_ATTACK:
-                hlColor = "#7f000088"; break;
-            case Highlight.CAN_INTERACT:
-                hlColor = "#007f0088"; break;
-
-            case Highlight.HOVER_MOVE_MIDDLE:
-                hlColor = "#003f3f88"; break;
-            case Highlight.HOVER_MOVE_END:
-                hlColor = "#00007f88"; break;
-            case Highlight.HOVER_ATTACK_MIDDLE:
-                hlColor = "#cf3400ff"; break;
-            case Highlight.HOVER_ATTACK_END:
-                hlColor = "#ff000088"; break;
-            case Highlight.HOVER_INTERACT_MIDDLE:
-                hlColor = "#4fb400ff"; break;
-            case Highlight.HOVER_INTERACT_END:
-                hlColor = "#00ff0088"; break;
-
-            case Highlight.ANIM_MOVE_MIDDLE:
-                hlColor = "#007f7f88"; break;
-            case Highlight.ANIM_MOVE_END:
-                hlColor = "#0000ff88"; break;
-            case Highlight.ANIM_ATTACK_MIDDLE:
-                hlColor = "#ff690088"; break;
-            case Highlight.ANIM_ATTACK_END:
-                hlColor = "#bf000088"; break;
-            case Highlight.ANIM_INTERACT_MIDDLE:
-                hlColor = "#9fff00ff"; break;
-            case Highlight.ANIM_INTERACT_END:
-                hlColor = "#00bf0088"; break;
-
-            default:
-                internalError("Missing case for highlight type: " +
-                        `${displayHlType}.`);
-                return this;
-        }
-
-        return this._setHighlight(hlColor);
     },
     _setHighlight: function(color) {
         return this.css({
