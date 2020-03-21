@@ -55,22 +55,26 @@ export function createMovementGrid(character) {
     });
 }
 
-export function hoverHighlightObj(toObj, fromObj) {
-    // TODO: This should just be hoverHighlightAction, not hoverHighlightObj.
-    if (toObj.autoAction === null) {
+export function hoverHighlightAction(action) {
+    if (action === null) {
         return;
     }
+
+    let type = action.type;
+    // We currently don't use action.subject
+    let target = action.target;
+    let path = action.path;
 
     let endHighlight  = null;
     let pathHighlight = null;
 
-    if (toObj.autoAction.type === ActionType.MOVE) {
+    if (type === ActionType.MOVE) {
         endHighlight  = Highlight.HOVER_MOVE_END;
         pathHighlight = Highlight.HOVER_MOVE_MIDDLE;
-    } else if (toObj.autoAction.type === ActionType.ATTACK) {
+    } else if (type === ActionType.ATTACK) {
         endHighlight  = Highlight.HOVER_ATTACK_END;
         pathHighlight = Highlight.HOVER_ATTACK_MIDDLE;
-    } else if (toObj.autoAction.type === ActionType.INTERACT) {
+    } else if (type === ActionType.INTERACT) {
         endHighlight  = Highlight.HOVER_INTERACT_END;
         pathHighlight = Highlight.HOVER_INTERACT_MIDDLE;
     } else {
@@ -78,23 +82,35 @@ export function hoverHighlightObj(toObj, fromObj) {
         return;
     }
 
-    let path = toObj.autoAction.path;
     assert(path !== undefined);
 
-    toObj.enableHighlight(endHighlight);
+    if (target !== undefined) {
+        target.enableHighlight(endHighlight);
+    } else {
+        highlightPos(
+            path[path.length - 1].x,
+            path[path.length - 1].y,
+            endHighlight);
+    }
 
     // Start at 1 because 0 is the ground under the character that's moving,
     // and that character is probably already highlighted as "selected".
     // End before length-1 because length-1 is the target, which was separately
     // highlighted above with endHighlight.
     for (let i = 1; i < path.length - 1; i++) {
-        Crafty("GridObject").each(function() {
-            if (this.getPos().x === path[i].x &&
-                    this.getPos().y === path[i].y) {
-                this.enableHighlight(pathHighlight);
-            }
-        });
+        highlightPos(path[i].x, path[i].y, pathHighlight);
     }
+}
+
+function highlightPos(x, y, highlightType) {
+    // TODO: currently this highlights every GridObject at this position
+    //      We iterate over every GridObject.  This is slow.
+    Crafty("GridObject").each(function() {
+        if (this.getPos().x === x &&
+                this.getPos().y === y) {
+            this.enableHighlight(highlightType);
+        }
+    });
 }
 
 export function clearHoverHighlights() {

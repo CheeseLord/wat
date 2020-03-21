@@ -24,7 +24,7 @@ import {
 } from "./geometry.js";
 
 import {
-    hoverHighlightObj,
+    hoverHighlightAction,
     clearHoverHighlights,
 } from "./highlight.js";
 
@@ -32,10 +32,6 @@ import {
     internalError,
     userMessage,
 } from "./message.js";
-
-import {
-    selectedCharacter,
-} from "./turn_order.js";
 
 import {
     getProportion,
@@ -76,7 +72,7 @@ Crafty.c("GridObject", {
             // TODO: Move this logic... somewhere else. Seems like maybe a UI
             // question to me.
             if (getGlobalState() === StateEnum.CHARACTER_SELECTED) {
-                hoverHighlightObj(this, selectedCharacter);
+                hoverHighlightAction(this.autoAction);
             }
         },
         "MouseOut":  function() { clearHoverHighlights();  },
