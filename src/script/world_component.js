@@ -52,7 +52,10 @@ Crafty.c("GridObject", {
 
         // Highlighting
         this._highlights = new Array(Highlight.NUM_VALS).fill(false);
-        this._baseBgColor = null;
+        this._bgColor          = null;
+        this._defaultHighlight = null;
+        this._hoverHighlight   = null;
+        this._animHighlight    = null;
     },
 
     events: {
@@ -85,49 +88,65 @@ Crafty.c("GridObject", {
     ////////////////////////////////////////
     // Highlighting stuff
 
-    baseBgColor: function(color) {
-        this._baseBgColor = color;
+    setBgColor: function(color) {
+        this._bgColor = color;
         this._redraw();
         return this;
     },
-
-    enableHighlight: function(hlType) {
-        return this._setHighlightFlag(hlType, true);
+    setDefaultHighlight: function(color) {
+        this._defaultHighlight = color;
+        this._redraw();
+        return this;
     },
-    disableHighlight: function(hlType) {
-        return this._setHighlightFlag(hlType, false);
+    setHoverHighlight: function(color) {
+        this._hoverHighlight = color;
+        this._redraw();
+        return this;
     },
-    clearHighlights: function() {
-        this._highlights.fill(false);
+    setAnimHighlight: function(color) {
+        this._animHighlight = color;
+        this._redraw();
+        return this;
+    },
+    clearDefaultHighlight: function() {
+        return this.setDefaultHighlight(null);
+    },
+    clearHoverHighlight: function() {
+        return this.setHoverHighlight(null);
+    },
+    clearAnimHighlight: function() {
+        return this.setAnimHighlight(null);
+    },
+    clearAllHighlights: function() {
+        this.clearDefaultHighlight();
+        this.clearHoverHighlight();
+        this.clearAnimHighlight();
         return this._redraw();
     },
 
-    // Set or clear one of the highlight flags
-    _setHighlightFlag: function(hlType, val) {
-        if (0 <= hlType && hlType < Highlight.NUM_VALS) {
-            this._highlights[hlType] = val;
-            return this._redraw();
-        } else {
-            internalError(`Unrecognized highlight type: ${hlType}.`);
-            return this;
-        }
-    },
     _redraw: function() {
-        // Find the first highlight flag which is set.
-        let displayHlType = 0;
-        for (; displayHlType < Highlight.NUM_VALS; displayHlType++) {
-            if (this._highlights[displayHlType]) {
+        // Find the first highlight category which is set.
+        let displayHlType = null;
+        let hlToTry = [
+            this._animHighlight,
+            this._hoverHighlight,
+            this._defaultHighlight,
+        ];
+        for (let i = 0; i < hlToTry.length; i++) {
+            if (hlToTry[i] !== null) {
+                displayHlType = hlToTry[i];
                 break;
             }
         }
 
-        if (displayHlType >= Highlight.NUM_VALS) {
+        if (displayHlType === null)  {
             // No highlight flags set.
             return this._clearHighlight();
         }
 
         // Map each highlight flag to a border color.
         // TODO: Better colors.
+        // TODO: Make the colors the named constants, avoid this switch.
         let hlColor = null;
         switch (displayHlType) {
             // TODO proper rgba handling
@@ -185,7 +204,7 @@ Crafty.c("GridObject", {
     },
     _clearHighlight: function() {
         return this.css({
-            "background-color": this._baseBgColor,
+            "background-color": this._bgColor,
         });
     },
 });
@@ -365,7 +384,7 @@ Crafty.c("Ground", {
     required: "StaticObject, ground_anim",
 
     init: function() {
-        this.baseBgColor("#764e00");
+        this.setBgColor("#764e00");
         this.attr({z: Z_GROUND});
     },
 });
