@@ -8,7 +8,6 @@ import {
 
 import {
     Highlight,
-    HL_RADIUS,
     SPRITE_DUR_PER_FRAME,
     StateEnum,
     TILE_HEIGHT,
@@ -36,15 +35,6 @@ import {
 import {
     getProportion,
 } from "./util.js";
-
-///////////////////////////////////////////////////////////////////////////////
-
-const HighlightStrategy = Object.freeze({
-    BORDER:  {},
-    OVERLAY: {},
-});
-
-const HL_STRAT = HighlightStrategy.OVERLAY;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Component definitions
@@ -123,15 +113,6 @@ Crafty.c("GridObject", {
         }
     },
     _redraw: function() {
-        if (HL_STRAT === HighlightStrategy.BORDER) {
-            // In this case, there is never an overlay. Always apply the
-            // background color, since otherwise we need two separate sprites
-            // for the two strategies.
-            this.css({
-                "background-color": this._baseBgColor,
-            });
-        }
-
         // Find the first highlight flag which is set.
         let displayHlType = 0;
         for (; displayHlType < Highlight.NUM_VALS; displayHlType++) {
@@ -148,109 +129,64 @@ Crafty.c("GridObject", {
         // Map each highlight flag to a border color.
         // TODO: Better colors.
         let hlColor = null;
-        if (HL_STRAT === HighlightStrategy.BORDER) {
-            switch (displayHlType) {
-                case Highlight.SELECTED_CHARACTER:  hlColor = "#ffff00"; break;
-                case Highlight.AVAILABLE_CHARACTER: hlColor = "#ff7f00"; break;
+        switch (displayHlType) {
+            // TODO proper rgba handling
+            // TODO: these colors still need tweaking.
+            case Highlight.SELECTED_CHARACTER:
+                hlColor = "#ffff00bb"; break;
+            case Highlight.AVAILABLE_CHARACTER:
+                hlColor = "#ffff0066"; break;
 
-                case Highlight.ANIM_MOVE_END:       hlColor = "#0000ff"; break;
-                case Highlight.ANIM_MOVE_MIDDLE:    hlColor = "#4f4f7f"; break;
-                case Highlight.HOVER_MOVE_END:      hlColor = "#ff00ff"; break;
-                case Highlight.HOVER_MOVE_MIDDLE:   hlColor = "#7f4f7f"; break;
+            case Highlight.CAN_MOVE:
+                hlColor = "#9f6900ff"; break;
+            case Highlight.CAN_ATTACK:
+                hlColor = "#7f000088"; break;
+            case Highlight.CAN_INTERACT:
+                hlColor = "#007f0088"; break;
 
-                case Highlight.CAN_ATTACK:          hlColor = "#ff0000"; break;
-                case Highlight.CAN_INTERACT:        hlColor = "#00ff00"; break;
-                    // TODO: Green looks bad with green ground
-                case Highlight.CAN_MOVE:            hlColor = "#00ffff"; break;
+            case Highlight.HOVER_MOVE_MIDDLE:
+                hlColor = "#003f3f88"; break;
+            case Highlight.HOVER_MOVE_END:
+                hlColor = "#00007f88"; break;
+            case Highlight.HOVER_ATTACK_MIDDLE:
+                hlColor = "#cf3400ff"; break;
+            case Highlight.HOVER_ATTACK_END:
+                hlColor = "#ff000088"; break;
+            case Highlight.HOVER_INTERACT_MIDDLE:
+                hlColor = "#4fb400ff"; break;
+            case Highlight.HOVER_INTERACT_END:
+                hlColor = "#00ff0088"; break;
 
-                default:
-                    // I know, I haven't implemented a bunch of highlight cases
-                    // for BORDER. TODO I guess.
-                    internalError("Missing case for highlight type: " +
+            case Highlight.ANIM_MOVE_MIDDLE:
+                hlColor = "#007f7f88"; break;
+            case Highlight.ANIM_MOVE_END:
+                hlColor = "#0000ff88"; break;
+            case Highlight.ANIM_ATTACK_MIDDLE:
+                hlColor = "#ff690088"; break;
+            case Highlight.ANIM_ATTACK_END:
+                hlColor = "#bf000088"; break;
+            case Highlight.ANIM_INTERACT_MIDDLE:
+                hlColor = "#9fff00ff"; break;
+            case Highlight.ANIM_INTERACT_END:
+                hlColor = "#00bf0088"; break;
+
+            default:
+                internalError("Missing case for highlight type: " +
                         `${displayHlType}.`);
-                    hlColor = "#000000";
-            }
-        } else if (HL_STRAT === HighlightStrategy.OVERLAY) {
-            switch (displayHlType) {
-                // TODO proper rgba handling
-                // TODO: these colors still need tweaking.
-                case Highlight.SELECTED_CHARACTER:
-                    hlColor = "#ffff00bb"; break;
-                case Highlight.AVAILABLE_CHARACTER:
-                    hlColor = "#ffff0066"; break;
-
-                case Highlight.CAN_MOVE:
-                    hlColor = "#9f6900ff"; break;
-                case Highlight.CAN_ATTACK:
-                    hlColor = "#7f000088"; break;
-                case Highlight.CAN_INTERACT:
-                    hlColor = "#007f0088"; break;
-
-                case Highlight.HOVER_MOVE_MIDDLE:
-                    hlColor = "#003f3f88"; break;
-                case Highlight.HOVER_MOVE_END:
-                    hlColor = "#00007f88"; break;
-                case Highlight.HOVER_ATTACK_MIDDLE:
-                    hlColor = "#cf3400ff"; break;
-                case Highlight.HOVER_ATTACK_END:
-                    hlColor = "#ff000088"; break;
-                case Highlight.HOVER_INTERACT_MIDDLE:
-                    hlColor = "#4fb400ff"; break;
-                case Highlight.HOVER_INTERACT_END:
-                    hlColor = "#00ff0088"; break;
-
-                case Highlight.ANIM_MOVE_MIDDLE:
-                    hlColor = "#007f7f88"; break;
-                case Highlight.ANIM_MOVE_END:
-                    hlColor = "#0000ff88"; break;
-                case Highlight.ANIM_ATTACK_MIDDLE:
-                    hlColor = "#ff690088"; break;
-                case Highlight.ANIM_ATTACK_END:
-                    hlColor = "#bf000088"; break;
-                case Highlight.ANIM_INTERACT_MIDDLE:
-                    hlColor = "#9fff00ff"; break;
-                case Highlight.ANIM_INTERACT_END:
-                    hlColor = "#00bf0088"; break;
-
-                default:
-                    internalError("Missing case for highlight type: " +
-                            `${displayHlType}.`);
-                    return this;
-            }
-        } else {
-            internalError("Unknown HighlightStrategy.");
-            return this;
+                return this;
         }
 
         return this._setHighlight(hlColor);
     },
     _setHighlight: function(color) {
-        if (HL_STRAT === HighlightStrategy.BORDER) {
-            return this.css({
-                "outline": "solid " + (HL_RADIUS) + "px " + color,
-            });
-        } else if (HL_STRAT === HighlightStrategy.OVERLAY) {
-            return this.css({
-                "background-color": color,
-            });
-        } else {
-            internalError("Unknown HighlightStrategy.");
-            return this;
-        }
+        return this.css({
+            "background-color": color,
+        });
     },
     _clearHighlight: function() {
-        if (HL_STRAT === HighlightStrategy.BORDER) {
-            return this.css({
-                "outline": "none",
-            });
-        } else if (HL_STRAT === HighlightStrategy.OVERLAY) {
-            return this.css({
-                "background-color": this._baseBgColor,
-            });
-        } else {
-            internalError("Unknown HighlightStrategy.");
-            return this;
-        }
+        return this.css({
+            "background-color": this._baseBgColor,
+        });
     },
 });
 

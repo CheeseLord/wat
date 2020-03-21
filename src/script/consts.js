@@ -21,10 +21,6 @@ export const MENU_HEIGHT = GAME_HEIGHT;
 export const WORLDVIEW_WIDTH  = GAME_WIDTH - MENU_WIDTH;
 export const WORLDVIEW_HEIGHT = GAME_HEIGHT;
 
-// TODO: Maybe separate horiz. and vert.? Should probably in general be
-// MapGrid.tile.[hv]space/2, or something like that.
-export const HL_RADIUS = 2;
-
 ///////////////////////////////////////////////////////////////////////////////
 // Misc graphics stuff
 
