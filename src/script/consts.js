@@ -43,7 +43,6 @@ export const ANIM_DUR_STEP             = 100;
 export const ANIM_DUR_HALF_ATTACK      = 100;
 export const ANIM_DUR_PAUSE_BW_MOV_ATK = 80;
 export const ANIM_DUR_RANGED_SHOT      = 150;
-export const ANIM_DUR_PAUSE_AFTER_SHOT = 50;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Other stuff (actual gameplay?)

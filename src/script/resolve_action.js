@@ -21,7 +21,6 @@ import {
 import {
     ANIM_DUR_HALF_ATTACK,
     ANIM_DUR_MOVE,
-    ANIM_DUR_PAUSE_AFTER_SHOT,
     ANIM_DUR_PAUSE_BW_MOV_ATK,
     ANIM_DUR_RANGED_SHOT,
     ANIM_DUR_STEP,
@@ -175,40 +174,8 @@ function doActionAnimation(action, callback) {
             anims.push(pauseAnimation(ANIM_DUR_PAUSE_BW_MOV_ATK));
         }
 
-        let damageText = Crafty.e("2D, DOM, Text, Tween")
-                .attr({
-                    x:     action.target.x,
-                    y:     action.target.y,
-                    z:     Z_WORLD_UI + 2,  // TODO: Make this less awful.
-                    alpha: 0.00,
-                })
-                .textColor("rgba(255, 0, 0)")
-                .textAlign("center")
-                .textFont({size: "30px"})
-                .text("" + action.damage);
-
         // Add the attack animation, regardless.
         let halfPos = midpoint(moveToPos, targetPos);
-
-        let textAnim = seriesAnimations([
-            tweenAnimation(damageText, function() {
-                damageText.tween(
-                    {
-                        alpha: 1.0,
-                        y:     action.target.y - 30,
-                    },
-                    ANIM_DUR_STEP,
-                );
-            }),
-            tweenAnimation(damageText, function() {
-                damageText.tween(
-                    {
-                        alpha: 0.0,
-                    },
-                    ANIM_DUR_STEP * 3,
-                );
-            }),
-        ]);
 
         anims = anims.concat([
             tweenAnimation(action.subject, function() {
@@ -218,15 +185,11 @@ function doActionAnimation(action, callback) {
                 tweenAnimation(action.subject, function() {
                     action.subject.animateTo(moveToPos, ANIM_DUR_HALF_ATTACK);
                 }),
-                textAnim,
+                takeDamageAnim(action.target, action.damage),
             ]),
         ]);
 
         anims = seriesAnimations(anims);
-        cleanupCallback = function() {
-            damageText.destroy();
-            callback();
-        };
     } else if (action.type === ActionType.RANGED_ATTACK) {
         let bullet = Crafty.e("2D, DOM, bullet_anim, Tween")
                 .attr({
@@ -246,7 +209,7 @@ function doActionAnimation(action, callback) {
             synchronousAnimation(function() {
                 bullet.destroy();
             }),
-            pauseAnimation(ANIM_DUR_PAUSE_AFTER_SHOT),
+            takeDamageAnim(action.target, action.damage),
         ]);
     } else if (action.type === ActionType.SWAP_PLACES) {
         // Swap positions of subject and target.
@@ -286,6 +249,49 @@ function doActionAnimation(action, callback) {
     doAnimate(anims, cleanupCallback);
 
     // TODO: Make sure the global state gets reset.
+}
+
+function takeDamageAnim(target, damage) {
+    // Note: we could probably create this object in a synchronousAnimation to
+    // avoid having to pre-create it as fully transparent. If we want it to
+    // fade in anyway, though, it doesn't matter.
+    let damageText = Crafty.e("2D, DOM, Text, Tween")
+            .attr({
+                x:     target.x,
+                y:     target.y,
+                z:     Z_WORLD_UI + 2,  // TODO: Make this less awful.
+                alpha: 0.00,
+            })
+            .textColor("rgba(255, 0, 0)")
+            .textAlign("center")
+            .textFont({size: "30px"})
+            .text("" + damage);
+
+    // TODO: Different named constants for these durations
+    let textAnim = seriesAnimations([
+        tweenAnimation(damageText, function() {
+            damageText.tween(
+                {
+                    alpha: 1.0,
+                    y:     target.y - 30,
+                },
+                ANIM_DUR_STEP,
+            );
+        }),
+        tweenAnimation(damageText, function() {
+            damageText.tween(
+                {
+                    alpha: 0.0,
+                },
+                ANIM_DUR_STEP * 3,
+            );
+        }),
+        synchronousAnimation(function() {
+            damageText.destroy();
+        }),
+    ]);
+
+    return textAnim;
 }
 
 function updateState(action) {
