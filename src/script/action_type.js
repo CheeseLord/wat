@@ -86,34 +86,33 @@ function nullaryAction(type, subject) {
 // Action-related queries
 
 export function getActionPointCost(action) {
-    switch (action.type) {
-        case ActionType.MOVE:
-        case ActionType.ATTACK:
-        case ActionType.INTERACT:
-            // Path length must at least include starting point
-            assert(action.path.length >= 1);
-            let cost = action.path.length - 1;
-            // For move, action.path.length - 1 is the number of squares of
-            // movement, which equals the AP cost, so we're done.
-            // For interact/attack, it's one more than the number of squares of
-            // movement because it includes the target. So currently cost is 1
-            // per square of movement plus 1 for the final action.
-            // For (move-and-)attack, add 1 because the attack itself costs 2.
-            if (action.type === ActionType.ATTACK) {
-                cost += 1;
-            }
-            return cost;
-        case ActionType.SWAP_PLACES:
-            return 2;
-        case ActionType.RANGED_ATTACK:
-            return 2;
-        case ActionType.SPECIAL_ATTACK:
-            return 3;
-        case ActionType.END_TURN:
-            return action.subject.actionPoints;
-        default:
-            internalError("Unknown ActionType");
-            return Infinity;
+    if (action.type === ActionType.MOVE) {
+        // Path includes start point.
+        assert(action.path.length >= 1);
+        return action.path.length - 1;
+    } else if (action.type === ActionType.ATTACK) {
+        // Path includes start point and target.
+        assert(action.path.length >= 1);
+        let moveCost = action.path.length - 2;
+        let attackCost = 2;
+        return moveCost + attackCost;
+    } else if (action.type === ActionType.INTERACT) {
+        // Path includes start point and target.
+        assert(action.path.length >= 1);
+        let moveCost = action.path.length - 2;
+        let interactCost = 1;
+        return moveCost + interactCost;
+    } else if (action.type === ActionType.SWAP_PLACES) {
+        return 2;
+    } else if (action.type === ActionType.RANGED_ATTACK) {
+        return 2;
+    } else if (action.type === ActionType.SPECIAL_ATTACK) {
+        return 3;
+    } else if (action.type === ActionType.END_TURN) {
+        return action.subject.actionPoints;
+    } else {
+        internalError("Unknown ActionType");
+        return Infinity;
     }
 }
 
