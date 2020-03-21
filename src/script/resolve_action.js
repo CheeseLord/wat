@@ -19,6 +19,8 @@ import {
     tweenAnimation,
 } from "./animation.js";
 import {
+    ANIM_DUR_DMG_NUM_FADE_IN,
+    ANIM_DUR_DMG_NUM_FADE_OUT,
     ANIM_DUR_HALF_ATTACK,
     ANIM_DUR_MOVE,
     ANIM_DUR_PAUSE_BW_MOV_ATK,
@@ -131,7 +133,6 @@ function doActionAnimation(action, callback) {
     setGlobalState(StateEnum.ANIMATING);
 
     let anims = seriesAnimations([]);
-    let cleanupCallback = callback;
 
     if (action.type === ActionType.MOVE) {
         let path = action.path;
@@ -246,7 +247,7 @@ function doActionAnimation(action, callback) {
         internalError(`Invalid action type: ${action.type}`);
     }
 
-    doAnimate(anims, cleanupCallback);
+    doAnimate(anims, callback);
 
     // TODO: Make sure the global state gets reset.
 }
@@ -267,7 +268,6 @@ function takeDamageAnim(target, damage) {
             .textFont({size: "30px"})
             .text("" + damage);
 
-    // TODO: Different named constants for these durations
     let textAnim = seriesAnimations([
         tweenAnimation(damageText, function() {
             damageText.tween(
@@ -275,7 +275,7 @@ function takeDamageAnim(target, damage) {
                     alpha: 1.0,
                     y:     target.y - 30,
                 },
-                ANIM_DUR_STEP,
+                ANIM_DUR_DMG_NUM_FADE_IN,
             );
         }),
         tweenAnimation(damageText, function() {
@@ -283,7 +283,7 @@ function takeDamageAnim(target, damage) {
                 {
                     alpha: 0.0,
                 },
-                ANIM_DUR_STEP * 3,
+                ANIM_DUR_DMG_NUM_FADE_OUT,
             );
         }),
         synchronousAnimation(function() {
