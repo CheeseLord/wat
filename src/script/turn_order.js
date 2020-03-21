@@ -13,7 +13,6 @@ import {
 } from "./consts.js";
 import {
     clearAllHighlights,
-    clearHighlightType,
     createMovementGrid,
 } from "./highlight.js";
 import {
@@ -107,10 +106,7 @@ export function startTeam(team) {
 function startCharacter(character) {
     // TODO Move this to requestMoveFromPlayer.
     clearAllHighlights();
-    let availCharacters = getAllReadyCharacters();
-    for (let i = 0; i < availCharacters.length; i++) {
-        availCharacters[i].enableHighlight(Highlight.AVAILABLE_CHARACTER);
-    }
+    highlightAvailableCharacters();
 
     // TODO: Why does startCharacter not call selectCharacter? Who calls it
     // instead?
@@ -251,7 +247,7 @@ export function selectCharacter(character) {
     assert(isOnCurrentTeam(character));
     deselectCharacter();
     selectedCharacter = character;
-    selectedCharacter.enableHighlight(Highlight.SELECTED_CHARACTER);
+    selectedCharacter.setDefaultHighlight(Highlight.SELECTED_CHARACTER);
     updateAutoActions(character);
     createMovementGrid(character);
 }
@@ -260,11 +256,16 @@ export function deselectCharacter() {
     clearAutoActions();
 
     if (selectedCharacter) {
-        selectedCharacter.disableHighlight(Highlight.SELECTED_CHARACTER);
         selectedCharacter = null;
     }
-    // Clear movement grid.
-    clearHighlightType(Highlight.CAN_MOVE);
-    clearHighlightType(Highlight.CAN_ATTACK);
-    clearHighlightType(Highlight.CAN_INTERACT);
+    // Clear movement grid and highlighting of selectedCharacter.
+    clearAllHighlights();
+    highlightAvailableCharacters();
+}
+
+function highlightAvailableCharacters() {
+    let availCharacters = getAllReadyCharacters();
+    for (let i = 0; i < availCharacters.length; i++) {
+        availCharacters[i].setDefaultHighlight(Highlight.AVAILABLE_CHARACTER);
+    }
 }

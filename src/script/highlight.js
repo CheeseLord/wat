@@ -18,23 +18,24 @@ export function highlightPath(path) {
             if (this.getPos().x === path[i].x &&
                     this.getPos().y === path[i].y) {
                 if (i === path.length - 1) {
-                    this.enableHighlight(Highlight.ANIM_MOVE_END);
+                    this.setAnimHighlight(Highlight.ANIM_MOVE_END);
                 } else {
-                    this.enableHighlight(Highlight.ANIM_MOVE_MIDDLE);
+                    this.setAnimHighlight(Highlight.ANIM_MOVE_MIDDLE);
                 }
             }
         });
     }
 }
 
-export function clearHighlightType(hlType) {
-    Crafty("GridObject").each(function() {
-        this.disableHighlight(hlType);
-    });
-}
 export function clearAllHighlights() {
     Crafty("GridObject").each(function() {
-        this.clearHighlights();
+        this.clearAllHighlights();
+    });
+}
+
+export function clearHoverHighlights() {
+    Crafty("GridObject").each(function() {
+        this.clearHoverHighlight();
     });
 }
 
@@ -43,11 +44,11 @@ export function createMovementGrid(character) {
         if (this.autoAction === null) {
             // No highlight
         } else if (this.autoAction.type === ActionType.MOVE) {
-            this.enableHighlight(Highlight.CAN_MOVE);
+            this.setDefaultHighlight(Highlight.CAN_MOVE);
         } else if (this.autoAction.type === ActionType.ATTACK) {
-            this.enableHighlight(Highlight.CAN_ATTACK);
+            this.setDefaultHighlight(Highlight.CAN_ATTACK);
         } else if (this.autoAction.type === ActionType.INTERACT) {
-            this.enableHighlight(Highlight.CAN_INTERACT);
+            this.setDefaultHighlight(Highlight.CAN_INTERACT);
         } else {
             // There are other ActionTypes, but none used as auto-actions.
             assert(false);
@@ -84,10 +85,13 @@ export function hoverHighlightAction(action) {
 
     assert(path !== undefined);
 
+    // TODO: Why would target be undefined?
+    //   - ActionType.MOVE?
+    //   - Can we check for that directly?
     if (target !== undefined) {
-        target.enableHighlight(endHighlight);
+        target.setHoverHighlight(endHighlight);
     } else {
-        highlightPos(
+        hoverHighlightPos(
             path[path.length - 1].x,
             path[path.length - 1].y,
             endHighlight);
@@ -98,28 +102,17 @@ export function hoverHighlightAction(action) {
     // End before length-1 because length-1 is the target, which was separately
     // highlighted above with endHighlight.
     for (let i = 1; i < path.length - 1; i++) {
-        highlightPos(path[i].x, path[i].y, pathHighlight);
+        hoverHighlightPos(path[i].x, path[i].y, pathHighlight);
     }
 }
 
-function highlightPos(x, y, highlightType) {
+function hoverHighlightPos(x, y, highlightType) {
     // TODO: currently this highlights every GridObject at this position
     //      We iterate over every GridObject.  This is slow.
     Crafty("GridObject").each(function() {
         if (this.getPos().x === x &&
                 this.getPos().y === y) {
-            this.enableHighlight(highlightType);
+            this.setHoverHighlight(highlightType);
         }
-    });
-}
-
-export function clearHoverHighlights() {
-    Crafty("GridObject").each(function() {
-        this.disableHighlight(Highlight.HOVER_INTERACT_END);
-        this.disableHighlight(Highlight.HOVER_INTERACT_MIDDLE);
-        this.disableHighlight(Highlight.HOVER_ATTACK_END);
-        this.disableHighlight(Highlight.HOVER_ATTACK_MIDDLE);
-        this.disableHighlight(Highlight.HOVER_MOVE_END);
-        this.disableHighlight(Highlight.HOVER_MOVE_MIDDLE);
     });
 }

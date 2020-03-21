@@ -21,10 +21,6 @@ export const MENU_HEIGHT = GAME_HEIGHT;
 export const WORLDVIEW_WIDTH  = GAME_WIDTH - MENU_WIDTH;
 export const WORLDVIEW_HEIGHT = GAME_HEIGHT;
 
-// TODO: Maybe separate horiz. and vert.? Should probably in general be
-// MapGrid.tile.[hv]space/2, or something like that.
-export const HL_RADIUS = 2;
-
 ///////////////////////////////////////////////////////////////////////////////
 // Misc graphics stuff
 
@@ -78,37 +74,36 @@ export const StateEnum = Object.freeze({
     CHARACTER_INTERACT:      {},
 });
 
-// List of highlighting types. Several of these can be set on a single object,
-// in which case the lowest-valued one is the one that will be displayed.
+// Highlighting colors.
+// TODO proper rgba handling
+// TODO: these colors still need tweaking.
 export const Highlight = Object.freeze({
-    SELECTED_CHARACTER:     0, // Character currently selected
-    AVAILABLE_CHARACTER:    1, // Character that can be selected this turn
+    SELECTED_CHARACTER:     "#ffff00bb", // Character currently selected
+    AVAILABLE_CHARACTER:    "#ffff0066", // Can be selected this turn
 
     // ANIM_<foo>_* is like HOVER_<foo>_*, but when the action is being
     // animated rather than simply considered.
-    ANIM_INTERACT_END:      2,
-    ANIM_INTERACT_MIDDLE:   3,
-    ANIM_ATTACK_END:        4,
-    ANIM_ATTACK_MIDDLE:     5,
-    ANIM_MOVE_END:          6,
-    ANIM_MOVE_MIDDLE:       7,
+    ANIM_INTERACT_END:      "#00bf0088",
+    ANIM_INTERACT_MIDDLE:   "#9fff00ff",
+    ANIM_ATTACK_END:        "#bf000088",
+    ANIM_ATTACK_MIDDLE:     "#ff690088",
+    ANIM_MOVE_END:          "#0000ff88",
+    ANIM_MOVE_MIDDLE:       "#007f7f88",
 
     // HOVER_<foo>_{MIDDLE,END} are used to highlight how action <foo> will be
     // performed. _MIDDLE is for cells on the path to the target, _END is for
     // the target itself.
-    HOVER_INTERACT_END:     8,
-    HOVER_INTERACT_MIDDLE:  9,
-    HOVER_ATTACK_END:      10,
-    HOVER_ATTACK_MIDDLE:   11,
-    HOVER_MOVE_END:        12,
-    HOVER_MOVE_MIDDLE:     13,
+    HOVER_INTERACT_END:    "#00ff0088",
+    HOVER_INTERACT_MIDDLE: "#4fb400ff",
+    HOVER_ATTACK_END:      "#ff000088",
+    HOVER_ATTACK_MIDDLE:   "#cf3400ff",
+    HOVER_MOVE_END:        "#00007f88",
+    HOVER_MOVE_MIDDLE:     "#003f3f88",
 
     // CAN_<foo> is the highlight applied when choosing a move for a character,
     // to indicate that <foo> is a valid action on the highlighted square.
-    CAN_INTERACT:          14,
-    CAN_ATTACK:            15,
-    CAN_MOVE:              16,
-
-    NUM_VALS:              17, // For sizing arrays of flag values
+    CAN_INTERACT:          "#007f0088",
+    CAN_ATTACK:            "#7f000088",
+    CAN_MOVE:              "#9f6900ff",
 });
 

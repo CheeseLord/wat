@@ -7,8 +7,6 @@ import {
 } from "./resolve_action.js";
 
 import {
-    Highlight,
-    HL_RADIUS,
     SPRITE_DUR_PER_FRAME,
     StateEnum,
     TILE_HEIGHT,
@@ -29,22 +27,12 @@ import {
 } from "./highlight.js";
 
 import {
-    internalError,
     userMessage,
 } from "./message.js";
 
 import {
     getProportion,
 } from "./util.js";
-
-///////////////////////////////////////////////////////////////////////////////
-
-const HighlightStrategy = Object.freeze({
-    BORDER:  {},
-    OVERLAY: {},
-});
-
-const HL_STRAT = HighlightStrategy.OVERLAY;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Component definitions
@@ -61,8 +49,10 @@ Crafty.c("GridObject", {
         this.autoAction = null;
 
         // Highlighting
-        this._highlights = new Array(Highlight.NUM_VALS).fill(false);
-        this._baseBgColor = null;
+        this._bgColor          = null;
+        this._defaultHighlight = null;
+        this._hoverHighlight   = null;
+        this._animHighlight    = null;
     },
 
     events: {
@@ -95,162 +85,73 @@ Crafty.c("GridObject", {
     ////////////////////////////////////////
     // Highlighting stuff
 
-    baseBgColor: function(color) {
-        this._baseBgColor = color;
+    setBgColor: function(color) {
+        this._bgColor = color;
         this._redraw();
         return this;
     },
-
-    enableHighlight: function(hlType) {
-        return this._setHighlightFlag(hlType, true);
+    setDefaultHighlight: function(color) {
+        this._defaultHighlight = color;
+        this._redraw();
+        return this;
     },
-    disableHighlight: function(hlType) {
-        return this._setHighlightFlag(hlType, false);
+    setHoverHighlight: function(color) {
+        this._hoverHighlight = color;
+        this._redraw();
+        return this;
     },
-    clearHighlights: function() {
-        this._highlights.fill(false);
+    setAnimHighlight: function(color) {
+        this._animHighlight = color;
+        this._redraw();
+        return this;
+    },
+    clearDefaultHighlight: function() {
+        return this.setDefaultHighlight(null);
+    },
+    clearHoverHighlight: function() {
+        return this.setHoverHighlight(null);
+    },
+    clearAnimHighlight: function() {
+        return this.setAnimHighlight(null);
+    },
+    clearAllHighlights: function() {
+        this.clearDefaultHighlight();
+        this.clearHoverHighlight();
+        this.clearAnimHighlight();
         return this._redraw();
     },
 
-    // Set or clear one of the highlight flags
-    _setHighlightFlag: function(hlType, val) {
-        if (0 <= hlType && hlType < Highlight.NUM_VALS) {
-            this._highlights[hlType] = val;
-            return this._redraw();
-        } else {
-            internalError(`Unrecognized highlight type: ${hlType}.`);
-            return this;
-        }
-    },
     _redraw: function() {
-        if (HL_STRAT === HighlightStrategy.BORDER) {
-            // In this case, there is never an overlay. Always apply the
-            // background color, since otherwise we need two separate sprites
-            // for the two strategies.
-            this.css({
-                "background-color": this._baseBgColor,
-            });
-        }
-
-        // Find the first highlight flag which is set.
-        let displayHlType = 0;
-        for (; displayHlType < Highlight.NUM_VALS; displayHlType++) {
-            if (this._highlights[displayHlType]) {
+        // Find the first highlight category which is set.
+        let hlColor = null;
+        let hlToTry = [
+            this._animHighlight,
+            this._hoverHighlight,
+            this._defaultHighlight,
+        ];
+        for (let i = 0; i < hlToTry.length; i++) {
+            if (hlToTry[i] !== null) {
+                hlColor = hlToTry[i];
                 break;
             }
         }
 
-        if (displayHlType >= Highlight.NUM_VALS) {
-            // No highlight flags set.
+        if (hlColor !== null)  {
+            return this._setHighlight(hlColor);
+        } else {
+            // No highlight set.
             return this._clearHighlight();
         }
-
-        // Map each highlight flag to a border color.
-        // TODO: Better colors.
-        let hlColor = null;
-        if (HL_STRAT === HighlightStrategy.BORDER) {
-            switch (displayHlType) {
-                case Highlight.SELECTED_CHARACTER:  hlColor = "#ffff00"; break;
-                case Highlight.AVAILABLE_CHARACTER: hlColor = "#ff7f00"; break;
-
-                case Highlight.ANIM_MOVE_END:       hlColor = "#0000ff"; break;
-                case Highlight.ANIM_MOVE_MIDDLE:    hlColor = "#4f4f7f"; break;
-                case Highlight.HOVER_MOVE_END:      hlColor = "#ff00ff"; break;
-                case Highlight.HOVER_MOVE_MIDDLE:   hlColor = "#7f4f7f"; break;
-
-                case Highlight.CAN_ATTACK:          hlColor = "#ff0000"; break;
-                case Highlight.CAN_INTERACT:        hlColor = "#00ff00"; break;
-                    // TODO: Green looks bad with green ground
-                case Highlight.CAN_MOVE:            hlColor = "#00ffff"; break;
-
-                default:
-                    // I know, I haven't implemented a bunch of highlight cases
-                    // for BORDER. TODO I guess.
-                    internalError("Missing case for highlight type: " +
-                        `${displayHlType}.`);
-                    hlColor = "#000000";
-            }
-        } else if (HL_STRAT === HighlightStrategy.OVERLAY) {
-            switch (displayHlType) {
-                // TODO proper rgba handling
-                // TODO: these colors still need tweaking.
-                case Highlight.SELECTED_CHARACTER:
-                    hlColor = "#ffff00bb"; break;
-                case Highlight.AVAILABLE_CHARACTER:
-                    hlColor = "#ffff0066"; break;
-
-                case Highlight.CAN_MOVE:
-                    hlColor = "#9f6900ff"; break;
-                case Highlight.CAN_ATTACK:
-                    hlColor = "#7f000088"; break;
-                case Highlight.CAN_INTERACT:
-                    hlColor = "#007f0088"; break;
-
-                case Highlight.HOVER_MOVE_MIDDLE:
-                    hlColor = "#003f3f88"; break;
-                case Highlight.HOVER_MOVE_END:
-                    hlColor = "#00007f88"; break;
-                case Highlight.HOVER_ATTACK_MIDDLE:
-                    hlColor = "#cf3400ff"; break;
-                case Highlight.HOVER_ATTACK_END:
-                    hlColor = "#ff000088"; break;
-                case Highlight.HOVER_INTERACT_MIDDLE:
-                    hlColor = "#4fb400ff"; break;
-                case Highlight.HOVER_INTERACT_END:
-                    hlColor = "#00ff0088"; break;
-
-                case Highlight.ANIM_MOVE_MIDDLE:
-                    hlColor = "#007f7f88"; break;
-                case Highlight.ANIM_MOVE_END:
-                    hlColor = "#0000ff88"; break;
-                case Highlight.ANIM_ATTACK_MIDDLE:
-                    hlColor = "#ff690088"; break;
-                case Highlight.ANIM_ATTACK_END:
-                    hlColor = "#bf000088"; break;
-                case Highlight.ANIM_INTERACT_MIDDLE:
-                    hlColor = "#9fff00ff"; break;
-                case Highlight.ANIM_INTERACT_END:
-                    hlColor = "#00bf0088"; break;
-
-                default:
-                    internalError("Missing case for highlight type: " +
-                            `${displayHlType}.`);
-                    return this;
-            }
-        } else {
-            internalError("Unknown HighlightStrategy.");
-            return this;
-        }
-
-        return this._setHighlight(hlColor);
     },
     _setHighlight: function(color) {
-        if (HL_STRAT === HighlightStrategy.BORDER) {
-            return this.css({
-                "outline": "solid " + (HL_RADIUS) + "px " + color,
-            });
-        } else if (HL_STRAT === HighlightStrategy.OVERLAY) {
-            return this.css({
-                "background-color": color,
-            });
-        } else {
-            internalError("Unknown HighlightStrategy.");
-            return this;
-        }
+        return this.css({
+            "background-color": color,
+        });
     },
     _clearHighlight: function() {
-        if (HL_STRAT === HighlightStrategy.BORDER) {
-            return this.css({
-                "outline": "none",
-            });
-        } else if (HL_STRAT === HighlightStrategy.OVERLAY) {
-            return this.css({
-                "background-color": this._baseBgColor,
-            });
-        } else {
-            internalError("Unknown HighlightStrategy.");
-            return this;
-        }
+        return this.css({
+            "background-color": this._bgColor,
+        });
     },
 });
 
@@ -429,7 +330,7 @@ Crafty.c("Ground", {
     required: "StaticObject, ground_anim",
 
     init: function() {
-        this.baseBgColor("#764e00");
+        this.setBgColor("#764e00");
         this.attr({z: Z_GROUND});
     },
 });

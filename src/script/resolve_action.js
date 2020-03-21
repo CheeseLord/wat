@@ -438,6 +438,10 @@ export function updateAutoActions(subject) {
         let path = getPath(theMap, subjectPos, target.getPos());
         if (path === null) {
             return;
+        } else if (path.length <= 1) {
+            // Don't set auto-actions on your own cell, since clicking on your
+            // own cell is intercepted by the player UI.
+            return;
         }
         // TODO: Make a list and loop over it. Store the ActionDesc instead of
         // a separate AutoActionEnum value, and then reuse that ActionDesc for
