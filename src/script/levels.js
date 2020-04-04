@@ -3,6 +3,7 @@
 import {
     updateMapForNewLevel,
 } from "./geometry.js";
+import {createPlayerCharacters} from "./characters.js";
 
 // TODO: Don't build the level in code.
 export function loadLevel1() {
@@ -37,37 +38,11 @@ export function loadLevel1() {
     }
 
     // Player characters
-    Crafty.e("SpriteCharacter, anim_start")
-            .initPos({x: 2, y: 2})
-            .setName_("Not Greg")
-            .maxHealth(15)
-            .setSpeed(2)
-            .setTeam(0)
-            .setAnimation(0, 4);
-
-    Crafty.e("SpriteCharacter, anim_start")
-            .initPos({x: 2, y: 4})
-            .setName_("Also Not Greg")
-            .maxHealth(15)
-            .setSpeed(4)
-            .setTeam(0)
-            .setAnimation(1, 4);
-
-    Crafty.e("SpriteCharacter, anim_start")
-            .initPos({x: 2, y: 6})
-            .setName_("Not Joel")
-            .maxHealth(15)
-            .setSpeed(4)
-            .setTeam(0)
-            .setAnimation(2, 4);
-
-    Crafty.e("SpriteCharacter, anim_start")
-            .initPos({x: 2, y: 8})
-            .setName_("Samson")
-            .maxHealth(15)
-            .setSpeed(8)
-            .setTeam(0)
-            .setAnimation(3, 4);
+    let playerCharacters = createPlayerCharacters();
+    for (let i = 0; i < playerCharacters.length; i++) {
+        let character = playerCharacters[i];
+        character.initPos({x: 2, y: 2 + 2 * i});
+    }
 
     // Enemies
     let ENEMY_POSITIONS = [

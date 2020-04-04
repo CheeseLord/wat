@@ -292,6 +292,11 @@ Crafty.c("Character", {
         return this;
     },
 
+    setActions: function(actions) {
+        this.availableActions = actions;
+        return this;
+    },
+
     readyActions: function() {
         this.actionPoints = this.speed;
     },

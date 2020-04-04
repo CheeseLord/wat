@@ -70,10 +70,7 @@ export function setGlobalState(newState) { globalState = newState; }
 // Action handlers
 
 export function canDoAction(character, actionType) {
-    let ans = true;
-    ans &= (character.name !== "Samson");
-    ans &= (actionType !== ActionType.RANGED_ATTACK);
-    return ans;
+    return (character.availableActions.includes(actionType));
 }
 
 export function checkAction(action) {
