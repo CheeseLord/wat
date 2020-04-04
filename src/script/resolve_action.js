@@ -69,9 +69,18 @@ export function setGlobalState(newState) { globalState = newState; }
 ///////////////////////////////////////////////////////////////////////////////
 // Action handlers
 
+export function canDoAction(character, actionType) {
+    let ans = true;
+    ans &= (character.name !== "Samson");
+    ans &= (actionType !== ActionType.RANGED_ATTACK);
+    return ans;
+}
+
 export function checkAction(action) {
-    if (action.subject.actionPoints < getActionPointCost(action)) {
-        return failCheck("Not enough action points");
+    if (!canDoAction(action.subject, action.type)) {
+        return failCheck("That character can't do that.");
+    } else if (action.subject.actionPoints < getActionPointCost(action)) {
+        return failCheck("Not enough action points.");
     }
     switch (action.type) {
         case ActionType.MOVE:
