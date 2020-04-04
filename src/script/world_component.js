@@ -33,6 +33,7 @@ import {
 import {
     getProportion,
 } from "./util.js";
+import {ActionType} from "./action_type.js";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Component definitions
@@ -269,6 +270,10 @@ Crafty.c("Character", {
 
     init: function() {
         this.attr({
+            availableActions: [
+                ActionType.MOVE,
+                ActionType.ATTACK,
+            ],
             name_: "Steve",
             speed: 4,
             team:  -1,

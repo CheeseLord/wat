@@ -70,7 +70,8 @@ export function setGlobalState(newState) { globalState = newState; }
 // Action handlers
 
 export function canDoAction(character, actionType) {
-    return (character.availableActions.includes(actionType));
+    return (actionType === ActionType.END_TURN ||
+            character.availableActions.includes(actionType));
 }
 
 export function checkAction(action) {
