@@ -5,6 +5,7 @@
 import {StateEnum} from "./consts.js";
 
 import {
+    ActionType,
     endTurnAction,
     specialAttackAction,
 } from "./action_type.js";
@@ -33,6 +34,53 @@ const CLEAR_MENU  = {};
 const PARENT_MENU = {};
 
 const clearMenuState = StateEnum.DEFAULT;
+
+// eslint-disable-next-line no-unused-vars
+const ACTION_TYPE_TREE = {
+    action:   false,
+    children: [
+        {
+            action: true,
+            name:   "Move",
+            type:   ActionType.MOVE,
+        },
+        {
+            action: true,
+            name:   "Swap Places",
+            type:   ActionType.SWAP_PLACES,
+        },
+        {
+            action:   false,
+            children: [
+                {
+                    action: true,
+                    name:   "Melee Attack",
+                    type:   ActionType.ATTACK,
+                },
+                {
+                    action: true,
+                    name:   "Ranged Attack",
+                    type:   ActionType.RANGED_ATTACK,
+                },
+                {
+                    action: true,
+                    name:   "Special Attack",
+                    type:   ActionType.SPECIAL_ATTACK,
+                },
+            ],
+        },
+        {
+            action: true,
+            name:   "Interact",
+            type:   ActionType.INTERACT,
+        },
+        {
+            action: true,
+            name:   "End Turn",
+            type:   ActionType.END_TURN,
+        },
+    ],
+};
 
 // menuStack - list of menus that would be transitioned to if you click a
 //     "back" button. Does not include the current menu.
