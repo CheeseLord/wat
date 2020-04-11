@@ -260,9 +260,13 @@ function applyMenuByName(menuName) {
         internalError("No such menu: " + menuName);
         return;
     }
+    debugLog("Attempting to apply menu: " + menuName);
+    applyMenuByDesc(menuDesc);
+}
+
+function applyMenuByDesc(menuDesc) {
     if (!menuDesc["title"] || !menuDesc["state"] || !menuDesc["buttons"]) {
-        internalError("Description for menu '" + menuName +
-            "' is ill-formed.");
+        internalError("Description for menu is ill-formed.");
         return;
     }
 
@@ -286,8 +290,7 @@ function applyMenuByName(menuName) {
     for (let i = 0; i < menuDesc["buttons"].length; i++) {
         let buttonDesc = menuDesc["buttons"][i];
         if (buttonDesc.length !== 3) {
-            internalError("Description for menu '" + menuName +
-                "' is ill-formed.");
+            internalError("Description for menu is ill-formed.");
             return;
         }
         let buttonText   = buttonDesc[0];
@@ -303,7 +306,7 @@ function applyMenuByName(menuName) {
         ]);
     }
 
-    debugLog("Enter menu: " + menuName);
+    debugLog("About to enter menu");
     onEntry();
     Crafty.s("ButtonMenu").setMenu(title, buttonList);
 }
