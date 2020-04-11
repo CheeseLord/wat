@@ -28,12 +28,7 @@ import {
 } from "./turn_order.js";
 
 ///////////////////////////////////////////////////////////////////////////////
-// Menu table handling
-
-const CLEAR_MENU  = {};
-const PARENT_MENU = {};
-
-const clearMenuState = StateEnum.DEFAULT;
+// Temporary placeholder stuff for eventual dynamic menu building.
 
 // eslint-disable-next-line no-unused-vars
 const ACTION_TYPE_TREE = {
@@ -81,6 +76,60 @@ const ACTION_TYPE_TREE = {
         },
     ],
 };
+
+// TODO move these functions somewhere better
+
+// TODO [#36]: Rework globalState
+// eslint-disable-next-line no-unused-vars
+function getStateFromAction(actionType) {
+    // TODO [#35]: Replace switch statements with dynamic dispatch.
+    switch (actionType) {
+        case ActionType.MOVE:
+            return StateEnum.CHARACTER_MOVE;
+        case ActionType.ATTACK:
+            return StateEnum.CHARACTER_ATTACK;
+        case ActionType.INTERACT:
+            return StateEnum.CHARACTER_INTERACT;
+        case ActionType.SWAP_PLACES:
+            return StateEnum.CHARACTER_SWAP;
+        case ActionType.RANGED_ATTACK:
+            return StateEnum.CHARACTER_RANGED_ATTACK;
+        case ActionType.SPECIAL_ATTACK:
+        case ActionType.END_TURN:
+            internalError("No state for this action type");
+            return StateEnum.DEFAULT;
+        default:
+            internalError("Unknown ActionType");
+            return StateEnum.DEFAULT;
+    }
+}
+
+// eslint-disable-next-line no-unused-vars
+function doesActionNeedTarget(actionType) {
+    // TODO [#35]: Replace switch statements with dynamic dispatch.
+    switch (actionType) {
+        case ActionType.MOVE:
+        case ActionType.ATTACK:
+        case ActionType.INTERACT:
+        case ActionType.SWAP_PLACES:
+        case ActionType.RANGED_ATTACK:
+            return true;
+        case ActionType.SPECIAL_ATTACK:
+        case ActionType.END_TURN:
+            return false;
+        default:
+            internalError("Unknown ActionType");
+            return false;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Menu table handling
+
+const CLEAR_MENU  = {};
+const PARENT_MENU = {};
+
+const clearMenuState = StateEnum.DEFAULT;
 
 // menuStack - list of menus that would be transitioned to if you click a
 //     "back" button. Does not include the current menu.
