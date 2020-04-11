@@ -28,7 +28,7 @@ import {
 } from "./geometry.js";
 import {
     doMenu,
-    topMenu,
+    getTopMenu,
 } from "./menu.js";
 import {
     assert,
@@ -145,7 +145,7 @@ export function worldClickHandler(evt) {
                 debugLog("User intended SELECT");
                 selectCharacter(disambig.target);
                 // TODO: Also setFocusOn? Or even call out to startCharacter?
-                doMenu(topMenu);
+                doMenu(getTopMenu());
                 return;
             case UserDisambigType.ACTION:
                 debugLog("User intended ACTION");
