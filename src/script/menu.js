@@ -133,10 +133,10 @@ const clearMenuState = StateEnum.DEFAULT;
 
 // menuStack - list of menus that would be transitioned to if you click a
 //     "back" button. Does not include the current menu.
-// currMenuName - the name of the currently-displayed menu, or null if there is
-//     no menu displayed.
+// currMenuName - the menuDesc of the currently-displayed menu, or null if
+//     there is no menu displayed.
 var menuStack    = [];
-var currMenuName = null;
+var currMenuDesc = null;
 
 function doNothing() {}
 
@@ -232,37 +232,55 @@ export function clearMenu() {
     Crafty.s("ButtonMenu").clearMenu();
 }
 
+// TODO Temporary for backward-compatibility
 function transitionToMenu(menuName, isTop) {
-    if (menuName === CLEAR_MENU) {
-        clearMenu();
-    } else if (menuName === PARENT_MENU) {
-        // Pop menu
-        if (menuStack.length === 0) {
-            Crafty.s("ButtonMenu").clearMenu();
-            currMenuName = null;
-        } else {
-            menuName = menuStack.pop();
-            applyMenuByName(menuName);
-            currMenuName = menuName;
-        }
+    if (menuName === CLEAR_MENU || menuName === PARENT_MENU) {
+        // Handled as descs now
+        transitionToMenuDesc(menuName, isTop);
     } else {
-        applyMenuByName(menuName);
-        if (currMenuName && !isTop) {
-            menuStack.push(currMenuName);
+        let menuDesc = menuTable[menuName];
+        if (!menuDesc) {
+            internalError("No such menu: " + menuName);
+            return;
         }
-        currMenuName = menuName;
+        transitionToMenuDesc(menuDesc, isTop);
     }
 }
 
-function applyMenuByName(menuName) {
-    let menuDesc = menuTable[menuName];
-    if (!menuDesc) {
-        internalError("No such menu: " + menuName);
-        return;
+function transitionToMenuDesc(menuDesc, isTop) {
+    if (menuDesc === CLEAR_MENU) {
+        clearMenu();
+    } else if (menuDesc === PARENT_MENU) {
+        // Pop menu
+        if (menuStack.length === 0) {
+            Crafty.s("ButtonMenu").clearMenu();
+            currMenuDesc = null;
+        } else {
+            menuDesc = menuStack.pop();
+            applyMenuByDesc(menuDesc);
+            currMenuDesc = menuDesc;
+        }
+    } else {
+        applyMenuByDesc(menuDesc);
+        // TODO: If isTop, do we clear the stack anywhere?
+        if (currMenuDesc !== null && !isTop) {
+            menuStack.push(currMenuDesc);
+        }
+        currMenuDesc = menuDesc;
     }
-    debugLog("Attempting to apply menu: " + menuName);
-    applyMenuByDesc(menuDesc);
 }
+
+// TODO Temporary for backward-compatibility
+//     ...not actually used?
+// function applyMenuByName(menuName) {
+//     let menuDesc = menuTable[menuName];
+//     if (!menuDesc) {
+//         internalError("No such menu: " + menuName);
+//         return;
+//     }
+//     debugLog("Attempting to apply menu: " + menuName);
+//     applyMenuByDesc(menuDesc);
+// }
 
 function applyMenuByDesc(menuDesc) {
     if (!menuDesc["title"] || !menuDesc["state"] || !menuDesc["buttons"]) {
