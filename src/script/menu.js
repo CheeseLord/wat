@@ -140,111 +140,95 @@ var currMenuDesc = null;
 
 function doNothing() {}
 
-var menuTable = {
-    topMenu: {
-        title:   "Select Action",
-        state:   StateEnum.CHARACTER_SELECTED,
-        buttons: [
-            // Text         New Menu      Action
-            ["Move",        "move",       doNothing],
-            ["Swap places", "swapPlaces", doNothing],
-            ["Attack",      "attack",     doNothing],
-            ["Interact",    "interact",   doNothing],
-            ["Auto Attack", CLEAR_MENU,    () => {
-                doAction(chooseAiAction(selectedCharacter), afterPlayerMove);
-            }],
-            ["End Turn",    CLEAR_MENU,   () => {
-                doAction(endTurnAction(selectedCharacter), afterPlayerMove);
-            }],
-            ["Cancel",      CLEAR_MENU,   () => { deselectCharacter(); }],
-        ],
-    },
-
-    move: {
-        title:   "Moving",
-        state:   StateEnum.CHARACTER_MOVE,
-        buttons: [
-            // Text  New Menu     Action
-            ["Back", PARENT_MENU, doNothing],
-        ],
-    },
-
-    swapPlaces: {
-        title:   "Swap Places",
-        state:   StateEnum.CHARACTER_SWAP,
-        buttons: [
-            // Text  New Menu     Action
-            ["Back", PARENT_MENU, doNothing],
-        ],
-    },
-
-    interact: {
-        title:   "Interact",
-        state:   StateEnum.CHARACTER_INTERACT,
-        buttons: [
-            // Text  New Menu     Action
-            ["Back", PARENT_MENU, doNothing],
-        ],
-    },
-
-    attack: {
-        title:   "Attack",
-        state:   StateEnum.CHARACTER_ATTACK,
-        buttons: [
-            // Text            New Menu        Action
-            ["Basic Attack",   "basicAttack",  doNothing],
-            ["Ranged Attack",  "rangedAttack", doNothing],
-            ["Special Attack", CLEAR_MENU,     () => {
-                doAction(
-                    specialAttackAction(selectedCharacter),
-                    afterPlayerMove
-                );
-            }],
-            ["Back",           PARENT_MENU,   doNothing],
-        ],
-    },
-
-    basicAttack: {
-        title:   "Basic Attack",
-        state:   StateEnum.CHARACTER_ATTACK,
-        buttons: [
-            // Text  New Menu     Action
-            ["Back", PARENT_MENU, doNothing],
-        ],
-    },
-
-    rangedAttack: {
-        title:   "Ranged Attack",
-        state:   StateEnum.CHARACTER_RANGED_ATTACK,
-        buttons: [
-            // Text  New Menu     Action
-            ["Back", PARENT_MENU, doNothing],
-        ],
-    },
+const moveMenu = {
+    title:   "Moving",
+    state:   StateEnum.CHARACTER_MOVE,
+    buttons: [
+        // Text  New Menu     Action
+        ["Back", PARENT_MENU, doNothing],
+    ],
 };
 
-export function doMenu(menuName) {
-    transitionToMenu(menuName, /* isTop = */true);
+const swapPlacesMenu = {
+    title:   "Swap Places",
+    state:   StateEnum.CHARACTER_SWAP,
+    buttons: [
+        // Text  New Menu     Action
+        ["Back", PARENT_MENU, doNothing],
+    ],
+};
+
+const interactMenu = {
+    title:   "Interact",
+    state:   StateEnum.CHARACTER_INTERACT,
+    buttons: [
+        // Text  New Menu     Action
+        ["Back", PARENT_MENU, doNothing],
+    ],
+};
+
+const basicAttackMenu = {
+    title:   "Basic Attack",
+    state:   StateEnum.CHARACTER_ATTACK,
+    buttons: [
+        // Text  New Menu     Action
+        ["Back", PARENT_MENU, doNothing],
+    ],
+};
+
+const rangedAttackMenu = {
+    title:   "Ranged Attack",
+    state:   StateEnum.CHARACTER_RANGED_ATTACK,
+    buttons: [
+        // Text  New Menu     Action
+        ["Back", PARENT_MENU, doNothing],
+    ],
+};
+
+const attackMenu = {
+    title:   "Attack",
+    state:   StateEnum.CHARACTER_ATTACK,
+    buttons: [
+        // Text            New Menu          Action
+        ["Basic Attack",   basicAttackMenu,  doNothing],
+        ["Ranged Attack",  rangedAttackMenu, doNothing],
+        ["Special Attack", CLEAR_MENU,       () => {
+            doAction(
+                specialAttackAction(selectedCharacter),
+                afterPlayerMove
+            );
+        }],
+        ["Back",           PARENT_MENU,   doNothing],
+    ],
+};
+
+
+export const topMenu = {
+    title:   "Select Action",
+    state:   StateEnum.CHARACTER_SELECTED,
+    buttons: [
+        // Text         New Menu      Action
+        ["Move",        moveMenu,       doNothing],
+        ["Swap places", swapPlacesMenu, doNothing],
+        ["Attack",      attackMenu,     doNothing],
+        ["Interact",    interactMenu,   doNothing],
+        ["Auto Attack", CLEAR_MENU,     () => {
+            doAction(chooseAiAction(selectedCharacter), afterPlayerMove);
+        }],
+        ["End Turn",    CLEAR_MENU,     () => {
+            doAction(endTurnAction(selectedCharacter), afterPlayerMove);
+        }],
+        ["Cancel",      CLEAR_MENU,     () => { deselectCharacter(); }],
+    ],
+};
+
+export function doMenu(menuDesc) {
+    transitionToMenuDesc(menuDesc, /* isTop = */true);
 }
 
 export function clearMenu() {
     setGlobalState(clearMenuState);
     Crafty.s("ButtonMenu").clearMenu();
-}
-
-// TODO Temporary for backward-compatibility
-function transitionToMenu(menuName, isTop) {
-    if (menuName === CLEAR_MENU || menuName === PARENT_MENU) {
-        // Handled as descs now
-        transitionToMenuDesc(menuName, isTop);
-    } else {
-        let menuDesc = menuTable[menuName];
-        if (!menuDesc) {
-            internalError("No such menu: " + menuName);
-            return;
-        }
-        transitionToMenuDesc(menuDesc, isTop);
-    }
 }
 
 function transitionToMenuDesc(menuDesc, isTop) {
@@ -269,18 +253,6 @@ function transitionToMenuDesc(menuDesc, isTop) {
         currMenuDesc = menuDesc;
     }
 }
-
-// TODO Temporary for backward-compatibility
-//     ...not actually used?
-// function applyMenuByName(menuName) {
-//     let menuDesc = menuTable[menuName];
-//     if (!menuDesc) {
-//         internalError("No such menu: " + menuName);
-//         return;
-//     }
-//     debugLog("Attempting to apply menu: " + menuName);
-//     applyMenuByDesc(menuDesc);
-// }
 
 function applyMenuByDesc(menuDesc) {
     if (!menuDesc["title"] || !menuDesc["state"] || !menuDesc["buttons"]) {
@@ -319,7 +291,7 @@ function applyMenuByDesc(menuDesc) {
             () => {
                 buttonAction();
                 onExit();
-                transitionToMenu(newMenu, /* isTop = */false);
+                transitionToMenuDesc(newMenu, /* isTop = */false);
             },
         ]);
     }
