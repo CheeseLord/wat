@@ -18,6 +18,7 @@ import {
     internalError,
 } from "./message.js";
 import {
+    canDoAction,
     doAction,
     setGlobalState,
 } from  "./resolve_action.js";
@@ -166,11 +167,11 @@ var currMenuDesc = null;
 
 function doNothing() {}
 
-export function getTopMenu() {
-    return buildOneMenuNode(ACTION_TYPE_TREE, /* isTop = */true);
+export function getTopMenu(character) {
+    return buildOneMenuNode(ACTION_TYPE_TREE, character, /* isTop = */true);
 }
 
-function buildOneMenuNode(actionTypeSubtree, isTop) {
+function buildOneMenuNode(actionTypeSubtree, character, isTop) {
     if (actionTypeSubtree.action) {
         // .action, .name, .type
         if (doesActionNeedTarget(actionTypeSubtree.type)) {
@@ -190,7 +191,11 @@ function buildOneMenuNode(actionTypeSubtree, isTop) {
         // .action, .name, .state, .children
         let buttons = [];
         for (let i = 0; i < actionTypeSubtree.children.length; i++) {
-            buttons.push(buildOneMenuButton(actionTypeSubtree.children[i]));
+            let nextButton = buildOneMenuButton(actionTypeSubtree.children[i],
+                character);
+            if (nextButton !== null) {
+                buttons.push(nextButton);
+            }
         }
         if (isTop) {
             buttons.push([
@@ -209,13 +214,16 @@ function buildOneMenuNode(actionTypeSubtree, isTop) {
     }
 }
 
-function buildOneMenuButton(actionTypeSubtree) {
+function buildOneMenuButton(actionTypeSubtree, character) {
     if (actionTypeSubtree.action) {
         // .action, .name, .type
+        if (!canDoAction(character, actionTypeSubtree.type)) {
+            return null;
+        }
         if (doesActionNeedTarget(actionTypeSubtree.type)) {
             return [
                 actionTypeSubtree.name,
-                buildOneMenuNode(actionTypeSubtree, false),
+                buildOneMenuNode(actionTypeSubtree, character, false),
                 doNothing,
             ];
         } else {
@@ -232,7 +240,7 @@ function buildOneMenuButton(actionTypeSubtree) {
         // .action, .name, .state, .children
         return [
             actionTypeSubtree.name,
-            buildOneMenuNode(actionTypeSubtree, false),
+            buildOneMenuNode(actionTypeSubtree, character, false),
             doNothing,
         ];
     }

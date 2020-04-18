@@ -145,7 +145,7 @@ export function worldClickHandler(evt) {
                 debugLog("User intended SELECT");
                 selectCharacter(disambig.target);
                 // TODO: Also setFocusOn? Or even call out to startCharacter?
-                doMenu(getTopMenu());
+                doMenu(getTopMenu(disambig.target));
                 return;
             case UserDisambigType.ACTION:
                 debugLog("User intended ACTION");
