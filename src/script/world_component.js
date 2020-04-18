@@ -282,7 +282,6 @@ Crafty.c("Name", {
     _setupName: function() {
         this._nameText = Crafty.e("2D, DOM, Text");
         this._nameText.attr({z: Z_WORLD_UI});
-        this._nameText.text("AAA");
         this._nameText.textColor("#000000");
         this._nameText.textAlign("center");
 
