@@ -13,6 +13,7 @@ import {
 import "./button.js";
 import "./world_component.js";
 import {
+    setupKeyHandler,
     worldClickHandler,
 } from "./ui.js";
 import {
@@ -65,6 +66,8 @@ export function doTheThing() {
             .color("#eee");
 
     initCamera();
+
+    setupKeyHandler();
 
     // Initialize message log. This has to go after creating the UILayer
     // because the message log is on the UILayer.
