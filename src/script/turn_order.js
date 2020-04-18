@@ -37,13 +37,13 @@ import {
 // TODO can we not export this? Or make it a UI-only thing?
 // At the very least, selectedCharacter and checkSelectCharacter should be in
 // the same file.
-export var selectedCharacter;
+export let selectedCharacter;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Whose turn is it, anyway?
 
-var currentTeamIndex   = 0;
-var currentTeamMembers = [];
+let currentTeamIndex   = 0;
+let currentTeamMembers = [];
 
 // TODO these functions are only used by checkSelectCharacter.
 export function isOnCurrentTeam(character) {
@@ -250,6 +250,18 @@ export function selectCharacter(character) {
     selectedCharacter.setDefaultHighlight(Highlight.SELECTED_CHARACTER);
     updateAutoActions(character);
     createMovementGrid(character);
+}
+
+export function selectNextCharacter() {
+    let index = currentTeamMembers.indexOf(selectedCharacter);
+    let teamSize = currentTeamMembers.length;
+
+    let i = (index + 1) % teamSize;
+    while (!canMoveThisTurn(currentTeamMembers[i]) && i !== index) {
+        i = (i + 1) % teamSize;
+    }
+
+    selectCharacter(currentTeamMembers[i]);
 }
 
 export function deselectCharacter() {

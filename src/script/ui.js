@@ -46,6 +46,7 @@ import {
     canMoveThisTurn,
     isOnCurrentTeam,
     selectCharacter,
+    selectNextCharacter,
     // TODO: Does this work??
     selectedCharacter,
 } from "./turn_order.js";
@@ -62,23 +63,11 @@ export const UserInputType = Object.freeze({
     END_TURN:       {},
 });
 
-export function worldClickInput(pos) {
+function worldClickInput(pos) {
     return {
         type: UserInputType.WORLD_CLICK,
         pos:  pos,
     };
-}
-
-export function specialAttackInput() {
-    return {type: UserInputType.SPECIAL_ATTACK};
-}
-
-export function autoAttackInput() {
-    return {type: UserInputType.AUTO_ATTACK};
-}
-
-export function endTurnInput() {
-    return {type: UserInputType.END_TURN};
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -301,5 +290,16 @@ function disambigActionIfPathExistsElseError(path, action) {
     } else {
         return disambigAction(action);
     }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Keyboard input handler.
+
+export function setupKeyHandler() {
+    Crafty.s("Keyboard").bind("KeyDown", function(e) {
+        if (e.key === Crafty.keys.SPACE) {
+            selectNextCharacter();
+        }
+    });
 }
 
