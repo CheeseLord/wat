@@ -9,9 +9,10 @@ import {
     endTurnAction,
     specialAttackAction,
 } from "./action_type.js";
-import {
-    chooseAiAction,
-} from  "./ai.js";
+// TODO: We'll need this if we re-add the "Auto Attack" button.
+// import {
+//     chooseAiAction,
+// } from  "./ai.js";
 import {
     debugLog,
     internalError,
@@ -30,9 +31,10 @@ import {
 ///////////////////////////////////////////////////////////////////////////////
 // Temporary placeholder stuff for eventual dynamic menu building.
 
-// eslint-disable-next-line no-unused-vars
 const ACTION_TYPE_TREE = {
     action:   false,
+    name:     "Select Action",
+    state:    StateEnum.CHARACTER_SELECTED,
     children: [
         {
             action: true,
@@ -46,6 +48,8 @@ const ACTION_TYPE_TREE = {
         },
         {
             action:   false,
+            name:     "Attack",
+            state:    StateEnum.CHARACTER_ATTACK,
             children: [
                 {
                     action: true,
@@ -69,6 +73,10 @@ const ACTION_TYPE_TREE = {
             name:   "Interact",
             type:   ActionType.INTERACT,
         },
+        // TODO: Custom entry for this button we used to have:
+        //   ["Auto Attack", CLEAR_MENU, () => {
+        //       doAction(chooseAiAction(selectedCharacter), afterPlayerMove);
+        //   }],
         {
             action: true,
             name:   "End Turn",
@@ -80,7 +88,6 @@ const ACTION_TYPE_TREE = {
 // TODO move these functions somewhere better
 
 // TODO [#36]: Rework globalState
-// eslint-disable-next-line no-unused-vars
 function getStateFromAction(actionType) {
     // TODO [#35]: Replace switch statements with dynamic dispatch.
     switch (actionType) {
@@ -104,7 +111,6 @@ function getStateFromAction(actionType) {
     }
 }
 
-// eslint-disable-next-line no-unused-vars
 function doesActionNeedTarget(actionType) {
     // TODO [#35]: Replace switch statements with dynamic dispatch.
     switch (actionType) {
@@ -120,6 +126,26 @@ function doesActionNeedTarget(actionType) {
         default:
             internalError("Unknown ActionType");
             return false;
+    }
+}
+
+function makeUntargetedAction(actionType) {
+    // TODO [#35]: Replace switch statements with dynamic dispatch.
+    switch (actionType) {
+        case ActionType.SPECIAL_ATTACK:
+            return specialAttackAction(selectedCharacter);
+        case ActionType.END_TURN:
+            return endTurnAction(selectedCharacter);
+        case ActionType.MOVE:
+        case ActionType.ATTACK:
+        case ActionType.INTERACT:
+        case ActionType.SWAP_PLACES:
+        case ActionType.RANGED_ATTACK:
+            internalError("makeUntargetedAction() of targeted ActionType");
+            return endTurnAction(selectedCharacter);
+        default:
+            internalError("Unknown ActionType");
+            return endTurnAction(selectedCharacter);
     }
 }
 
@@ -141,88 +167,75 @@ var currMenuDesc = null;
 function doNothing() {}
 
 export function getTopMenu() {
-    const moveMenu = {
-        title:   "Moving",
-        state:   StateEnum.CHARACTER_MOVE,
-        buttons: [
-            // Text  New Menu     Action
-            ["Back", PARENT_MENU, doNothing],
-        ],
-    };
+    return buildOneMenuNode(ACTION_TYPE_TREE, /* isTop = */true);
+}
 
-    const swapPlacesMenu = {
-        title:   "Swap Places",
-        state:   StateEnum.CHARACTER_SWAP,
-        buttons: [
-            // Text  New Menu     Action
-            ["Back", PARENT_MENU, doNothing],
-        ],
-    };
+function buildOneMenuNode(actionTypeSubtree, isTop) {
+    if (actionTypeSubtree.action) {
+        // .action, .name, .type
+        if (doesActionNeedTarget(actionTypeSubtree.type)) {
+            return {
+                title:   actionTypeSubtree.name,
+                state:   getStateFromAction(actionTypeSubtree.type),
+                buttons: [
+                    // Text  New Menu     Action
+                    ["Back", PARENT_MENU, doNothing],
+                ],
+            };
+        } else {
+            internalError("buildOneMenuNode() of untargeted ActionType");
+            return CLEAR_MENU;
+        }
+    } else {
+        // .action, .name, .state, .children
+        let buttons = [];
+        for (let i = 0; i < actionTypeSubtree.children.length; i++) {
+            buttons.push(buildOneMenuButton(actionTypeSubtree.children[i]));
+        }
+        if (isTop) {
+            buttons.push([
+                "Cancel",
+                CLEAR_MENU,
+                () => { deselectCharacter(); },
+            ]);
+        } else {
+            buttons.push(["Back", PARENT_MENU, doNothing]);
+        }
+        return {
+            title:   actionTypeSubtree.name,
+            state:   actionTypeSubtree.state,
+            buttons: buttons,
+        };
+    }
+}
 
-    const interactMenu = {
-        title:   "Interact",
-        state:   StateEnum.CHARACTER_INTERACT,
-        buttons: [
-            // Text  New Menu     Action
-            ["Back", PARENT_MENU, doNothing],
-        ],
-    };
-
-    const basicAttackMenu = {
-        title:   "Basic Attack",
-        state:   StateEnum.CHARACTER_ATTACK,
-        buttons: [
-            // Text  New Menu     Action
-            ["Back", PARENT_MENU, doNothing],
-        ],
-    };
-
-    const rangedAttackMenu = {
-        title:   "Ranged Attack",
-        state:   StateEnum.CHARACTER_RANGED_ATTACK,
-        buttons: [
-            // Text  New Menu     Action
-            ["Back", PARENT_MENU, doNothing],
-        ],
-    };
-
-    const attackMenu = {
-        title:   "Attack",
-        state:   StateEnum.CHARACTER_ATTACK,
-        buttons: [
-            // Text            New Menu          Action
-            ["Basic Attack",   basicAttackMenu,  doNothing],
-            ["Ranged Attack",  rangedAttackMenu, doNothing],
-            ["Special Attack", CLEAR_MENU,       () => {
-                doAction(
-                    specialAttackAction(selectedCharacter),
-                    afterPlayerMove
-                );
-            }],
-            ["Back",           PARENT_MENU,   doNothing],
-        ],
-    };
-
-    const topMenu = {
-        title:   "Select Action",
-        state:   StateEnum.CHARACTER_SELECTED,
-        buttons: [
-            // Text         New Menu      Action
-            ["Move",        moveMenu,       doNothing],
-            ["Swap places", swapPlacesMenu, doNothing],
-            ["Attack",      attackMenu,     doNothing],
-            ["Interact",    interactMenu,   doNothing],
-            ["Auto Attack", CLEAR_MENU,     () => {
-                doAction(chooseAiAction(selectedCharacter), afterPlayerMove);
-            }],
-            ["End Turn",    CLEAR_MENU,     () => {
-                doAction(endTurnAction(selectedCharacter), afterPlayerMove);
-            }],
-            ["Cancel",      CLEAR_MENU,     () => { deselectCharacter(); }],
-        ],
-    };
-
-    return topMenu;
+function buildOneMenuButton(actionTypeSubtree) {
+    if (actionTypeSubtree.action) {
+        // .action, .name, .type
+        if (doesActionNeedTarget(actionTypeSubtree.type)) {
+            return [
+                actionTypeSubtree.name,
+                buildOneMenuNode(actionTypeSubtree, false),
+                doNothing,
+            ];
+        } else {
+            return [
+                actionTypeSubtree.name,
+                CLEAR_MENU,
+                () => {
+                    doAction(makeUntargetedAction(actionTypeSubtree.type),
+                        afterPlayerMove);
+                },
+            ];
+        }
+    } else {
+        // .action, .name, .state, .children
+        return [
+            actionTypeSubtree.name,
+            buildOneMenuNode(actionTypeSubtree, false),
+            doNothing,
+        ];
+    }
 }
 
 export function doMenu(menuDesc) {
