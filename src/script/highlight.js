@@ -43,6 +43,7 @@ export function createMovementGrid(character) {
     Crafty("GridObject").each(function() {
         if (this.autoAction === null) {
             // No highlight
+        // TODO[#35]: this.autoAction.type.getDefaultHighlight()
         } else if (this.autoAction.type === ActionType.MOVE) {
             this.setDefaultHighlight(Highlight.CAN_MOVE);
         } else if (this.autoAction.type === ActionType.ATTACK) {
@@ -69,6 +70,7 @@ export function hoverHighlightAction(action) {
     let endHighlight  = null;
     let pathHighlight = null;
 
+    // TODO[#35]: this.autoAction.type.getHoverHighlight{End,Middle}()
     if (type === ActionType.MOVE) {
         endHighlight  = Highlight.HOVER_MOVE_END;
         pathHighlight = Highlight.HOVER_MOVE_MIDDLE;

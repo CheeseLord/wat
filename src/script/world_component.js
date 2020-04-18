@@ -294,6 +294,11 @@ Crafty.c("Character", {
 
     init: function() {
         this.attr({
+            // TODO[#35]: Make this null (or sentinel value) by default. Define
+            // a property on the actions for "is this in the default set". When
+            // checking, if availableActions is null/sentinel, ask the action
+            // if it's default. Otherwise, check for containment as we
+            // currently do.
             availableActions: [
                 ActionType.MOVE,
                 ActionType.ATTACK,
