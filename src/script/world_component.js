@@ -183,11 +183,11 @@ Crafty.c("Health", {
     required: "DynamicObject",
 
     init: function() {
-        this.setupHealthBar_();
+        this._setupHealthBar();
         this.maxHealth(1);
     },
 
-    setupHealthBar_: function() {
+    _setupHealthBar: function() {
         let x = Math.round(this.x + (this.w / 8));
         let y = Math.round(this.y + (6 * this.h / 8));
         let w = Math.round(this.w * 6 / 8);
@@ -234,7 +234,7 @@ Crafty.c("Health", {
         this.attach(this.healthBarForeground_);
     },
 
-    updateHealthBar_: function() {
+    _updateHealthBar: function() {
         let healthFrac = getProportion(this.health_, this.maxHealth_);
         let newW = this.healthBarTotWidth_ * healthFrac;
         this.healthBarForeground_.attr({w: newW});
@@ -244,13 +244,13 @@ Crafty.c("Health", {
     maxHealth: function(health) {
         this.maxHealth_ = health;
         this.health_    = health;
-        this.updateHealthBar_();
+        this._updateHealthBar();
         return this;
     },
 
     setHealth: function(health) {
         this.health = health;
-        this.updateHealthBar_();
+        this._updateHealthBar();
         return this;
     },
 
@@ -259,14 +259,39 @@ Crafty.c("Health", {
         if (this.health_ <= 0) {
             this.destroy();
         } else {
-            this.updateHealthBar_();
+            this._updateHealthBar();
         }
         return this;
     },
 });
 
+Crafty.c("Name", {
+    required: "DynamicObject",
+
+    init: function() {
+        this._setupName();
+        this.setName_("Steve");
+    },
+
+    setName_: function(name) {
+        this.name_ = name;
+        this._nameText.text(name);
+        return this;
+    },
+
+    _setupName: function() {
+        this._nameText = Crafty.e("2D, DOM, Text");
+        this._nameText.attr({z: Z_WORLD_UI});
+        this._nameText.text("AAA");
+        this._nameText.textColor("#000000");
+        this._nameText.textAlign("center");
+
+        this.attach(this._nameText);
+    },
+});
+
 Crafty.c("Character", {
-    required: "DynamicObject, Health",
+    required: "DynamicObject, Health, Name",
 
     init: function() {
         this.attr({
@@ -274,17 +299,11 @@ Crafty.c("Character", {
                 ActionType.MOVE,
                 ActionType.ATTACK,
             ],
-            name_: "Steve",
             speed: 4,
             team:  -1,
             z:     Z_CHARACTER,
         });
         // inherit blocksMovement=true from DynamicObject
-    },
-
-    setName_: function(name) {
-        this.name_ = name;
-        return this;
     },
 
     setSpeed: function(speed) {
