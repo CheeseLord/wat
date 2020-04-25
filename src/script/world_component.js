@@ -280,12 +280,28 @@ Crafty.c("Name", {
     },
 
     _setupName: function() {
+        this._nameBackground = Crafty.e("2D, DOM, Color")
+                .css({"background-color": "#ffffff88"});
+        // TODO: Fix Magic numbers
+        this._nameBackground.attr({
+            z: Z_WORLD_UI - 1,
+            w: 100, // this seems to work, but we may want this to be dynamic
+            h: 16, // this seems to work
+            x: (-100 + 32) / 2, // (-w + cell_size)/2
+            y: -16, // (- cell_size)/2
+        });
         this._nameText = Crafty.e("2D, DOM, Text");
-        this._nameText.attr({z: Z_WORLD_UI});
+        this._nameText.attr({
+            z: Z_WORLD_UI,
+            w: 100,
+            x: (-100) / 2 + 16,
+            y: -16,
+
+        });
         this._nameText.textColor("#000000");
         this._nameText.textAlign("center");
-
-        this.attach(this._nameText);
+        this.attach(this._nameBackground);
+        this._nameBackground.attach(this._nameText);
     },
 });
 

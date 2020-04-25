@@ -298,7 +298,8 @@ function disambigActionIfPathExistsElseError(path, action) {
 export function setupKeyHandler() {
     Crafty.s("Keyboard").bind("KeyDown", function(e) {
         if (e.key === Crafty.keys.SPACE) {
-            selectNextCharacter();
+            let character = selectNextCharacter();
+            doMenu(getTopMenu(character));
         }
     });
 }
