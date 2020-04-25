@@ -5,9 +5,7 @@
 import {
     ActionType,
     MeleeAttackAction,
-    getActionPointCost,
     InteractAction,
-    isValidActionType,
     MoveAction,
 } from "./new_action.js";
 import {
@@ -78,7 +76,8 @@ export function canDoAction(character, actionType) {
 export function checkAction(action) {
     if (!canDoAction(action.subject, action.type)) {
         return failCheck("That character can't do that.");
-    } else if (action.subject.actionPoints < getActionPointCost(action)) {
+    } else if (action.subject.actionPoints <
+            action.type.actionPointCost(action)) {
         return failCheck("Not enough action points.");
     }
     switch (action.type) {
@@ -103,7 +102,7 @@ export function checkAction(action) {
 }
 
 export function doAction(action, callback) {
-    assert(isValidActionType(action.type));
+    assert(action.type.isActionType);
     if (!checkAction(action).valid) {
         // Callers are supposed to prevent this from happening, so if we get
         // here it indicates a bug in the code. In the interest of both
@@ -303,7 +302,7 @@ function takeDamageAnim(target, damage) {
 }
 
 function updateState(action) {
-    action.subject.actionPoints -= getActionPointCost(action);
+    action.subject.actionPoints -= action.type.actionPointCost(action);
 
     if (action.type === ActionType.MOVE) {
         // State change handle by Crafty's animation.

@@ -1,7 +1,6 @@
 "use strict";
 
 import {
-    assert,
     internalError,
 } from "./message.js";
 
@@ -12,16 +11,11 @@ const BaseAction = Object.freeze({
     name:         "BaseAction",
     isActionType: true,
 
-    mustOverride: function(methodName) {
-        internalError(`${this.name} does not override method ${methodName} ` +
-            `of BaseAction`);
-    },
-
     init: function() {
         this.mustOverride("init");
     },
 
-    // TODO: Actually override these
+    // TODO: Actually override and use these next 3
 
     check: function(action) {
         this.mustOverride("check");
@@ -33,6 +27,24 @@ const BaseAction = Object.freeze({
 
     doAnimate: function(action) {
         this.mustOverride("doAnimate");
+    },
+
+    actionPointCost: function(action) {
+        this.mustOverride("actionPointCost");
+    },
+
+    // Common helpers; don't override these.
+
+    mustOverride: function(methodName) {
+        internalError(`${this.name} does not override method ${methodName} ` +
+            `of BaseAction`);
+    },
+
+    checkActionType: function(action) {
+        if (action.type !== this) {
+            internalError(`Method of ${this.name} called on action of type ` +
+                `${action.type.name}`);
+        }
     },
 });
 
@@ -53,6 +65,11 @@ export const MoveAction = actionSubclass({
             path:    path,
         };
     },
+
+    actionPointCost: function(action) {
+        this.checkActionType(action);
+        return pathApExclTarget(action.path) + 1;
+    },
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,6 +80,11 @@ export const MeleeAttackAction = actionSubclass({
 
     init: function(subject, target, path) {
         return actionWithPathAndTarget(this, subject, target, path);
+    },
+
+    actionPointCost: function(action) {
+        this.checkActionType(action);
+        return pathApExclTarget(action.path) + 2;
     },
 });
 
@@ -75,6 +97,11 @@ export const InteractAction = actionSubclass({
     init: function(subject, target, path) {
         return actionWithPathAndTarget(this, subject, target, path);
     },
+
+    actionPointCost: function(action) {
+        this.checkActionType(action);
+        return pathApExclTarget(action.path) + 1;
+    },
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -85,6 +112,11 @@ export const SwapPlacesAction = actionSubclass({
 
     init: function(subject, target, path) {
         return actionWithTarget(this, subject, target);
+    },
+
+    actionPointCost: function(action) {
+        this.checkActionType(action);
+        return 2;
     },
 });
 
@@ -97,6 +129,11 @@ export const RangedAttackAction = actionSubclass({
     init: function(subject, target, path) {
         return actionWithTarget(this, subject, target);
     },
+
+    actionPointCost: function(action) {
+        this.checkActionType(action);
+        return 2;
+    },
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -107,6 +144,11 @@ export const SpecialAttackAction = actionSubclass({
 
     init: function(subject, target, path) {
         return nullaryAction(this, subject);
+    },
+
+    actionPointCost: function(action) {
+        this.checkActionType(action);
+        return 3;
     },
 });
 
@@ -119,10 +161,15 @@ export const EndTurnAction = actionSubclass({
     init: function(subject, target, path) {
         return nullaryAction(this, subject);
     },
+
+    actionPointCost: function(action) {
+        this.checkActionType(action);
+        return action.subject.actionPoints;
+    },
 });
 
 ///////////////////////////////////////////////////////////////////////////////
-// Helpers for various .init() methods.
+// Misc helpers
 
 function actionWithTarget(type, subject, target) {
     return {
@@ -150,6 +197,14 @@ function nullaryAction(type, subject) {
     };
 }
 
+function pathApExclTarget(path) {
+    // Minus 1 for the start cell, minus 1 for the target cell.
+    // TODO: Exclude target from path for MeleeAttackAction and InteractAction,
+    // so that everyone can just use action.path.length - 1? (Which matches
+    // getPathLength.)
+    return path.length - 2;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // FIXME: For backward compatibility with action_type.js. Delete these.
 
@@ -162,42 +217,4 @@ export const ActionType = Object.freeze({
     SPECIAL_ATTACK: SpecialAttackAction,
     END_TURN:       EndTurnAction,
 });
-
-export function isValidActionType(actionType) {
-    // Replace (true|undefined) with (true|false).
-    return !!actionType.isActionType;
-}
-
-// FIXME: Member function
-
-export function getActionPointCost(action) {
-    if (action.type === ActionType.MOVE) {
-        // Path includes start point.
-        assert(action.path.length >= 1);
-        return action.path.length - 1;
-    } else if (action.type === ActionType.ATTACK) {
-        // Path includes start point and target.
-        assert(action.path.length >= 1);
-        let moveCost = action.path.length - 2;
-        let attackCost = 2;
-        return moveCost + attackCost;
-    } else if (action.type === ActionType.INTERACT) {
-        // Path includes start point and target.
-        assert(action.path.length >= 1);
-        let moveCost = action.path.length - 2;
-        let interactCost = 1;
-        return moveCost + interactCost;
-    } else if (action.type === ActionType.SWAP_PLACES) {
-        return 2;
-    } else if (action.type === ActionType.RANGED_ATTACK) {
-        return 2;
-    } else if (action.type === ActionType.SPECIAL_ATTACK) {
-        return 3;
-    } else if (action.type === ActionType.END_TURN) {
-        return action.subject.actionPoints;
-    } else {
-        internalError("Unknown ActionType");
-        return Infinity;
-    }
-}
 
