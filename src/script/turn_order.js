@@ -262,6 +262,7 @@ export function selectNextCharacter() {
     }
 
     selectCharacter(currentTeamMembers[i]);
+    return currentTeamMembers[i];
 }
 
 export function deselectCharacter() {
