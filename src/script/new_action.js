@@ -163,34 +163,6 @@ export const ActionType = Object.freeze({
     END_TURN:       EndTurnAction,
 });
 
-export function moveAction(subject, path) {
-    return MoveAction.init(subject, path);
-}
-
-export function attackAction(subject, target, path) {
-    return MeleeAttackAction.init(subject, target, path);
-}
-
-export function interactAction(subject, target, path) {
-    return InteractAction.init(subject, target, path);
-}
-
-export function swapPlacesAction(subject, target) {
-    return SwapPlacesAction.init(subject, target);
-}
-
-export function rangedAttackAction(subject, target) {
-    return RangedAttackAction.init(subject, target);
-}
-
-export function specialAttackAction(subject) {
-    return SpecialAttackAction.init(subject);
-}
-
-export function endTurnAction(subject) {
-    return EndTurnAction.init(subject);
-}
-
 export function isValidActionType(actionType) {
     // Replace (true|undefined) with (true|false).
     return !!actionType.isActionType;

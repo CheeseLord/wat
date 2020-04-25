@@ -4,11 +4,11 @@
 
 import {
     ActionType,
-    attackAction,
+    MeleeAttackAction,
     getActionPointCost,
-    interactAction,
+    InteractAction,
     isValidActionType,
-    moveAction,
+    MoveAction,
 } from "./new_action.js";
 import {
     doAnimate,
@@ -455,9 +455,9 @@ export function updateAutoActions(subject) {
         // a separate AutoActionEnum value, and then reuse that ActionDesc for
         // highlighting and resolving the action.
         let tryActions = [
-            interactAction(subject, target, path),
-            attackAction(subject, target, path),
-            moveAction(subject, path),
+            InteractAction.init(subject, target, path),
+            MeleeAttackAction.init(subject, target, path),
+            MoveAction.init(subject, path),
         ];
         for (let i = 0; i < tryActions.length; i++) {
             if (checkAction(tryActions[i]).valid) {

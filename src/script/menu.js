@@ -6,8 +6,8 @@ import {StateEnum} from "./consts.js";
 
 import {
     ActionType,
-    endTurnAction,
-    specialAttackAction,
+    EndTurnAction,
+    SpecialAttackAction,
 } from "./new_action.js";
 // TODO: We'll need this if we re-add the "Auto Attack" button.
 // import {
@@ -134,19 +134,19 @@ function makeUntargetedAction(actionType) {
     // TODO [#35]: Replace switch statements with dynamic dispatch.
     switch (actionType) {
         case ActionType.SPECIAL_ATTACK:
-            return specialAttackAction(selectedCharacter);
+            return SpecialAttackAction.init(selectedCharacter);
         case ActionType.END_TURN:
-            return endTurnAction(selectedCharacter);
+            return EndTurnAction.init(selectedCharacter);
         case ActionType.MOVE:
         case ActionType.ATTACK:
         case ActionType.INTERACT:
         case ActionType.SWAP_PLACES:
         case ActionType.RANGED_ATTACK:
             internalError("makeUntargetedAction() of targeted ActionType");
-            return endTurnAction(selectedCharacter);
+            return EndTurnAction.init(selectedCharacter);
         default:
             internalError("Unknown ActionType");
-            return endTurnAction(selectedCharacter);
+            return EndTurnAction.init(selectedCharacter);
     }
 }
 

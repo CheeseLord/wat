@@ -3,9 +3,9 @@
 "use strict";
 
 import {
-    attackAction,
-    endTurnAction,
-    moveAction,
+    MeleeAttackAction,
+    EndTurnAction,
+    MoveAction,
 } from "./new_action.js";
 import {
     findPaths,
@@ -34,7 +34,7 @@ export function chooseAiAction(character) {
         }
     });
     if (nearestTarget === null) {
-        return endTurnAction(character);
+        return EndTurnAction.init(character);
     } else {
         let path = getPath(
             theMap,
@@ -42,10 +42,10 @@ export function chooseAiAction(character) {
             nearestTarget.getPos()
         );
         if (path === null) {
-            return endTurnAction(character);
+            return EndTurnAction.init(character);
         }
 
-        let tryAttack = attackAction(character, nearestTarget, path);
+        let tryAttack = MeleeAttackAction.init(character, nearestTarget, path);
         if (checkAction(tryAttack).valid) {
             return tryAttack;
         }
@@ -54,7 +54,7 @@ export function chooseAiAction(character) {
         // Give up once we get down to a length of 1, since that's just the
         // starting cell (and doesn't indicate actually moving anywhere).
         while (path.length > 1) {
-            let tryMove = moveAction(character, path);
+            let tryMove = MoveAction.init(character, path);
             if (checkAction(tryMove).valid) {
                 return tryMove;
             }
@@ -67,6 +67,6 @@ export function chooseAiAction(character) {
         // move. This can happen if we are adjacent to the target, but don't
         // have enough action points to attack it. In this case, skip our turn
         // since we have nothing useful to do.
-        return endTurnAction(character);
+        return EndTurnAction.init(character);
     }
 }

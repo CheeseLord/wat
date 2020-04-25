@@ -3,13 +3,13 @@
 "use strict";
 
 import {
-    attackAction,
-    endTurnAction,
-    interactAction,
-    moveAction,
-    rangedAttackAction,
-    specialAttackAction,
-    swapPlacesAction,
+    MeleeAttackAction,
+    EndTurnAction,
+    InteractAction,
+    MoveAction,
+    RangedAttackAction,
+    SpecialAttackAction,
+    SwapPlacesAction,
 } from "./new_action.js";
 import {
     chooseAiAction,
@@ -181,11 +181,11 @@ function figureOutWhatTheUserMeant(inputDesc) {
             break;
         // These are trivial wrappers.
         case UserInputType.SPECIAL_ATTACK:
-            return disambigAction(specialAttackAction(subject));
+            return disambigAction(SpecialAttackAction.init(subject));
         case UserInputType.AUTO_ATTACK:
             return disambigAction(chooseAiAction(subject));
         case UserInputType.END_TURN:
-            return disambigAction(endTurnAction(subject));
+            return disambigAction(EndTurnAction.init(subject));
         default:
             internalError("Unknown UserInputType");
             return disambigError("An internal error occurred.");
@@ -238,22 +238,22 @@ function figureOutWhatTheUserMeant(inputDesc) {
         case StateEnum.CHARACTER_MOVE:
             return disambigActionIfPathExistsElseError(
                 path,
-                moveAction(subject, path)
+                MoveAction.init(subject, path)
             );
         case StateEnum.CHARACTER_ATTACK:
             return disambigActionIfPathExistsElseError(
                 path,
-                attackAction(subject, target, path)
+                MeleeAttackAction.init(subject, target, path)
             );
         case StateEnum.CHARACTER_INTERACT:
             return disambigActionIfPathExistsElseError(
                 path,
-                interactAction(subject, target, path)
+                InteractAction.init(subject, target, path)
             );
         case StateEnum.CHARACTER_RANGED_ATTACK:
-            return disambigAction(rangedAttackAction(subject, target));
+            return disambigAction(RangedAttackAction.init(subject, target));
         case StateEnum.CHARACTER_SWAP:
-            return disambigAction(swapPlacesAction(subject, target));
+            return disambigAction(SwapPlacesAction.init(subject, target));
         default:
             internalError("Unknown state value.");
             return disambigError("An internal error occurred.");
