@@ -8,7 +8,7 @@ import {
     ActionType,
     endTurnAction,
     specialAttackAction,
-} from "./action_type.js";
+} from "./new_action.js";
 // TODO: We'll need this if we re-add the "Auto Attack" button.
 // import {
 //     chooseAiAction,

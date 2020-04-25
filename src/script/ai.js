@@ -6,7 +6,7 @@ import {
     attackAction,
     endTurnAction,
     moveAction,
-} from "./action_type.js";
+} from "./new_action.js";
 import {
     findPaths,
     getPath,

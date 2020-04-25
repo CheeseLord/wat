@@ -33,7 +33,7 @@ import {
 import {
     getProportion,
 } from "./util.js";
-import {ActionType} from "./action_type.js";
+import {ActionType} from "./new_action.js";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Component definitions

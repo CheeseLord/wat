@@ -10,7 +10,7 @@ import {
     rangedAttackAction,
     specialAttackAction,
     swapPlacesAction,
-} from "./action_type.js";
+} from "./new_action.js";
 import {
     chooseAiAction,
 } from  "./ai.js";

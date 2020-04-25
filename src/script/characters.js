@@ -2,7 +2,7 @@
 
 import {
     ActionType,
-} from "./action_type.js";
+} from "./new_action.js";
 
 export function createPlayerCharacters() {
     return [

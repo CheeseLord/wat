@@ -9,7 +9,7 @@ import {
     interactAction,
     isValidActionType,
     moveAction,
-} from "./action_type.js";
+} from "./new_action.js";
 import {
     doAnimate,
     parallelAnimations,

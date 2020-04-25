@@ -4,7 +4,7 @@
 
 import {
     ActionType,
-} from "./action_type.js";
+} from "./new_action.js";
 import {
     Highlight,
 } from  "./consts.js";
