@@ -5,8 +5,8 @@ import {
 } from "./message.js";
 import {
     canDoAction,
-    checkAttack,
     checkInteract,
+    checkMeleeAttack,
     checkMove,
     checkRangedAttack,
     checkSwap,
@@ -114,8 +114,7 @@ export const MeleeAttackAction = actionSubclass({
     },
 
     check: function(action) {
-        // TODO: s/checkAttack/checkMeleeAttack/g
-        return this.commonCheck(action, checkAttack);
+        return this.commonCheck(action, checkMeleeAttack);
     },
 
     actionPointCost: function(action) {

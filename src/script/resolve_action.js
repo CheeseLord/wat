@@ -350,7 +350,7 @@ export function checkInteract(action) {
     }
 }
 
-export function checkAttack(action) {
+export function checkMeleeAttack(action) {
     if (action.target === null) {
         return failCheck("No enemy there.");
     } else if (!action.target.has("Character")) {
