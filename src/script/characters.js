@@ -13,9 +13,12 @@ export function createPlayerCharacters() {
                 .setTeam(0)
                 .setAnimation(0, 4)
                 .setActions([
-                    ActionType.RANGED_ATTACK,
-                    ActionType.MOVE,
+                    ActionType.ATTACK,
                     ActionType.INTERACT,
+                    ActionType.MOVE,
+                    ActionType.RANGED_ATTACK,
+                    ActionType.SPECIAL_ATTACK,
+                    ActionType.SWAP_PLACES,
                 ]),
 
         Crafty.e("SpriteCharacter, anim_start")
@@ -25,8 +28,12 @@ export function createPlayerCharacters() {
                 .setTeam(0)
                 .setAnimation(1, 4)
                 .setActions([
-                    ActionType.SWAP_PLACES,
+                    ActionType.ATTACK,
+                    ActionType.INTERACT,
+                    ActionType.MOVE,
                     ActionType.RANGED_ATTACK,
+                    ActionType.SPECIAL_ATTACK,
+                    ActionType.SWAP_PLACES,
                 ]),
 
         Crafty.e("SpriteCharacter, anim_start")
@@ -36,9 +43,12 @@ export function createPlayerCharacters() {
                 .setTeam(0)
                 .setAnimation(2, 4)
                 .setActions([
-                    ActionType.SWAP_PLACES,
+                    ActionType.ATTACK,
+                    ActionType.INTERACT,
                     ActionType.MOVE,
+                    ActionType.RANGED_ATTACK,
                     ActionType.SPECIAL_ATTACK,
+                    ActionType.SWAP_PLACES,
                 ]),
 
         Crafty.e("SpriteCharacter, anim_start")
@@ -48,9 +58,12 @@ export function createPlayerCharacters() {
                 .setTeam(0)
                 .setAnimation(3, 4)
                 .setActions([
-                    ActionType.RANGED_ATTACK,
-                    ActionType.MOVE,
                     ActionType.ATTACK,
+                    ActionType.INTERACT,
+                    ActionType.MOVE,
+                    ActionType.RANGED_ATTACK,
+                    ActionType.SPECIAL_ATTACK,
+                    ActionType.SWAP_PLACES,
                 ]),
     ];
 }
