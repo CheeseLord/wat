@@ -3,6 +3,16 @@
 import {
     internalError,
 } from "./message.js";
+import {
+    canDoAction,
+    checkAttack,
+    checkInteract,
+    checkMove,
+    checkRangedAttack,
+    checkSwap,
+    failCheck,
+    passCheck,
+} from "./resolve_action.js";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Base Action type
@@ -33,7 +43,24 @@ const BaseAction = Object.freeze({
         this.mustOverride("actionPointCost");
     },
 
+    ////////////////
     // Common helpers; don't override these.
+
+    // Helpers used by implementations of real methods
+
+    commonCheck: function(action, checkFunc) {
+        this.checkActionType(action);
+        if (!canDoAction(action.subject, action.type)) {
+            return failCheck("That character can't do that.");
+        } else if (action.subject.actionPoints <
+                action.type.actionPointCost(action)) {
+            return failCheck("Not enough action points.");
+        } else {
+            return checkFunc(action);
+        }
+    },
+
+    // Sanity checks
 
     mustOverride: function(methodName) {
         internalError(`${this.name} does not override method ${methodName} ` +
@@ -66,6 +93,10 @@ export const MoveAction = actionSubclass({
         };
     },
 
+    check: function(action) {
+        return this.commonCheck(action, checkMove);
+    },
+
     actionPointCost: function(action) {
         this.checkActionType(action);
         return pathApExclTarget(action.path) + 1;
@@ -80,6 +111,11 @@ export const MeleeAttackAction = actionSubclass({
 
     init: function(subject, target, path) {
         return actionWithPathAndTarget(this, subject, target, path);
+    },
+
+    check: function(action) {
+        // TODO: s/checkAttack/checkMeleeAttack/g
+        return this.commonCheck(action, checkAttack);
     },
 
     actionPointCost: function(action) {
@@ -98,6 +134,10 @@ export const InteractAction = actionSubclass({
         return actionWithPathAndTarget(this, subject, target, path);
     },
 
+    check: function(action) {
+        return this.commonCheck(action, checkInteract);
+    },
+
     actionPointCost: function(action) {
         this.checkActionType(action);
         return pathApExclTarget(action.path) + 1;
@@ -112,6 +152,10 @@ export const SwapPlacesAction = actionSubclass({
 
     init: function(subject, target, path) {
         return actionWithTarget(this, subject, target);
+    },
+
+    check: function(action) {
+        return this.commonCheck(action, checkSwap);
     },
 
     actionPointCost: function(action) {
@@ -130,6 +174,10 @@ export const RangedAttackAction = actionSubclass({
         return actionWithTarget(this, subject, target);
     },
 
+    check: function(action) {
+        return this.commonCheck(action, checkRangedAttack);
+    },
+
     actionPointCost: function(action) {
         this.checkActionType(action);
         return 2;
@@ -144,6 +192,10 @@ export const SpecialAttackAction = actionSubclass({
 
     init: function(subject, target, path) {
         return nullaryAction(this, subject);
+    },
+
+    check: function(action) {
+        return this.commonCheck(action, (_) => { passCheck(); });
     },
 
     actionPointCost: function(action) {
@@ -162,6 +214,10 @@ export const EndTurnAction = actionSubclass({
         return nullaryAction(this, subject);
     },
 
+    check: function(action) {
+        return this.commonCheck(action, (_) => { passCheck(); });
+    },
+
     actionPointCost: function(action) {
         this.checkActionType(action);
         return action.subject.actionPoints;
@@ -169,7 +225,7 @@ export const EndTurnAction = actionSubclass({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
-// Misc helpers
+// Helpers - factory functions
 
 function actionWithTarget(type, subject, target) {
     return {
@@ -196,6 +252,9 @@ function nullaryAction(type, subject) {
         subject: subject,
     };
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Helpers - other
 
 function pathApExclTarget(path) {
     // Minus 1 for the start cell, minus 1 for the target cell.

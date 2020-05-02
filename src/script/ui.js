@@ -37,7 +37,6 @@ import {
     userError,
 } from "./message.js";
 import {
-    checkAction,
     doAction,
     getGlobalState,
 } from "./resolve_action.js";
@@ -146,7 +145,7 @@ export function worldClickHandler(evt) {
         }
 
         // Handle actions.
-        let checkVal = checkAction(disambig.action);
+        let checkVal = disambig.action.type.check(disambig.action);
         if (checkVal.valid) {
             doAction(disambig.action, afterPlayerMove);
         } else {

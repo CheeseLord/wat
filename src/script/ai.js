@@ -12,9 +12,6 @@ import {
     getPath,
     getPathLength,
 } from "./geometry.js";
-import {
-    checkAction,
-} from "./resolve_action.js";
 
 
 export function chooseAiAction(character) {
@@ -46,7 +43,7 @@ export function chooseAiAction(character) {
         }
 
         let tryAttack = MeleeAttackAction.init(character, nearestTarget, path);
-        if (checkAction(tryAttack).valid) {
+        if (tryAttack.type.check(tryAttack).valid) {
             return tryAttack;
         }
 
@@ -55,7 +52,7 @@ export function chooseAiAction(character) {
         // starting cell (and doesn't indicate actually moving anywhere).
         while (path.length > 1) {
             let tryMove = MoveAction.init(character, path);
-            if (checkAction(tryMove).valid) {
+            if (tryMove.type.check(tryMove).valid) {
                 return tryMove;
             }
 

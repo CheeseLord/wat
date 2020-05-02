@@ -73,37 +73,9 @@ export function canDoAction(character, actionType) {
             character.availableActions.includes(actionType));
 }
 
-export function checkAction(action) {
-    if (!canDoAction(action.subject, action.type)) {
-        return failCheck("That character can't do that.");
-    } else if (action.subject.actionPoints <
-            action.type.actionPointCost(action)) {
-        return failCheck("Not enough action points.");
-    }
-    switch (action.type) {
-        case ActionType.MOVE:
-            return checkMove(action);
-        case ActionType.ATTACK:
-            return checkAttack(action);
-        case ActionType.INTERACT:
-            return checkInteract(action);
-        case ActionType.SWAP_PLACES:
-            return checkSwap(action);
-        case ActionType.RANGED_ATTACK:
-            return checkRangedAttack(action);
-        case ActionType.SPECIAL_ATTACK:
-            return passCheck(); // TODO?
-        case ActionType.END_TURN:
-            return passCheck();
-        default:
-            internalError("Unknown ActionType");
-            return failCheck("An internal error occurred.");
-    }
-}
-
 export function doAction(action, callback) {
     assert(action.type.isActionType);
-    if (!checkAction(action).valid) {
+    if (!action.type.check(action).valid) {
         // Callers are supposed to prevent this from happening, so if we get
         // here it indicates a bug in the code. In the interest of both
         // debugging and continuing somewhat gracefully:
@@ -332,7 +304,7 @@ function updateState(action) {
     }
 }
 
-function checkMove(action, callback) {
+export function checkMove(action, callback) {
     let theMap = findPaths(
         action.subject.getPos(),
         action.subject.speed,
@@ -346,7 +318,7 @@ function checkMove(action, callback) {
     }
 }
 
-function checkSwap(action) {
+export function checkSwap(action) {
     if (action.target === null) {
         return failCheck("There's nothing there to swap with.");
     } else if (!action.target.has("Character")) {
@@ -360,7 +332,7 @@ function checkSwap(action) {
     }
 }
 
-function checkInteract(action) {
+export function checkInteract(action) {
     if (action.target === null) {
         return failCheck("Nothing there to interact with.");
     } else if (!action.target.has("Interactable")) {
@@ -378,7 +350,7 @@ function checkInteract(action) {
     }
 }
 
-function checkAttack(action) {
+export function checkAttack(action) {
     if (action.target === null) {
         return failCheck("No enemy there.");
     } else if (!action.target.has("Character")) {
@@ -398,7 +370,7 @@ function checkAttack(action) {
     }
 }
 
-function checkRangedAttack(action) {
+export function checkRangedAttack(action) {
     if (action.target === null) {
         return failCheck("No enemy there.");
     } else if (!action.target.has("Character")) {
@@ -424,10 +396,10 @@ function checkRangedAttack(action) {
 //     (where .reason is a string suitable for displaying to the user).
 // These are helper functions for generating those objects, to avoid writing a
 // whole bunch of object literals.
-function passCheck() {
+export function passCheck() {
     return {valid: true};
 }
-function failCheck(reason) {
+export function failCheck(reason) {
     return {valid: false, reason: reason};
 }
 
@@ -459,7 +431,7 @@ export function updateAutoActions(subject) {
             MoveAction.init(subject, path),
         ];
         for (let i = 0; i < tryActions.length; i++) {
-            if (checkAction(tryActions[i]).valid) {
+            if (tryActions[i].type.check(tryActions[i]).valid) {
                 this.autoAction = tryActions[i];
                 break;
             }
