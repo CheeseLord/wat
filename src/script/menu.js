@@ -19,7 +19,6 @@ import {
 } from "./message.js";
 import {
     canDoAction,
-    doAction,
     setGlobalState,
 } from  "./resolve_action.js";
 import {
@@ -76,7 +75,8 @@ const ACTION_TYPE_TREE = {
         },
         // TODO: Custom entry for this button we used to have:
         //   ["Auto Attack", CLEAR_MENU, () => {
-        //       doAction(chooseAiAction(selectedCharacter), afterPlayerMove);
+        //       let action = chooseAiAction(selectedCharacter);
+        //       action.type.doit(action, afterPlayerMove);
         //   }],
         {
             action: true,
@@ -231,8 +231,8 @@ function buildOneMenuButton(actionTypeSubtree, character) {
                 actionTypeSubtree.name,
                 CLEAR_MENU,
                 () => {
-                    doAction(makeUntargetedAction(actionTypeSubtree.type),
-                        afterPlayerMove);
+                    let action = makeUntargetedAction(actionTypeSubtree.type);
+                    action.type.doit(action, afterPlayerMove);
                 },
             ];
         }

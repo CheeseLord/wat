@@ -24,10 +24,6 @@ import {
     ANIM_DUR_PAUSE_BW_MOV_ATK,
     ANIM_DUR_RANGED_SHOT,
     ANIM_DUR_STEP,
-    ATTACK_DAMAGE_MIN,
-    ATTACK_DAMAGE_MAX,
-    RANGED_ATTACK_DAMAGE_MIN,
-    RANGED_ATTACK_DAMAGE_MAX,
     RANGED_ATTACK_RANGE,
     SPECIAL_ATTACK_DAMAGE_MIN,
     SPECIAL_ATTACK_DAMAGE_MAX,
@@ -48,7 +44,6 @@ import {
 } from "./highlight.js";
 import {
     assert,
-    internalError,
     userMessage,
 } from "./message.js";
 import {
@@ -73,162 +68,157 @@ export function canDoAction(character, actionType) {
             character.availableActions.includes(actionType));
 }
 
-export function doAction(action, callback) {
-    assert(action.type.isActionType);
-    if (!action.type.check(action).valid) {
-        // Callers are supposed to prevent this from happening, so if we get
-        // here it indicates a bug in the code. In the interest of both
-        // debugging and continuing somewhat gracefully:
-        //   - Report an internal error, so we can catch and fix the bug.
-        //   - Skip this action, so neither users nor AI can use such a bug to
-        //     cheat.
-        //   - End the current character's turn, so that if this is an AI move
-        //     we don't go into an infinite loop of trying and failing the same
-        //     invalid action over and over again.
-        internalError("Invalid action.");
-        action.subject.actionPoints = 0;
-        callback();
-        return;
-    }
-
-    // TODO: Details should be handled in a resolvedAction type, and we
-    // should call a resolveAction function here.
-    if (action.type === ActionType.ATTACK) {
-        action.damage = randInt(ATTACK_DAMAGE_MIN, ATTACK_DAMAGE_MAX);
-    } else if (action.type === ActionType.RANGED_ATTACK) {
-        action.damage = randInt(
-            RANGED_ATTACK_DAMAGE_MIN,
-            RANGED_ATTACK_DAMAGE_MAX,
-        );
-    }
-
-    doActionAnimation(action, function() {
-        updateState(action);
-        callback();
-    });
-}
-
-function doActionAnimation(action, callback) {
+export function animateMove(action, callback) {
     setGlobalState(StateEnum.ANIMATING);
-
     let anims = seriesAnimations([]);
 
-    if (action.type === ActionType.MOVE) {
-        let path = action.path;
-        highlightPath(path);
+    let path = action.path;
+    highlightPath(path);
 
-        anims = [];
-        for (let i = 1; i < path.length; i++) {
-            anims.push(tweenAnimation(action.subject, function() {
-                action.subject.animateTo(path[i], ANIM_DUR_STEP);
-            }));
-        }
-        anims = seriesAnimations(anims);
-    } else if (action.type === ActionType.ATTACK) {
-        assert(action.path.length > 1);
-        let targetPos = action.path[action.path.length - 1];
-        let moveToPos = action.path[action.path.length - 2];
-        let path = action.path.slice(0, action.path.length - 1);
-        highlightPath(path);
-
-        // Tell the user what happened.
-        userMessage(
-            `${action.subject.name_} moved to ` +
-            `(${moveToPos.x}, ${moveToPos.y})`
-        );
-        userMessage(
-            `${action.subject.name_} attacked ${action.target.name_}`
-        );
-
-        anims = [];
-
-        // Move up to the target.
-        for (let i = 1; i < path.length; i++) {
-            anims.push(tweenAnimation(action.subject, function() {
-                action.subject.animateTo(path[i], ANIM_DUR_STEP);
-            }));
-        }
-
-        // Pause between move and attack, but only if we actually moved.
-        if (anims.length > 0) {
-            anims.push(pauseAnimation(ANIM_DUR_PAUSE_BW_MOV_ATK));
-        }
-
-        // Add the attack animation, regardless.
-        let halfPos = midpoint(moveToPos, targetPos);
-
-        anims = anims.concat([
-            tweenAnimation(action.subject, function() {
-                action.subject.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
-            }),
-            parallelAnimations([
-                tweenAnimation(action.subject, function() {
-                    action.subject.animateTo(moveToPos, ANIM_DUR_HALF_ATTACK);
-                }),
-                takeDamageAnim(action.target, action.damage),
-            ]),
-        ]);
-
-        anims = seriesAnimations(anims);
-    } else if (action.type === ActionType.RANGED_ATTACK) {
-        let bullet = Crafty.e("2D, DOM, bullet_anim, Tween")
-                .attr({
-                    x: action.subject.x,
-                    y: action.subject.y,
-                    z: Z_PARTICLE,
-                });
-        // TODO: The duration for this tween should be dependent on the
-        // distance. Have a bullet speed, not a fixed bullet duration.
-        anims = seriesAnimations([
-            tweenAnimation(bullet, function() {
-                bullet.tween({
-                    x: action.target.x,
-                    y: action.target.y,
-                }, ANIM_DUR_RANGED_SHOT);
-            }),
-            synchronousAnimation(function() {
-                bullet.destroy();
-            }),
-            takeDamageAnim(action.target, action.damage),
-        ]);
-    } else if (action.type === ActionType.SWAP_PLACES) {
-        // Swap positions of subject and target.
-        let selectPos = action.subject.getPos();
-        let clickPos  = action.target.getPos();
-        anims = parallelAnimations([
-            tweenAnimation(action.subject, function() {
-                action.subject.animateTo(clickPos, ANIM_DUR_MOVE);
-            }),
-            tweenAnimation(action.target, function() {
-                action.target.animateTo(selectPos, ANIM_DUR_MOVE);
-            }),
-        ]);
-    } else if (action.type === ActionType.INTERACT) {
-        assert(action.path.length > 0);
-        let path = action.path.slice(0, action.path.length - 1);
-        highlightPath(path);
-
-        anims = [];
-        for (let i = 1; i < path.length; i++) {
-            anims.push(tweenAnimation(action.subject, function() {
-                action.subject.animateTo(path[i], ANIM_DUR_STEP);
-            }));
-        }
-
-        anims = seriesAnimations(anims);
-    } else if (action.type === ActionType.RANGED_ATTACK) {
-        // FIXME: No animation.
-    } else if (action.type === ActionType.SPECIAL_ATTACK) {
-        // No animation.
-    } else if (action.type === ActionType.END_TURN) {
-        // No animation.
-    } else {
-        internalError(`Invalid action type: ${action.type}`);
+    anims = [];
+    for (let i = 1; i < path.length; i++) {
+        anims.push(tweenAnimation(action.subject, function() {
+            action.subject.animateTo(path[i], ANIM_DUR_STEP);
+        }));
     }
+    anims = seriesAnimations(anims);
 
     doAnimate(anims, callback);
+}
 
-    // TODO: Make sure the global state gets reset.
+export function animateSwap(action, callback) {
+    setGlobalState(StateEnum.ANIMATING);
+    let anims = seriesAnimations([]);
+
+    // Swap positions of subject and target.
+    let selectPos = action.subject.getPos();
+    let clickPos  = action.target.getPos();
+    anims = parallelAnimations([
+        tweenAnimation(action.subject, function() {
+            action.subject.animateTo(clickPos, ANIM_DUR_MOVE);
+        }),
+        tweenAnimation(action.target, function() {
+            action.target.animateTo(selectPos, ANIM_DUR_MOVE);
+        }),
+    ]);
+
+    doAnimate(anims, callback);
+}
+
+export function animateMeleeAttack(action, callback) {
+    setGlobalState(StateEnum.ANIMATING);
+    let anims = seriesAnimations([]);
+
+    assert(action.path.length > 1);
+    let targetPos = action.path[action.path.length - 1];
+    let moveToPos = action.path[action.path.length - 2];
+    let path = action.path.slice(0, action.path.length - 1);
+    highlightPath(path);
+
+    // Tell the user what happened.
+    userMessage(
+        `${action.subject.name_} moved to ` +
+        `(${moveToPos.x}, ${moveToPos.y})`
+    );
+    userMessage(
+        `${action.subject.name_} attacked ${action.target.name_}`
+    );
+
+    anims = [];
+
+    // Move up to the target.
+    for (let i = 1; i < path.length; i++) {
+        anims.push(tweenAnimation(action.subject, function() {
+            action.subject.animateTo(path[i], ANIM_DUR_STEP);
+        }));
+    }
+
+    // Pause between move and attack, but only if we actually moved.
+    if (anims.length > 0) {
+        anims.push(pauseAnimation(ANIM_DUR_PAUSE_BW_MOV_ATK));
+    }
+
+    // Add the attack animation, regardless.
+    let halfPos = midpoint(moveToPos, targetPos);
+
+    anims = anims.concat([
+        tweenAnimation(action.subject, function() {
+            action.subject.animateTo(halfPos, ANIM_DUR_HALF_ATTACK);
+        }),
+        parallelAnimations([
+            tweenAnimation(action.subject, function() {
+                action.subject.animateTo(moveToPos, ANIM_DUR_HALF_ATTACK);
+            }),
+            takeDamageAnim(action.target, action.damage),
+        ]),
+    ]);
+
+    anims = seriesAnimations(anims);
+
+    doAnimate(anims, callback);
+}
+
+export function animateRangedAttack(action, callback) {
+    setGlobalState(StateEnum.ANIMATING);
+    let anims = seriesAnimations([]);
+
+    let bullet = Crafty.e("2D, DOM, bullet_anim, Tween")
+            .attr({
+                x: action.subject.x,
+                y: action.subject.y,
+                z: Z_PARTICLE,
+            });
+    // TODO: The duration for this tween should be dependent on the
+    // distance. Have a bullet speed, not a fixed bullet duration.
+    anims = seriesAnimations([
+        tweenAnimation(bullet, function() {
+            bullet.tween({
+                x: action.target.x,
+                y: action.target.y,
+            }, ANIM_DUR_RANGED_SHOT);
+        }),
+        synchronousAnimation(function() {
+            bullet.destroy();
+        }),
+        takeDamageAnim(action.target, action.damage),
+    ]);
+
+    doAnimate(anims, callback);
+}
+
+export function animateSpecialAttack(action, callback) {
+    setGlobalState(StateEnum.ANIMATING);
+    let anims = seriesAnimations([]);
+
+    // TODO: Actually animate special attacks
+
+    doAnimate(anims, callback);
+}
+
+export function animateInteract(action, callback) {
+    setGlobalState(StateEnum.ANIMATING);
+    let anims = seriesAnimations([]);
+
+    assert(action.path.length > 0);
+    let path = action.path.slice(0, action.path.length - 1);
+    highlightPath(path);
+
+    anims = [];
+    for (let i = 1; i < path.length; i++) {
+        anims.push(tweenAnimation(action.subject, function() {
+            action.subject.animateTo(path[i], ANIM_DUR_STEP);
+        }));
+    }
+
+    anims = seriesAnimations(anims);
+
+    doAnimate(anims, callback);
+}
+
+export function animateEndTurn(action, callback) {
+    // Intentionally no animation.
+    setGlobalState(StateEnum.ANIMATING);
+    callback();
 }
 
 function takeDamageAnim(target, damage) {
@@ -273,35 +263,19 @@ function takeDamageAnim(target, damage) {
     return textAnim;
 }
 
-function updateState(action) {
-    action.subject.actionPoints -= action.type.actionPointCost(action);
-
-    if (action.type === ActionType.MOVE) {
-        // State change handle by Crafty's animation.
-    } else if (action.type === ActionType.ATTACK) {
-        // TODO: This should read damage from resolved action.
-        action.target.takeDamage(action.damage);
-    } else if (action.type === ActionType.SWAP_PLACES) {
-        // State change handle by Crafty's animation.
-    } else if (action.type === ActionType.INTERACT) {
-        action.target.interact(action.subject);
-    } else if (action.type === ActionType.RANGED_ATTACK) {
-        // TODO: This should read damage from resolved action.
-        action.target.takeDamage(action.damage);
-    } else if (action.type === ActionType.SPECIAL_ATTACK) {
-        // TODO: Handle the damage in resolveAction.
-        Crafty("Character").each(function() {
-            if (this.team !== action.subject.team &&
-                    isAdjacent(action.subject.getPos(), this.getPos())) {
-                this.takeDamage(randInt(SPECIAL_ATTACK_DAMAGE_MIN,
-                    SPECIAL_ATTACK_DAMAGE_MAX));
-            }
-        });
-    } else if (action.type === ActionType.END_TURN) {
-        // No state change.
-    } else {
-        internalError(`Invalid action type: ${action.type}`);
-    }
+// Put this function in resolve_action.js because it's nontrivial. I couldn't
+// bring myself to out-of-line all of the one-line updateStates for other
+// actions.
+// TODO: Would still be nice to be consistent.
+export function updateStateSpecialAttack(action) {
+    // TODO: Handle the damage in resolveAction.
+    Crafty("Character").each(function() {
+        if (this.team !== action.subject.team &&
+                isAdjacent(action.subject.getPos(), this.getPos())) {
+            this.takeDamage(randInt(SPECIAL_ATTACK_DAMAGE_MIN,
+                SPECIAL_ATTACK_DAMAGE_MAX));
+        }
+    });
 }
 
 export function checkMove(action, callback) {

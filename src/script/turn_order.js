@@ -26,7 +26,6 @@ import {
 } from "./message.js";
 import {
     clearAutoActions,
-    doAction,
     setGlobalState,
     updateAutoActions,
 } from "./resolve_action.js";
@@ -227,7 +226,8 @@ function requestMoveFromPlayer(character) {
 function requestMoveFromAI(character) {
     // TODO this creates the movement grid, don't want that.
     selectCharacter(character);
-    doAction(chooseAiAction(character), () => {
+    let action = chooseAiAction(character);
+    action.type.doit(action, () => {
         endCharacter(character);
     });
 }

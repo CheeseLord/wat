@@ -1,9 +1,22 @@
 "use strict";
 
 import {
+    ATTACK_DAMAGE_MIN,
+    ATTACK_DAMAGE_MAX,
+    RANGED_ATTACK_DAMAGE_MIN,
+    RANGED_ATTACK_DAMAGE_MAX,
+} from "./consts.js";
+import {
     internalError,
 } from "./message.js";
 import {
+    animateEndTurn,
+    animateInteract,
+    animateMeleeAttack,
+    animateMove,
+    animateRangedAttack,
+    animateSpecialAttack,
+    animateSwap,
     canDoAction,
     checkInteract,
     checkMeleeAttack,
@@ -12,7 +25,11 @@ import {
     checkSwap,
     failCheck,
     passCheck,
+    updateStateSpecialAttack,
 } from "./resolve_action.js";
+import {
+    randInt,
+} from "./util.js";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Base Action type
@@ -21,22 +38,51 @@ const BaseAction = Object.freeze({
     name:         "BaseAction",
     isActionType: true,
 
+    ////////////////
+    // Public API
+
     init: function() {
         this.mustOverride("init");
     },
-
-    // TODO: Actually override and use these next 3
 
     check: function(action) {
         this.mustOverride("check");
     },
 
-    doStateUpdate: function(action) {
-        this.mustOverride("doStateUpdate");
-    },
-
-    doAnimate: function(action) {
-        this.mustOverride("doAnimate");
+    doit: function(action, callback) {
+        this.checkActionType(action);
+        if (!this.check(action).valid) {
+            // Callers are supposed to prevent this from happening, so if we
+            // get here it indicates a bug in the code. In the interest of both
+            // debugging and continuing somewhat gracefully:
+            //   - Report an internal error, so we can catch and fix the bug.
+            //   - Skip this action, so neither users nor AI can use such a bug
+            //     to cheat.
+            //   - End the current character's turn, so that if this is an AI
+            //     move we don't go into an infinite loop of trying and failing
+            //     the same invalid action over and over again.
+            internalError("Invalid action.");
+            action.subject.actionPoints = 0;
+            callback();
+            return;
+        }
+        this.resolve(action);
+        action.subject.actionPoints -= this.actionPointCost(action);
+        // The anonymous function passed to this.animate() will not be called
+        // in the context of this, but must still reference 'this' in order to
+        // call this.updateState(). We can't simply close over 'this', because
+        // (I guess) it's reset to undefined when the function is called not
+        // from the context of any object. We also can't close over just a
+        // reference to this.updateState, because then when we call it inside
+        // the anonymous function it won't be in the context of this object,
+        // meaning that any references to 'this' in updateState will fail.
+        // Instead, create a local reference to 'this' under a different name,
+        // then close over that.
+        let outerThis = this;
+        this.animate(action, function() {
+            outerThis.updateState(action);
+            callback();
+        });
     },
 
     actionPointCost: function(action) {
@@ -44,7 +90,25 @@ const BaseAction = Object.freeze({
     },
 
     ////////////////
-    // Common helpers; don't override these.
+    // Internal helpers, specific to action type
+
+    // Default resolve is blank, because lots of actions don't need it.
+    resolve: function(action) { },
+
+    // Ditto updateState, because in a few cases state update is handled by the
+    // animation itself.
+    updateState: function(action) { },
+
+    // animate must be overridden. I only know of one case where it
+    // intentionally should be empty (EndTurnAction); all other missing
+    // animations should be filled in.
+    // TODO: Make sure the global state gets reset after animations.
+    animate: function(action) {
+        this.mustOverride("animate");
+    },
+
+    ////////////////
+    // Common helpers called by subclasses -- don't override these
 
     // Helpers used by implementations of real methods
 
@@ -101,46 +165,10 @@ export const MoveAction = actionSubclass({
         this.checkActionType(action);
         return pathApExclTarget(action.path) + 1;
     },
-});
 
-///////////////////////////////////////////////////////////////////////////////
-// MeleeAttackAction
+    // State change handled by Crafty's animation
 
-export const MeleeAttackAction = actionSubclass({
-    name: "MeleeAttackAction",
-
-    init: function(subject, target, path) {
-        return actionWithPathAndTarget(this, subject, target, path);
-    },
-
-    check: function(action) {
-        return this.commonCheck(action, checkMeleeAttack);
-    },
-
-    actionPointCost: function(action) {
-        this.checkActionType(action);
-        return pathApExclTarget(action.path) + 2;
-    },
-});
-
-///////////////////////////////////////////////////////////////////////////////
-// InteractAction
-
-export const InteractAction = actionSubclass({
-    name: "InteractAction",
-
-    init: function(subject, target, path) {
-        return actionWithPathAndTarget(this, subject, target, path);
-    },
-
-    check: function(action) {
-        return this.commonCheck(action, checkInteract);
-    },
-
-    actionPointCost: function(action) {
-        this.checkActionType(action);
-        return pathApExclTarget(action.path) + 1;
-    },
+    animate: animateMove,
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -161,6 +189,42 @@ export const SwapPlacesAction = actionSubclass({
         this.checkActionType(action);
         return 2;
     },
+
+    // State change handled by Crafty's animation
+
+    animate: animateSwap,
+});
+
+///////////////////////////////////////////////////////////////////////////////
+// MeleeAttackAction
+
+export const MeleeAttackAction = actionSubclass({
+    name: "MeleeAttackAction",
+
+    init: function(subject, target, path) {
+        return actionWithPathAndTarget(this, subject, target, path);
+    },
+
+    check: function(action) {
+        return this.commonCheck(action, checkMeleeAttack);
+    },
+
+    actionPointCost: function(action) {
+        this.checkActionType(action);
+        return pathApExclTarget(action.path) + 2;
+    },
+
+    resolve: function(action) {
+        action.damage = randInt(ATTACK_DAMAGE_MIN, ATTACK_DAMAGE_MAX);
+    },
+
+    updateState: function(action) {
+        this.checkActionType(action);
+        // TODO: This should read damage from resolved action.
+        action.target.takeDamage(action.damage);
+    },
+
+    animate: animateMeleeAttack,
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -181,6 +245,21 @@ export const RangedAttackAction = actionSubclass({
         this.checkActionType(action);
         return 2;
     },
+
+    resolve: function(action) {
+        action.damage = randInt(
+            RANGED_ATTACK_DAMAGE_MIN,
+            RANGED_ATTACK_DAMAGE_MAX,
+        );
+    },
+
+    updateState: function(action) {
+        this.checkActionType(action);
+        // TODO: This should read damage from resolved action.
+        action.target.takeDamage(action.damage);
+    },
+
+    animate: animateRangedAttack,
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -194,13 +273,44 @@ export const SpecialAttackAction = actionSubclass({
     },
 
     check: function(action) {
-        return this.commonCheck(action, (_) => { passCheck(); });
+        return this.commonCheck(action, (_) => { return passCheck(); });
     },
 
     actionPointCost: function(action) {
         this.checkActionType(action);
         return 3;
     },
+
+    updateState: updateStateSpecialAttack,
+
+    animate: animateSpecialAttack,
+});
+
+///////////////////////////////////////////////////////////////////////////////
+// InteractAction
+
+export const InteractAction = actionSubclass({
+    name: "InteractAction",
+
+    init: function(subject, target, path) {
+        return actionWithPathAndTarget(this, subject, target, path);
+    },
+
+    check: function(action) {
+        return this.commonCheck(action, checkInteract);
+    },
+
+    actionPointCost: function(action) {
+        this.checkActionType(action);
+        return pathApExclTarget(action.path) + 1;
+    },
+
+    updateState: function(action) {
+        this.checkActionType(action);
+        action.target.interact(action.subject);
+    },
+
+    animate: animateInteract,
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -214,13 +324,17 @@ export const EndTurnAction = actionSubclass({
     },
 
     check: function(action) {
-        return this.commonCheck(action, (_) => { passCheck(); });
+        return this.commonCheck(action, (_) => { return passCheck(); });
     },
 
     actionPointCost: function(action) {
         this.checkActionType(action);
         return action.subject.actionPoints;
     },
+
+    // No updateState because there's no state change.
+
+    animate: animateEndTurn,
 });
 
 ///////////////////////////////////////////////////////////////////////////////
