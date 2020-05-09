@@ -30,12 +30,6 @@ import {
     userMessage,
 } from "./message.js";
 
-// FIXME[#35]: Cyclic imports
-import {
-    MeleeAttackAction,
-    MoveAction,
-} from "./new_action.js";
-
 import {
     getProportion,
 } from "./util.js";
@@ -315,18 +309,10 @@ Crafty.c("Character", {
 
     init: function() {
         this.attr({
-            // TODO[#35]: Make this null (or sentinel value) by default. Define
-            // a property on the actions for "is this in the default set". When
-            // checking, if availableActions is null/sentinel, ask the action
-            // if it's default. Otherwise, check for containment as we
-            // currently do.
-            availableActions: [
-                MoveAction,
-                MeleeAttackAction,
-            ],
-            speed: 4,
-            team:  -1,
-            z:     Z_CHARACTER,
+            availableActions: [],
+            speed:            4,
+            team:             -1,
+            z:                Z_CHARACTER,
         });
         // inherit blocksMovement=true from DynamicObject
     },

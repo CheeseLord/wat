@@ -1,11 +1,15 @@
 /* global Crafty */
 
 import {
+    createPlayerCharacters,
+} from "./characters.js";
+import {
     updateMapForNewLevel,
 } from "./geometry.js";
 import {
-    createPlayerCharacters,
-} from "./characters.js";
+    MeleeAttackAction,
+    MoveAction,
+} from "./new_action.js";
 
 // TODO: Don't build the levels in code.
 export function loadLevel1() {
@@ -64,7 +68,11 @@ export function loadLevel1() {
         Crafty.e("Enemy")
                 .initPos(pos)
                 .setTeam(team)
-                .maxHealth(10);
+                .maxHealth(10)
+                .setActions([
+                    MoveAction,
+                    MeleeAttackAction,
+                ]);
     }
 
     // Finish up.
@@ -143,7 +151,11 @@ export function loadLevel2() {
         Crafty.e("Enemy")
                 .initPos(pos)
                 .setTeam(team)
-                .maxHealth(10);
+                .maxHealth(10)
+                .setActions([
+                    MoveAction,
+                    MeleeAttackAction,
+                ]);
     }
 
     // Finish up.
