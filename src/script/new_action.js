@@ -58,7 +58,7 @@ const BaseAction = Object.freeze({
 
     initNoTarget: function(subject) {
         assert(!this.isTargeted());
-        this.init(subject);
+        return this.init(subject);
     },
 
     // TODO: initWithTarget is handled in figureOutWhatTheUserMeant, based on
