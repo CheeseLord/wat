@@ -1,6 +1,5 @@
 /* global Crafty */
 
-// FIXME[#35]: Cyclic imports
 import {
     InteractAction,
     MeleeAttackAction,

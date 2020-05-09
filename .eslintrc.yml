@@ -70,6 +70,9 @@ rules:
     import/no-unresolved:
       - error
       - always
+    import/no-cycle:
+      - error
+      - always
     no-shadow:
       - error
       - hoist: all

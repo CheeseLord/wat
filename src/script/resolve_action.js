@@ -3,11 +3,6 @@
 "use strict";
 
 import {
-    MeleeAttackAction,
-    InteractAction,
-    MoveAction,
-} from "./new_action.js";
-import {
     doAnimate,
     parallelAnimations,
     pauseAnimation,
@@ -32,7 +27,6 @@ import {
 } from "./consts.js";
 import {
     findPaths,
-    getPath,
     isAdjacent,
     isPathValid,
     midpoint,
@@ -373,48 +367,5 @@ export function passCheck() {
 }
 export function failCheck(reason) {
     return {valid: false, reason: reason};
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// AutoAction stuff
-//
-// TODO: Probably also doesn't belong in this file.
-
-export function updateAutoActions(subject) {
-    let subjectPos = subject.getPos();
-    let theMap = findPaths(subjectPos, subject.actionPoints);
-    Crafty("GridObject").each(function() {
-        let target = this;
-        this.autoAction = null;
-        let path = getPath(theMap, subjectPos, target.getPos());
-        if (path === null) {
-            return;
-        } else if (path.length <= 1) {
-            // Don't set auto-actions on your own cell, since clicking on your
-            // own cell is intercepted by the player UI.
-            return;
-        }
-        // TODO: Make a list and loop over it. Store the ActionDesc instead of
-        // a separate AutoActionEnum value, and then reuse that ActionDesc for
-        // highlighting and resolving the action.
-        let tryActions = [
-            InteractAction.init(subject, target, path),
-            MeleeAttackAction.init(subject, target, path),
-            MoveAction.init(subject, path),
-        ];
-        for (let i = 0; i < tryActions.length; i++) {
-            if (tryActions[i].type.check(tryActions[i]).valid) {
-                this.autoAction = tryActions[i];
-                break;
-            }
-        }
-        // If none were valid, we already set autoAction to null above.
-    });
-}
-
-export function clearAutoActions() {
-    Crafty("GridObject").each(function() {
-        this.autoAction = null;
-    });
 }
 

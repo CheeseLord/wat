@@ -4,7 +4,6 @@
 
 import {StateEnum} from "./consts.js";
 
-// FIXME[#35]: Cyclic imports
 import {
     EndTurnAction,
     InteractAction,
