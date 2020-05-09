@@ -6,8 +6,6 @@ import {StateEnum} from "./consts.js";
 
 import {
     ActionType,
-    EndTurnAction,
-    SpecialAttackAction,
 } from "./new_action.js";
 // TODO: We'll need this if we re-add the "Auto Attack" button.
 // import {
@@ -29,7 +27,7 @@ import {
 } from "./turn_order.js";
 
 ///////////////////////////////////////////////////////////////////////////////
-// Temporary placeholder stuff for eventual dynamic menu building.
+// Static definition of menu structure.
 
 const ACTION_TYPE_TREE = {
     action:   false,
@@ -86,70 +84,6 @@ const ACTION_TYPE_TREE = {
     ],
 };
 
-// TODO move these functions somewhere better
-
-// TODO [#36]: Rework globalState
-function getStateFromAction(actionType) {
-    // TODO [#35]: Replace switch statements with dynamic dispatch.
-    switch (actionType) {
-        case ActionType.MOVE:
-            return StateEnum.CHARACTER_MOVE;
-        case ActionType.ATTACK:
-            return StateEnum.CHARACTER_ATTACK;
-        case ActionType.INTERACT:
-            return StateEnum.CHARACTER_INTERACT;
-        case ActionType.SWAP_PLACES:
-            return StateEnum.CHARACTER_SWAP;
-        case ActionType.RANGED_ATTACK:
-            return StateEnum.CHARACTER_RANGED_ATTACK;
-        case ActionType.SPECIAL_ATTACK:
-        case ActionType.END_TURN:
-            internalError("No state for this action type");
-            return StateEnum.DEFAULT;
-        default:
-            internalError("Unknown ActionType");
-            return StateEnum.DEFAULT;
-    }
-}
-
-function doesActionNeedTarget(actionType) {
-    // TODO [#35]: Replace switch statements with dynamic dispatch.
-    switch (actionType) {
-        case ActionType.MOVE:
-        case ActionType.ATTACK:
-        case ActionType.INTERACT:
-        case ActionType.SWAP_PLACES:
-        case ActionType.RANGED_ATTACK:
-            return true;
-        case ActionType.SPECIAL_ATTACK:
-        case ActionType.END_TURN:
-            return false;
-        default:
-            internalError("Unknown ActionType");
-            return false;
-    }
-}
-
-function makeUntargetedAction(actionType) {
-    // TODO [#35]: Replace switch statements with dynamic dispatch.
-    switch (actionType) {
-        case ActionType.SPECIAL_ATTACK:
-            return SpecialAttackAction.init(selectedCharacter);
-        case ActionType.END_TURN:
-            return EndTurnAction.init(selectedCharacter);
-        case ActionType.MOVE:
-        case ActionType.ATTACK:
-        case ActionType.INTERACT:
-        case ActionType.SWAP_PLACES:
-        case ActionType.RANGED_ATTACK:
-            internalError("makeUntargetedAction() of targeted ActionType");
-            return EndTurnAction.init(selectedCharacter);
-        default:
-            internalError("Unknown ActionType");
-            return EndTurnAction.init(selectedCharacter);
-    }
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // Menu table handling
 
@@ -174,10 +108,10 @@ export function getTopMenu(character) {
 function buildOneMenuNode(actionTypeSubtree, character, isTop) {
     if (actionTypeSubtree.action) {
         // .action, .name, .type
-        if (doesActionNeedTarget(actionTypeSubtree.type)) {
+        if (actionTypeSubtree.type.isTargeted()) {
             return {
                 title:   actionTypeSubtree.name,
-                state:   getStateFromAction(actionTypeSubtree.type),
+                state:   actionTypeSubtree.type.getState(),
                 buttons: [
                     // Text  New Menu     Action
                     ["Back", PARENT_MENU, doNothing],
@@ -220,7 +154,7 @@ function buildOneMenuButton(actionTypeSubtree, character) {
         if (!canDoAction(character, actionTypeSubtree.type)) {
             return null;
         }
-        if (doesActionNeedTarget(actionTypeSubtree.type)) {
+        if (actionTypeSubtree.type.isTargeted()) {
             return [
                 actionTypeSubtree.name,
                 buildOneMenuNode(actionTypeSubtree, character, false),
@@ -244,6 +178,10 @@ function buildOneMenuButton(actionTypeSubtree, character) {
             doNothing,
         ];
     }
+}
+
+function makeUntargetedAction(actionType) {
+    return actionType.initNoTarget(selectedCharacter);
 }
 
 export function doMenu(menuDesc) {

@@ -5,8 +5,10 @@ import {
     ATTACK_DAMAGE_MAX,
     RANGED_ATTACK_DAMAGE_MIN,
     RANGED_ATTACK_DAMAGE_MAX,
+    StateEnum,
 } from "./consts.js";
 import {
+    assert,
     internalError,
 } from "./message.js";
 import {
@@ -41,9 +43,27 @@ const BaseAction = Object.freeze({
     ////////////////
     // Public API
 
+    // Construction
+
+    // TODO: Get rid of init() and have separately-named constructors based on
+    // arg types?
     init: function() {
         this.mustOverride("init");
     },
+
+    isTargeted: function() {
+        this.mustOverride("needsTarget");
+    },
+
+    initNoTarget: function(subject) {
+        assert(!this.isTargeted());
+        this.init(subject);
+    },
+
+    // TODO: initWithTarget is handled in figureOutWhatTheUserMeant, based on
+    // globalState.
+
+    // Executing the action
 
     check: function(action) {
         this.mustOverride("check");
@@ -87,6 +107,17 @@ const BaseAction = Object.freeze({
 
     actionPointCost: function(action) {
         this.mustOverride("actionPointCost");
+    },
+
+    // Other misc
+
+    // TODO [#36]: Rework globalState
+    getState: function() {
+        if (!this.isTargeted()) {
+            internalError("getState() of untargeted action");
+        } else {
+            this.mustOverride("getState");
+        }
     },
 
     // Returns true if every character should always have this action type
@@ -163,6 +194,10 @@ export const MoveAction = actionSubclass({
         };
     },
 
+    isTargeted: function() {
+        return true;
+    },
+
     check: function(action) {
         return this.commonCheck(action, checkMove);
     },
@@ -175,6 +210,10 @@ export const MoveAction = actionSubclass({
     // State change handled by Crafty's animation
 
     animate: animateMove,
+
+    getState: function() {
+        return StateEnum.CHARACTER_MOVE;
+    },
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -185,6 +224,10 @@ export const SwapPlacesAction = actionSubclass({
 
     init: function(subject, target, path) {
         return actionWithTarget(this, subject, target);
+    },
+
+    isTargeted: function() {
+        return true;
     },
 
     check: function(action) {
@@ -199,6 +242,10 @@ export const SwapPlacesAction = actionSubclass({
     // State change handled by Crafty's animation
 
     animate: animateSwap,
+
+    getState: function() {
+        return StateEnum.CHARACTER_SWAP;
+    },
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -209,6 +256,10 @@ export const MeleeAttackAction = actionSubclass({
 
     init: function(subject, target, path) {
         return actionWithPathAndTarget(this, subject, target, path);
+    },
+
+    isTargeted: function() {
+        return true;
     },
 
     check: function(action) {
@@ -231,6 +282,10 @@ export const MeleeAttackAction = actionSubclass({
     },
 
     animate: animateMeleeAttack,
+
+    getState: function() {
+        return StateEnum.CHARACTER_ATTACK;
+    },
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -241,6 +296,10 @@ export const RangedAttackAction = actionSubclass({
 
     init: function(subject, target, path) {
         return actionWithTarget(this, subject, target);
+    },
+
+    isTargeted: function() {
+        return true;
     },
 
     check: function(action) {
@@ -266,6 +325,10 @@ export const RangedAttackAction = actionSubclass({
     },
 
     animate: animateRangedAttack,
+
+    getState: function() {
+        return StateEnum.CHARACTER_RANGED_ATTACK;
+    },
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -276,6 +339,10 @@ export const SpecialAttackAction = actionSubclass({
 
     init: function(subject, target, path) {
         return nullaryAction(this, subject);
+    },
+
+    isTargeted: function() {
+        return false;
     },
 
     check: function(action) {
@@ -302,6 +369,10 @@ export const InteractAction = actionSubclass({
         return actionWithPathAndTarget(this, subject, target, path);
     },
 
+    isTargeted: function() {
+        return true;
+    },
+
     check: function(action) {
         return this.commonCheck(action, checkInteract);
     },
@@ -317,6 +388,10 @@ export const InteractAction = actionSubclass({
     },
 
     animate: animateInteract,
+
+    getState: function() {
+        return StateEnum.CHARACTER_INTERACT;
+    },
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -327,6 +402,10 @@ export const EndTurnAction = actionSubclass({
 
     init: function(subject, target, path) {
         return nullaryAction(this, subject);
+    },
+
+    isTargeted: function() {
+        return false;
     },
 
     check: function(action) {
