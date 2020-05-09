@@ -3,9 +3,6 @@
 "use strict";
 
 import {
-    ActionType,
-} from "./new_action.js";
-import {
     Highlight,
 } from  "./consts.js";
 import {
@@ -17,6 +14,7 @@ export function highlightPath(path) {
         Crafty("Ground").each(function() {
             if (this.getPos().x === path[i].x &&
                     this.getPos().y === path[i].y) {
+                // TODO: Different colors for different action types?
                 if (i === path.length - 1) {
                     this.setAnimHighlight(Highlight.ANIM_MOVE_END);
                 } else {
@@ -41,18 +39,9 @@ export function clearHoverHighlights() {
 
 export function createMovementGrid(character) {
     Crafty("GridObject").each(function() {
-        if (this.autoAction === null) {
-            // No highlight
-        // TODO[#35]: this.autoAction.type.getDefaultHighlight()
-        } else if (this.autoAction.type === ActionType.MOVE) {
-            this.setDefaultHighlight(Highlight.CAN_MOVE);
-        } else if (this.autoAction.type === ActionType.ATTACK) {
-            this.setDefaultHighlight(Highlight.CAN_ATTACK);
-        } else if (this.autoAction.type === ActionType.INTERACT) {
-            this.setDefaultHighlight(Highlight.CAN_INTERACT);
-        } else {
-            // There are other ActionTypes, but none used as auto-actions.
-            assert(false);
+        if (this.autoAction !== null) {
+            let highlight = this.autoAction.type.getDefaultHighlight();
+            this.setDefaultHighlight(highlight);
         }
     });
 }
@@ -62,34 +51,19 @@ export function hoverHighlightAction(action) {
         return;
     }
 
-    let type = action.type;
     // We currently don't use action.subject
     let target = action.target;
-    let path = action.path;
-
-    let endHighlight  = null;
-    let pathHighlight = null;
-
-    // TODO[#35]: this.autoAction.type.getHoverHighlight{End,Middle}()
-    if (type === ActionType.MOVE) {
-        endHighlight  = Highlight.HOVER_MOVE_END;
-        pathHighlight = Highlight.HOVER_MOVE_MIDDLE;
-    } else if (type === ActionType.ATTACK) {
-        endHighlight  = Highlight.HOVER_ATTACK_END;
-        pathHighlight = Highlight.HOVER_ATTACK_MIDDLE;
-    } else if (type === ActionType.INTERACT) {
-        endHighlight  = Highlight.HOVER_INTERACT_END;
-        pathHighlight = Highlight.HOVER_INTERACT_MIDDLE;
-    } else {
-        assert(false);
-        return;
-    }
-
+    let path   = action.path;
     assert(path !== undefined);
+
+    let pathHighlight = action.type.getHoverHighlightMiddle();
+    let endHighlight  = action.type.getHoverHighlightEnd();
 
     // TODO: Why would target be undefined?
     //   - ActionType.MOVE?
     //   - Can we check for that directly?
+    //   - Can we not access action.target without first knowing that it
+    //     exists?
     if (target !== undefined) {
         target.setHoverHighlight(endHighlight);
     } else {

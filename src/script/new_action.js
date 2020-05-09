@@ -3,6 +3,7 @@
 import {
     ATTACK_DAMAGE_MIN,
     ATTACK_DAMAGE_MAX,
+    Highlight,
     RANGED_ATTACK_DAMAGE_MIN,
     RANGED_ATTACK_DAMAGE_MAX,
     StateEnum,
@@ -109,6 +110,20 @@ const BaseAction = Object.freeze({
         this.mustOverride("actionPointCost");
     },
 
+    // Highlighting colors
+
+    getDefaultHighlight: function() {
+        this.overrideIfCalled("getDefaultHighlight");
+    },
+
+    getHoverHighlightMiddle: function() {
+        this.overrideIfCalled("getHoverHighlightMiddle");
+    },
+
+    getHoverHighlightEnd: function() {
+        this.overrideIfCalled("getHoverHighlightEnd");
+    },
+
     // Other misc
 
     // TODO [#36]: Rework globalState
@@ -163,9 +178,20 @@ const BaseAction = Object.freeze({
 
     // Sanity checks
 
+    // Used for methods that every subclass should be overriding.
     mustOverride: function(methodName) {
         internalError(`${this.name} does not override method ${methodName} ` +
             `of BaseAction`);
+    },
+
+    // Used for methods that are only called on some subclasses, where those
+    // subclasses all need to override it, but others don't because it's never
+    // called. This is basically the same as mustOverride, but gives a
+    // different error message.
+    overrideIfCalled: function(methodName) {
+        internalError(`Method ${methodName} called on ${this.name}. Either ` +
+            `${this.name} should override it or it should not be called on ` +
+            `${this.name}`);
     },
 
     checkActionType: function(action) {
@@ -210,6 +236,18 @@ export const MoveAction = actionSubclass({
     // State change handled by Crafty's animation
 
     animate: animateMove,
+
+    getDefaultHighlight: function() {
+        return Highlight.CAN_MOVE;
+    },
+
+    getHoverHighlightMiddle: function() {
+        return Highlight.HOVER_MOVE_MIDDLE;
+    },
+
+    getHoverHighlightEnd: function() {
+        return Highlight.HOVER_MOVE_END;
+    },
 
     getState: function() {
         return StateEnum.CHARACTER_MOVE;
@@ -282,6 +320,18 @@ export const MeleeAttackAction = actionSubclass({
     },
 
     animate: animateMeleeAttack,
+
+    getDefaultHighlight: function() {
+        return Highlight.CAN_ATTACK;
+    },
+
+    getHoverHighlightMiddle: function() {
+        return Highlight.HOVER_ATTACK_MIDDLE;
+    },
+
+    getHoverHighlightEnd: function() {
+        return Highlight.HOVER_ATTACK_END;
+    },
 
     getState: function() {
         return StateEnum.CHARACTER_ATTACK;
@@ -388,6 +438,18 @@ export const InteractAction = actionSubclass({
     },
 
     animate: animateInteract,
+
+    getDefaultHighlight: function() {
+        return Highlight.CAN_INTERACT;
+    },
+
+    getHoverHighlightMiddle: function() {
+        return Highlight.HOVER_INTERACT_MIDDLE;
+    },
+
+    getHoverHighlightEnd: function() {
+        return Highlight.HOVER_INTERACT_END;
+    },
 
     getState: function() {
         return StateEnum.CHARACTER_INTERACT;
