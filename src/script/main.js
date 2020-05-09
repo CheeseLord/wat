@@ -25,7 +25,7 @@ import {
     initCamera,
 } from "./view.js";
 import {
-    loadLevel1,
+    loadLevel2,
 } from "./levels.js";
 import {
     beginLevel,
@@ -167,7 +167,7 @@ export function doTheThing() {
             },
         },
         function() {
-            loadLevel1();
+            loadLevel2();
             beginLevel(0);
         },
     );
