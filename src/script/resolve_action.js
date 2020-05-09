@@ -3,7 +3,6 @@
 "use strict";
 
 import {
-    ActionType,
     MeleeAttackAction,
     InteractAction,
     MoveAction,
@@ -63,8 +62,7 @@ export function setGlobalState(newState) { globalState = newState; }
 // Action handlers
 
 export function canDoAction(character, actionType) {
-    // TODO[#35]: Property on the actions for "is this always available".
-    return (actionType === ActionType.END_TURN ||
+    return (actionType.isAlwaysAvailable() ||
             character.availableActions.includes(actionType));
 }
 

@@ -89,6 +89,12 @@ const BaseAction = Object.freeze({
         this.mustOverride("actionPointCost");
     },
 
+    // Returns true if every character should always have this action type
+    // available, even if it isn't in their availableActions list.
+    isAlwaysAvailable: function() {
+        return false;
+    },
+
     ////////////////
     // Internal helpers, specific to action type
 
@@ -330,6 +336,10 @@ export const EndTurnAction = actionSubclass({
     actionPointCost: function(action) {
         this.checkActionType(action);
         return action.subject.actionPoints;
+    },
+
+    isAlwaysAvailable: function() {
+        return true;
     },
 
     // No updateState because there's no state change.
