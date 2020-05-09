@@ -4,8 +4,15 @@
 
 import {StateEnum} from "./consts.js";
 
+// FIXME[#35]: Cyclic imports
 import {
-    ActionType,
+    EndTurnAction,
+    InteractAction,
+    MeleeAttackAction,
+    MoveAction,
+    RangedAttackAction,
+    SpecialAttackAction,
+    SwapPlacesAction,
 } from "./new_action.js";
 // TODO: We'll need this if we re-add the "Auto Attack" button.
 // import {
@@ -37,12 +44,12 @@ const ACTION_TYPE_TREE = {
         {
             action: true,
             name:   "Move",
-            type:   ActionType.MOVE,
+            type:   MoveAction,
         },
         {
             action: true,
             name:   "Swap Places",
-            type:   ActionType.SWAP_PLACES,
+            type:   SwapPlacesAction,
         },
         {
             action:   false,
@@ -52,24 +59,24 @@ const ACTION_TYPE_TREE = {
                 {
                     action: true,
                     name:   "Melee Attack",
-                    type:   ActionType.ATTACK,
+                    type:   MeleeAttackAction,
                 },
                 {
                     action: true,
                     name:   "Ranged Attack",
-                    type:   ActionType.RANGED_ATTACK,
+                    type:   RangedAttackAction,
                 },
                 {
                     action: true,
                     name:   "Special Attack",
-                    type:   ActionType.SPECIAL_ATTACK,
+                    type:   SpecialAttackAction,
                 },
             ],
         },
         {
             action: true,
             name:   "Interact",
-            type:   ActionType.INTERACT,
+            type:   InteractAction,
         },
         // TODO: Custom entry for this button we used to have:
         //   ["Auto Attack", CLEAR_MENU, () => {
@@ -79,7 +86,7 @@ const ACTION_TYPE_TREE = {
         {
             action: true,
             name:   "End Turn",
-            type:   ActionType.END_TURN,
+            type:   EndTurnAction,
         },
     ],
 };
@@ -118,7 +125,7 @@ function buildOneMenuNode(actionTypeSubtree, character, isTop) {
                 ],
             };
         } else {
-            internalError("buildOneMenuNode() of untargeted ActionType");
+            internalError("buildOneMenuNode() of untargeted action type");
             return CLEAR_MENU;
         }
     } else {

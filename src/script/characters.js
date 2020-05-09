@@ -1,7 +1,13 @@
 /* global Crafty */
 
+// FIXME[#35]: Cyclic imports
 import {
-    ActionType,
+    InteractAction,
+    MeleeAttackAction,
+    MoveAction,
+    RangedAttackAction,
+    SpecialAttackAction,
+    SwapPlacesAction,
 } from "./new_action.js";
 
 export function createPlayerCharacters() {
@@ -13,12 +19,12 @@ export function createPlayerCharacters() {
                 .setTeam(0)
                 .setAnimation(0, 4)
                 .setActions([
-                    ActionType.ATTACK,
-                    ActionType.INTERACT,
-                    ActionType.MOVE,
-                    ActionType.RANGED_ATTACK,
-                    ActionType.SPECIAL_ATTACK,
-                    ActionType.SWAP_PLACES,
+                    MoveAction,
+                    SwapPlacesAction,
+                    MeleeAttackAction,
+                    RangedAttackAction,
+                    SpecialAttackAction,
+                    InteractAction,
                 ]),
 
         Crafty.e("SpriteCharacter, anim_start")
@@ -28,12 +34,12 @@ export function createPlayerCharacters() {
                 .setTeam(0)
                 .setAnimation(1, 4)
                 .setActions([
-                    ActionType.ATTACK,
-                    ActionType.INTERACT,
-                    ActionType.MOVE,
-                    ActionType.RANGED_ATTACK,
-                    ActionType.SPECIAL_ATTACK,
-                    ActionType.SWAP_PLACES,
+                    MoveAction,
+                    SwapPlacesAction,
+                    MeleeAttackAction,
+                    RangedAttackAction,
+                    SpecialAttackAction,
+                    InteractAction,
                 ]),
 
         Crafty.e("SpriteCharacter, anim_start")
@@ -43,12 +49,12 @@ export function createPlayerCharacters() {
                 .setTeam(0)
                 .setAnimation(2, 4)
                 .setActions([
-                    ActionType.ATTACK,
-                    ActionType.INTERACT,
-                    ActionType.MOVE,
-                    ActionType.RANGED_ATTACK,
-                    ActionType.SPECIAL_ATTACK,
-                    ActionType.SWAP_PLACES,
+                    MoveAction,
+                    SwapPlacesAction,
+                    MeleeAttackAction,
+                    RangedAttackAction,
+                    SpecialAttackAction,
+                    InteractAction,
                 ]),
 
         Crafty.e("SpriteCharacter, anim_start")
@@ -58,12 +64,12 @@ export function createPlayerCharacters() {
                 .setTeam(0)
                 .setAnimation(3, 4)
                 .setActions([
-                    ActionType.ATTACK,
-                    ActionType.INTERACT,
-                    ActionType.MOVE,
-                    ActionType.RANGED_ATTACK,
-                    ActionType.SPECIAL_ATTACK,
-                    ActionType.SWAP_PLACES,
+                    MoveAction,
+                    SwapPlacesAction,
+                    MeleeAttackAction,
+                    RangedAttackAction,
+                    SpecialAttackAction,
+                    InteractAction,
                 ]),
     ];
 }

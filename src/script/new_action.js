@@ -528,16 +528,3 @@ function pathApExclTarget(path) {
     return path.length - 2;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// FIXME: For backward compatibility with action_type.js. Delete these.
-
-export const ActionType = Object.freeze({
-    MOVE:           MoveAction,
-    ATTACK:         MeleeAttackAction,
-    INTERACT:       InteractAction,
-    SWAP_PLACES:    SwapPlacesAction,
-    RANGED_ATTACK:  RangedAttackAction,
-    SPECIAL_ATTACK: SpecialAttackAction,
-    END_TURN:       EndTurnAction,
-});
-

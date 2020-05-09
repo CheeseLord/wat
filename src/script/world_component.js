@@ -30,10 +30,15 @@ import {
     userMessage,
 } from "./message.js";
 
+// FIXME[#35]: Cyclic imports
+import {
+    MeleeAttackAction,
+    MoveAction,
+} from "./new_action.js";
+
 import {
     getProportion,
 } from "./util.js";
-import {ActionType} from "./new_action.js";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Component definitions
@@ -316,8 +321,8 @@ Crafty.c("Character", {
             // if it's default. Otherwise, check for containment as we
             // currently do.
             availableActions: [
-                ActionType.MOVE,
-                ActionType.ATTACK,
+                MoveAction,
+                MeleeAttackAction,
             ],
             speed: 4,
             team:  -1,

@@ -60,8 +60,8 @@ export function hoverHighlightAction(action) {
     let endHighlight  = action.type.getHoverHighlightEnd();
 
     // TODO: Why would target be undefined?
-    //   - ActionType.MOVE?
-    //   - Can we check for that directly?
+    //   - MoveAction?
+    //   - Can we check for that more directly somehow?
     //   - Can we not access action.target without first knowing that it
     //     exists?
     if (target !== undefined) {
