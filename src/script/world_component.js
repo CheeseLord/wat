@@ -146,8 +146,6 @@ Crafty.c("GridObject", {
     },
 });
 
-var doExtraLogging = false;
-
 // Component for things that never change state in any way.
 Crafty.c("StaticObject", {
     required: "GridObject, Canvas",
@@ -158,32 +156,18 @@ Crafty.c("StaticObject", {
     },
 
     _setHighlight: function(color) {
-        if (doExtraLogging) {
-            debugLog(`Highlight ${color} at (${this.x}, ${this.y})`);
-            if (color === null) {
-                debugLog("Break on me");
-            }
-            if (this.has("Ground")) {
-                debugLog("Break on me");
-            }
-        }
-        if (color === this._highlightColor) {
-            // Optimization: if not changing the color, don't
-            // destroy/recreate entities.
-            if (doExtraLogging) {
-                debugLog(`Don't change color at (${this.x}, ${this.y}); ` +
-                    `it's already ${color}`);
-            }
+        if (this.x === 0 && this.y === 0) {
+            // FIXME: This function is being called before the entities are
+            // moved into position. Hack around this by checking the values of
+            // x and y. Of course, this means that the entity at (0, 0) never
+            // gets highlighted.
             return this;
         }
-        if (doExtraLogging) {
-            debugLog(`Change color at (${this.x}, ${this.y}) from ` +
-                `${this._highlightColor} to ${color}`);
-        } /* else if (0) {
-            debugLog(`Change color <somewhere> from ` +
-                `${this._highlightColor} to ${color}`);
-        } */
-
+        if (color === this._highlightColor) {
+            // Optimization: if not changing the color, don't destroy/recreate
+            // entities.
+            return this;
+        }
         this._highlightColor = color;
         if (this._highlightEntity !== null) {
             this._highlightEntity.destroy();
