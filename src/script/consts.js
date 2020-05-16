@@ -76,6 +76,8 @@ export const StateEnum = Object.freeze({
 
 // Highlighting colors.
 // TODO proper rgba handling
+//   - For now, these have to be exactly 9 characters long ("#RRGGBBAA").
+//     StaticObject._setHighlight depends on it.
 // TODO: these colors still need tweaking.
 export const Highlight = Object.freeze({
     SELECTED_CHARACTER:     "#ffff00bb", // Character currently selected

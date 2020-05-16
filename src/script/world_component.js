@@ -27,6 +27,7 @@ import {
 } from "./highlight.js";
 
 import {
+    debugLog,
     userMessage,
 } from "./message.js";
 
@@ -40,7 +41,7 @@ import {
 // Component for anything that is located in a grid space.
 // Don't inherit from GridObject directly; use StaticObject or DynamicObject!
 Crafty.c("GridObject", {
-    required: "2D, DOM, Mouse",
+    required: "2D, Mouse",
 
     init: function() {
         this.attr({w: TILE_WIDTH, h: TILE_HEIGHT});
@@ -143,26 +144,83 @@ Crafty.c("GridObject", {
             return this._clearHighlight();
         }
     },
-    _setHighlight: function(color) {
-        return this.css({
-            "background-color": color,
-        });
-    },
-    _clearHighlight: function() {
-        return this.css({
-            "background-color": this._bgColor,
-        });
-    },
 });
+
+var doExtraLogging = false;
 
 // Component for things that never change state in any way.
 Crafty.c("StaticObject", {
-    required: "GridObject",
+    required: "GridObject, Canvas",
+
+    init: function() {
+        this._highlightColor  = null;
+        this._highlightEntity = null;
+    },
+
+    _setHighlight: function(color) {
+        if (doExtraLogging) {
+            debugLog(`Highlight ${color} at (${this.x}, ${this.y})`);
+            if (color === null) {
+                debugLog("Break on me");
+            }
+            if (this.has("Ground")) {
+                debugLog("Break on me");
+            }
+        }
+        if (color === this._highlightColor) {
+            // Optimization: if not changing the color, don't
+            // destroy/recreate entities.
+            if (doExtraLogging) {
+                debugLog(`Don't change color at (${this.x}, ${this.y}); ` +
+                    `it's already ${color}`);
+            }
+            return this;
+        }
+        if (doExtraLogging) {
+            debugLog(`Change color at (${this.x}, ${this.y}) from ` +
+                `${this._highlightColor} to ${color}`);
+        } /* else if (0) {
+            debugLog(`Change color <somewhere> from ` +
+                `${this._highlightColor} to ${color}`);
+        } */
+
+        this._highlightColor = color;
+        if (this._highlightEntity !== null) {
+            this._highlightEntity.destroy();
+        }
+        if (color === null) {
+            this._highlightEntity = null;
+            return this;
+        }
+        if (color.length > 7) {
+            // Strip alpha channel, since having an alpha channel was causing
+            // all Canvas highlights to show as black (not sure why).
+            color = color.substring(0, 7);
+        }
+        debugLog("Creating background entity");
+        this._highlightEntity = Crafty.e("2D, Canvas, Color")
+                .color(color)
+                .attr({
+                    x: this.x,
+                    y: this.y,
+                    w: this.w,
+                    h: this.h,
+                    // Force the highlight to be just behind us. Bit of a hack.
+                    z: (this.z <= 0 ? 0 : this.z - 1),
+                });
+        // We could do this:
+        //     this.attach(this._highlightEntity);
+        // But it doesn't matter because we won't ever move.
+        return this;
+    },
+    _clearHighlight: function() {
+        return this._setHighlight(this._bgColor);
+    },
 });
 
 // Component for things that might change state.
 Crafty.c("DynamicObject", {
-    required: "GridObject, Tween",
+    required: "GridObject, DOM, Tween",
 
     init: function() {
         this.attr({blocksMovement: true});
@@ -175,6 +233,17 @@ Crafty.c("DynamicObject", {
         this.attr({_tileX: gridPos.x, _tileY: gridPos.y});
         this.tween(gridPosToGraphics(gridPos), duration);
         return this;
+    },
+
+    _setHighlight: function(color) {
+        return this.css({
+            "background-color": color,
+        });
+    },
+    _clearHighlight: function() {
+        return this.css({
+            "background-color": this._bgColor,
+        });
     },
 });
 
