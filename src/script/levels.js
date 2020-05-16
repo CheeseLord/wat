@@ -76,7 +76,7 @@ export function loadLevel1() {
     }
 
     // Finish up.
-    updateMapForNewLevel();
+    finalizeLevel();
 }
 
 export function loadLevel2() {
@@ -159,7 +159,7 @@ export function loadLevel2() {
     }
 
     // Finish up.
-    updateMapForNewLevel();
+    finalizeLevel();
 }
 
 function clearLevel() {
@@ -167,5 +167,12 @@ function clearLevel() {
     Crafty("GridObject").each(function() {
         this.destroy();
     });
+}
+
+function finalizeLevel() {
+    Crafty("StaticObject").each(function() {
+        this.finalize();
+    });
+    updateMapForNewLevel();
 }
 

@@ -151,16 +151,21 @@ Crafty.c("StaticObject", {
     required: "GridObject, Canvas",
 
     init: function() {
+        this._finalized       = false;
         this._highlightColor  = null;
         this._highlightEntity = null;
     },
 
+    finalize: function() {
+        this._finalized = true;
+        this._redraw();
+    },
+
     _setHighlight: function(color) {
-        if (this.x === 0 && this.y === 0) {
-            // FIXME: This function is being called before the entities are
-            // moved into position. Hack around this by checking the values of
-            // x and y. Of course, this means that the entity at (0, 0) never
-            // gets highlighted.
+        if (!this._finalized) {
+            // If we're still being moved into position, don't try to redraw
+            // since that would mess up the optimization below.
+            assert(this._highlightColor === null);
             return this;
         }
         if (color === this._highlightColor) {
@@ -181,7 +186,8 @@ Crafty.c("StaticObject", {
             // all Canvas highlights to show as black (not sure why).
             color = color.substring(0, 7);
         }
-        assert(this.z !== 0);
+        // Since we're finalized, we should have a properly initialized z.
+        assert(this.z > 0);
         this._highlightEntity = Crafty.e("2D, Canvas, Color")
                 .color(color)
                 .attr({
