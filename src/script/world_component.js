@@ -27,7 +27,7 @@ import {
 } from "./highlight.js";
 
 import {
-    debugLog,
+    assert,
     userMessage,
 } from "./message.js";
 
@@ -181,7 +181,7 @@ Crafty.c("StaticObject", {
             // all Canvas highlights to show as black (not sure why).
             color = color.substring(0, 7);
         }
-        debugLog("Creating background entity");
+        assert(this.z !== 0);
         this._highlightEntity = Crafty.e("2D, Canvas, Color")
                 .color(color)
                 .attr({
@@ -190,7 +190,7 @@ Crafty.c("StaticObject", {
                     w: this.w,
                     h: this.h,
                     // Force the highlight to be just behind us. Bit of a hack.
-                    z: (this.z <= 0 ? 0 : this.z - 1),
+                    z: this.z - 1,
                 });
         // We could do this:
         //     this.attach(this._highlightEntity);
