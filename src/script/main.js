@@ -25,11 +25,8 @@ import {
     initCamera,
 } from "./view.js";
 import {
-    loadLevel2,
-} from "./levels.js";
-import {
-    beginLevel,
-} from "./turn_order.js";
+    splash,
+} from "./splash.js";
 
 
 export function doTheThing() {
@@ -167,8 +164,7 @@ export function doTheThing() {
             },
         },
         function() {
-            loadLevel2();
-            beginLevel(0);
+            splash();
         },
     );
 }
