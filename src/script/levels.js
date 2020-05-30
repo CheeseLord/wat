@@ -12,7 +12,7 @@ import {
     MoveAction,
 } from "./action_type.js";
 
-export function loadLevel(path) {
+export function loadLevel(path, callback) {
     $.getJSON(path, function(json) {
         clearLevel();
 
@@ -61,15 +61,18 @@ export function loadLevel(path) {
         }
 
         finalizeLevel();
+
+        // FIXME: This shouldn't be a callback.
+        callback(json.firstTeam);
     });
 }
 
-// TODO: Don't build the levels in code.
-export function loadLevel1() {
+export function loadLevel1(callback) {
     // TODO: Factor out path to levels.
-    loadLevel("../levels/level1.json");
+    loadLevel("../levels/level1.json", callback);
 }
 
+// TODO: Don't build the levels in code.
 export function loadLevel2() {
     clearLevel();
 

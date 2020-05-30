@@ -1,6 +1,7 @@
 {
     "height": 11,
     "width": 17,
+    "firstTeam": 0,
     "characters": [
         {"x": 2, "y": 2},
         {"x": 2, "y": 4},
