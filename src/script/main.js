@@ -27,6 +27,9 @@ import {
 import {
     splash,
 } from "./splash.js";
+import {
+    initDialogueDisplay,
+} from "./dialogue.js";
 
 
 export function doTheThing() {
@@ -76,6 +79,13 @@ export function doTheThing() {
             h: 25,
         });
     userMessage("Haldo World!");
+    initDialogueDisplay(
+        {
+            x: MENU_WIDTH + WORLDVIEW_WIDTH / 2 - 200,
+            y: 400,
+            w: 400,
+            h: 100,
+        });
 
     // Setup various event handlers.
 
