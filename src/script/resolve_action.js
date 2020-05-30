@@ -18,6 +18,9 @@ import {
     ANIM_DUR_PAUSE_BW_MOV_ATK,
     ANIM_DUR_RANGED_SHOT,
     ANIM_DUR_STEP,
+    FIREBALL_DAMAGE_MAX,
+    FIREBALL_DAMAGE_MIN,
+    FIREBALL_RANGE,
     RANGED_ATTACK_RANGE,
     SPECIAL_ATTACK_DAMAGE_MIN,
     SPECIAL_ATTACK_DAMAGE_MAX,
@@ -37,6 +40,7 @@ import {
 } from "./highlight.js";
 import {
     assert,
+    internalError,
     userMessage,
 } from "./message.js";
 import {
@@ -187,6 +191,36 @@ export function animateSpecialAttack(action, callback) {
     doAnimate(anims, callback);
 }
 
+export function animateFireballSpell(action, callback) {
+    // TODO: For now this is a copy of animateRangedAttack, but without the
+    // takeDamageAnim (because there are multiple different damage values to
+    // determine and they need to be synced with updateStateFireballSpell).
+    setGlobalState(StateEnum.ANIMATING);
+    let anims = seriesAnimations([]);
+
+    let bullet = Crafty.e("2D, DOM, bullet_anim, Tween")
+            .attr({
+                x: action.subject.x,
+                y: action.subject.y,
+                z: Z_PARTICLE,
+            });
+    // TODO: The duration for this tween should be dependent on the
+    // distance. Have a bullet speed, not a fixed bullet duration.
+    anims = seriesAnimations([
+        tweenAnimation(bullet, function() {
+            bullet.tween({
+                x: action.target.x,
+                y: action.target.y,
+            }, ANIM_DUR_RANGED_SHOT);
+        }),
+        synchronousAnimation(function() {
+            bullet.destroy();
+        }),
+    ]);
+
+    doAnimate(anims, callback);
+}
+
 export function animateInteract(action, callback) {
     setGlobalState(StateEnum.ANIMATING);
     let anims = seriesAnimations([]);
@@ -266,6 +300,16 @@ export function updateStateSpecialAttack(action) {
                 isAdjacent(action.subject.getPos(), this.getPos())) {
             this.takeDamage(randInt(SPECIAL_ATTACK_DAMAGE_MIN,
                 SPECIAL_ATTACK_DAMAGE_MAX));
+        }
+    });
+}
+
+export function updateStateFireballSpell(action) {
+    // TODO: Handle the damage in resolveAction.
+    Crafty("Character").each(function() {
+        // Unlike SpecialAttackAction, FireballSpellAction does friendly fire.
+        if (isAdjacent(action.target.getPos(), this.getPos())) {
+            this.takeDamage(randInt(FIREBALL_DAMAGE_MIN, FIREBALL_DAMAGE_MAX));
         }
     });
 }
@@ -350,6 +394,24 @@ export function checkRangedAttack(action) {
         );
         if (dist > RANGED_ATTACK_RANGE) {
             return failCheck("Enemy too far away.");
+        } else {
+            return passCheck();
+        }
+    }
+}
+
+export function checkFireballSpell(action) {
+    if (action.target === null) {
+        // How would this happen?
+        internalError("Invalid target square?");
+        return failCheck("Invalid target square?");
+    } else {
+        let dist = getDistance(
+            action.subject.getPos(),
+            action.target.getPos(),
+        );
+        if (dist > FIREBALL_RANGE) {
+            return failCheck("Target too far away.");
         } else {
             return passCheck();
         }

@@ -58,6 +58,10 @@ export const RANGED_ATTACK_RANGE = 5;
 // Exactly 4 damage
 export const SPECIAL_ATTACK_DAMAGE_MIN = 4;
 export const SPECIAL_ATTACK_DAMAGE_MAX = 4;
+// TODO balance this
+export const FIREBALL_DAMAGE_MIN = 6;
+export const FIREBALL_DAMAGE_MAX = 12;
+export const FIREBALL_RANGE      = 4;
 
 // Based on one of the comments on:
 //     https://stackoverflow.com/a/5040502
@@ -72,6 +76,7 @@ export const StateEnum = Object.freeze({
     CHARACTER_ATTACK:        {},
     CHARACTER_RANGED_ATTACK: {},
     CHARACTER_INTERACT:      {},
+    CHARACTER_FIREBALL:      {},
 });
 
 // Highlighting colors.

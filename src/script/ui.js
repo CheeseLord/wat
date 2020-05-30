@@ -3,9 +3,10 @@
 "use strict";
 
 import {
-    MeleeAttackAction,
     EndTurnAction,
+    FireballSpellAction,
     InteractAction,
+    MeleeAttackAction,
     MoveAction,
     RangedAttackAction,
     SpecialAttackAction,
@@ -250,6 +251,8 @@ function figureOutWhatTheUserMeant(inputDesc) {
             );
         case StateEnum.CHARACTER_RANGED_ATTACK:
             return disambigAction(RangedAttackAction.init(subject, target));
+        case StateEnum.CHARACTER_FIREBALL:
+            return disambigAction(FireballSpellAction.init(subject, target));
         case StateEnum.CHARACTER_SWAP:
             return disambigAction(SwapPlacesAction.init(subject, target));
         default:

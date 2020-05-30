@@ -1,11 +1,11 @@
 "use strict";
 
 import {
-    ATTACK_DAMAGE_MIN,
     ATTACK_DAMAGE_MAX,
+    ATTACK_DAMAGE_MIN,
     Highlight,
-    RANGED_ATTACK_DAMAGE_MIN,
     RANGED_ATTACK_DAMAGE_MAX,
+    RANGED_ATTACK_DAMAGE_MIN,
     StateEnum,
 } from "./consts.js";
 import {
@@ -14,6 +14,7 @@ import {
 } from "./message.js";
 import {
     animateEndTurn,
+    animateFireballSpell,
     animateInteract,
     animateMeleeAttack,
     animateMove,
@@ -21,6 +22,7 @@ import {
     animateSpecialAttack,
     animateSwap,
     canDoAction,
+    checkFireballSpell,
     checkInteract,
     checkMeleeAttack,
     checkMove,
@@ -28,6 +30,7 @@ import {
     checkSwap,
     failCheck,
     passCheck,
+    updateStateFireballSpell,
     updateStateSpecialAttack,
 } from "./resolve_action.js";
 import {
@@ -407,6 +410,38 @@ export const SpecialAttackAction = actionSubclass({
     updateState: updateStateSpecialAttack,
 
     animate: animateSpecialAttack,
+});
+
+///////////////////////////////////////////////////////////////////////////////
+// FireballSpellAction
+
+export const FireballSpellAction = actionSubclass({
+    name: "FireballSpellAction",
+
+    init: function(subject, target, path) {
+        return actionWithTarget(this, subject, target);
+    },
+
+    isTargeted: function() {
+        return true;
+    },
+
+    check: function(action) {
+        return this.commonCheck(action, checkFireballSpell);
+    },
+
+    actionPointCost: function(action) {
+        this.checkActionType(action);
+        return 6;
+    },
+
+    updateState: updateStateFireballSpell,
+
+    animate: animateFireballSpell,
+
+    getState: function() {
+        return StateEnum.CHARACTER_FIREBALL;
+    },
 });
 
 ///////////////////////////////////////////////////////////////////////////////

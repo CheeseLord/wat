@@ -1,6 +1,7 @@
 /* global Crafty */
 
 import {
+    FireballSpellAction,
     InteractAction,
     MeleeAttackAction,
     MoveAction,
@@ -68,6 +69,7 @@ export function createPlayerCharacters() {
                     MeleeAttackAction,
                     RangedAttackAction,
                     SpecialAttackAction,
+                    FireballSpellAction,
                     InteractAction,
                 ]),
     ];

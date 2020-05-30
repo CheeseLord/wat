@@ -6,6 +6,7 @@ import {StateEnum} from "./consts.js";
 
 import {
     EndTurnAction,
+    FireballSpellAction,
     InteractAction,
     MeleeAttackAction,
     MoveAction,
@@ -70,6 +71,12 @@ const ACTION_TYPE_TREE = {
                     action: true,
                     name:   "Special Attack",
                     type:   SpecialAttackAction,
+                },
+                // TODO: Separate submenu for spells?
+                {
+                    action: true,
+                    name:   "Fireball",
+                    type:   FireballSpellAction,
                 },
             ],
         },
