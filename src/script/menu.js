@@ -12,7 +12,7 @@ import {
     RangedAttackAction,
     SpecialAttackAction,
     SwapPlacesAction,
-} from "./new_action.js";
+} from "./action_type.js";
 // TODO: We'll need this if we re-add the "Auto Attack" button.
 // import {
 //     chooseAiAction,

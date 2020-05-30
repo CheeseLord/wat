@@ -32,7 +32,7 @@ import {
     MeleeAttackAction,
     InteractAction,
     MoveAction,
-} from "./new_action.js";
+} from "./action_type.js";
 import {
     setGlobalState,
 } from "./resolve_action.js";

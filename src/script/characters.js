@@ -7,7 +7,7 @@ import {
     RangedAttackAction,
     SpecialAttackAction,
     SwapPlacesAction,
-} from "./new_action.js";
+} from "./action_type.js";
 
 export function createPlayerCharacters() {
     return [

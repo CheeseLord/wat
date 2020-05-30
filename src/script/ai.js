@@ -6,7 +6,7 @@ import {
     MeleeAttackAction,
     EndTurnAction,
     MoveAction,
-} from "./new_action.js";
+} from "./action_type.js";
 import {
     findPaths,
     getPath,

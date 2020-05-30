@@ -9,7 +9,7 @@ import {
 import {
     MeleeAttackAction,
     MoveAction,
-} from "./new_action.js";
+} from "./action_type.js";
 
 // TODO: Don't build the levels in code.
 export function loadLevel1() {
