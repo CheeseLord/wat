@@ -14,7 +14,7 @@ export function createPlayerCharacters() {
     return [
         // Ranged DPS
         Crafty.e("SpriteCharacter, anim_start")
-                .setName_("Not Greg")
+                .setName_("Archie the Archer")
                 .maxHealth(10)
                 .setSpeed(6)
                 .setTeam(0)
@@ -27,7 +27,7 @@ export function createPlayerCharacters() {
 
         // Melee tank
         Crafty.e("SpriteCharacter, anim_start")
-                .setName_("Also Not Greg")
+                .setName_("Tank You")
                 .maxHealth(20)
                 .setSpeed(3)
                 .setTeam(0)
@@ -40,7 +40,7 @@ export function createPlayerCharacters() {
 
         // Melee DPS
         Crafty.e("SpriteCharacter, anim_start")
-                .setName_("Not Joel")
+                .setName_("Hulk Smash")
                 .maxHealth(15)
                 .setSpeed(5)
                 .setTeam(0)
@@ -54,7 +54,9 @@ export function createPlayerCharacters() {
 
         // Mage
         Crafty.e("SpriteCharacter, anim_start")
-                .setName_("Samson")
+                // With "You're" spelled out, it's too long and apparently gets
+                // silently truncated??
+                .setName_("Ur a Lizard, Harry")
                 .maxHealth(8)
                 .setSpeed(8)
                 .setTeam(0)
