@@ -20,6 +20,7 @@ import {
 import {
     debugLog,
     internalError,
+    userError,
 } from "./message.js";
 import {
     canDoAction,
@@ -172,7 +173,16 @@ function buildOneMenuButton(actionTypeSubtree, character) {
                 CLEAR_MENU,
                 () => {
                     let action = makeUntargetedAction(actionTypeSubtree.type);
-                    action.type.doit(action, afterPlayerMove);
+                    // TODO: Go through a common UI function for "player
+                    // intended this action", so we can report failure in a
+                    // consistent way without duplicating code. Need to resolve
+                    // cyclic imports to make this work.
+                    let result = action.type.check(action);
+                    if (result.valid) {
+                        action.type.doit(action, afterPlayerMove);
+                    } else {
+                        userError(result.reason);
+                    }
                 },
             ];
         }
