@@ -1,8 +1,8 @@
 "use strict";
 
 import {
-    ATTACK_DAMAGE_MAX,
-    ATTACK_DAMAGE_MIN,
+    MELEE_ATTACK_DAMAGE_MAX,
+    MELEE_ATTACK_DAMAGE_MIN,
     Highlight,
     RANGED_ATTACK_DAMAGE_MAX,
     RANGED_ATTACK_DAMAGE_MIN,
@@ -309,11 +309,12 @@ export const MeleeAttackAction = actionSubclass({
 
     actionPointCost: function(action) {
         this.checkActionType(action);
-        return pathApExclTarget(action.path) + 2;
+        return pathApExclTarget(action.path) + 3;
     },
 
     resolve: function(action) {
-        action.damage = randInt(ATTACK_DAMAGE_MIN, ATTACK_DAMAGE_MAX);
+        action.damage = randInt(MELEE_ATTACK_DAMAGE_MIN,
+            MELEE_ATTACK_DAMAGE_MAX);
     },
 
     updateState: function(action) {
@@ -404,7 +405,7 @@ export const SpecialAttackAction = actionSubclass({
 
     actionPointCost: function(action) {
         this.checkActionType(action);
-        return 3;
+        return 4;
     },
 
     updateState: updateStateSpecialAttack,
