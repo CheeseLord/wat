@@ -9,6 +9,9 @@ import {
     StateEnum,
 } from "./consts.js";
 import {
+    getPath,
+} from "./geometry.js";
+import {
     assert,
     internalError,
 } from "./message.js";
@@ -69,6 +72,13 @@ const BaseAction = Object.freeze({
     initNoTarget: function(subject) {
         assert(!this.isTargeted());
         return this.init(subject);
+    },
+
+    // Attempt to create an autoAction of this type, with subject targeting
+    // target. If successful, return the action; otherwise return null. The
+    // action will not be check()ed; the caller should do that.
+    tryInitAutoAction(subject, target, theMap) {
+        this.overrideIfCalled("tryInitAutoAction");
     },
 
     // TODO: initWithTarget is handled in figureOutWhatTheUserMeant, based on
@@ -234,6 +244,14 @@ export const MoveAction = actionSubclass({
         return true;
     },
 
+    tryInitAutoAction(subject, target, theMap) {
+        let path = getPath(theMap, subject.getPos(), target.getPos());
+        if (!path) {
+            return null;
+        }
+        return this.init(subject, path);
+    },
+
     check: function(action) {
         return this.commonCheck(action, checkMove);
     },
@@ -314,6 +332,16 @@ export const MeleeAttackAction = actionSubclass({
         return true;
     },
 
+    // TODO: This is identical in MeleeAttackAction and InteractAction (and
+    // almost identical in MoveAction). Factor it out somehow?
+    tryInitAutoAction(subject, target, theMap) {
+        let path = getPath(theMap, subject.getPos(), target.getPos());
+        if (!path) {
+            return null;
+        }
+        return this.init(subject, target, path);
+    },
+
     check: function(action) {
         return this.commonCheck(action, checkMeleeAttack);
     },
@@ -359,7 +387,7 @@ export const MeleeAttackAction = actionSubclass({
 export const RangedAttackAction = actionSubclass({
     name: "RangedAttackAction",
 
-    init: function(subject, target, path) {
+    init: function(subject, target) {
         return actionWithTarget(this, subject, target);
     },
 
@@ -369,6 +397,10 @@ export const RangedAttackAction = actionSubclass({
 
     needsPath: function() {
         return false;
+    },
+
+    tryInitAutoAction(subject, target, theMap) {
+        return this.init(subject, target);
     },
 
     check: function(action) {
@@ -442,7 +474,7 @@ export const SpecialAttackAction = actionSubclass({
 export const FireballSpellAction = actionSubclass({
     name: "FireballSpellAction",
 
-    init: function(subject, target, path) {
+    init: function(subject, target) {
         return actionWithTarget(this, subject, target);
     },
 
@@ -452,6 +484,10 @@ export const FireballSpellAction = actionSubclass({
 
     needsPath: function() {
         return false;
+    },
+
+    tryInitAutoAction(subject, target, theMap) {
+        return this.init(subject, target);
     },
 
     check: function(action) {
@@ -492,6 +528,14 @@ export const InteractAction = actionSubclass({
 
     isTargeted: function() {
         return true;
+    },
+
+    tryInitAutoAction(subject, target, theMap) {
+        let path = getPath(theMap, subject.getPos(), target.getPos());
+        if (!path) {
+            return null;
+        }
+        return this.init(subject, target, path);
     },
 
     check: function(action) {
