@@ -21,8 +21,7 @@ export function splash() {
         [
             "Level 2",
             () => {
-                loadLevel2();
-                beginLevel(0);
+                loadLevel2(beginLevel);
             },
         ],
     ];
