@@ -14,5 +14,8 @@
   },
   "scripts": {
     "lint": "eslint src/**/*.js"
+  },
+  "dependencies": {
+    "jquery": "^3.5.1"
   }
 }

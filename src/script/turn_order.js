@@ -203,8 +203,7 @@ function checkForGameEnd() {
         Crafty.s("ButtonMenu").setMenu("Game Over", [[
             "Restart",
             function() {
-                loadLevel1();
-                beginLevel(0);
+                loadLevel1(beginLevel);
             },
         ]]);
         return true;

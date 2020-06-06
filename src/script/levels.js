@@ -1,3 +1,4 @@
+/* global $ */
 /* global Crafty */
 
 import {
@@ -11,74 +12,67 @@ import {
     MoveAction,
 } from "./action_type.js";
 
-// TODO: Don't build the levels in code.
-export function loadLevel1() {
-    clearLevel();
+export function loadLevel(path, callback) {
+    $.getJSON(path, function(json) {
+        clearLevel();
 
-    // Ground et al.
-    for (let y = 0; y < 11; y++) {
-        for (let x = 0; x < 17; x++) {
-            if (x === 8 && y === 6) {
-                // The lever that opens the door.
-                Crafty.e("Lever")
-                        .initPos({x: x, y: y})
-                        .setIdString("DoorControl");
-            } else if (x === 1 && y === 1) {
-                // A second lever, which doesn't open the door.
-                Crafty.e("Lever")
-                        .initPos({x: x, y: y});
-            } else if (x === 9 && y === 5) {
-                Crafty.e("Door")
-                        .initPos({x: x, y: y})
-                        .bind("Interact", function(evtData) {
-                            if (evtData.idString === "DoorControl") {
-                                this.toggleOpen();
-                            }
-                        });
-            } else if (x === 0 || x === 9 || x === 16 || y === 0 || y === 10) {
-                // TODO: Some other sort of walls?
-                Crafty.e("Tree").initPos({x: x, y: y});
+        // Create the ground.
+        for (let x = 0; x < json.width; x++) {
+            for (let y = 0; y < json.height; y++) {
+                Crafty.e("Ground").initPos({x: x, y: y});
             }
-            Crafty.e("Ground").initPos({x: x, y: y});
         }
-    }
 
-    // Player characters
-    let playerCharacters = createPlayerCharacters();
-    for (let i = 0; i < playerCharacters.length; i++) {
-        let character = playerCharacters[i];
-        character.initPos({x: 2, y: 2 + 2 * i});
-    }
+        // Unpack the player characters.
+        let thing = json.characters;
+        let playerCharacters = createPlayerCharacters();
+        for (let i = 0; i < playerCharacters.length; i++) {
+            let character = playerCharacters[i];
+            character.initPos({x: thing[i].x, y: thing[i].y});
+        }
 
-    // Enemies
-    let enemyPositions = [
-        {team: 1, pos: {x:  6, y:  3}},
-        {team: 1, pos: {x:  6, y:  5}},
-        {team: 1, pos: {x:  6, y:  7}},
-        {team: 2, pos: {x: 12, y:  2}},
-        {team: 2, pos: {x: 14, y:  3}},
-        {team: 2, pos: {x: 12, y:  4}},
-        {team: 2, pos: {x: 12, y:  6}},
-        {team: 2, pos: {x: 14, y:  7}},
-        {team: 2, pos: {x: 12, y:  8}},
-    ];
-    for (let i = 0; i < enemyPositions.length; i++) {
-        let team = enemyPositions[i].team;
-        let pos  = enemyPositions[i].pos;
-        Crafty.e("Enemy")
-                .initPos(pos)
-                .setTeam(team)
-                .maxHealth(10)
-                .setActions([
-                    MoveAction,
-                    MeleeAttackAction,
-                ]);
-    }
+        // Unpack the entities.
+        for (let i = 0; i < json.entities.length; i++) {
+            let desc = json.entities[i];
+            let entity = Crafty.e(desc.type).initPos({x: desc.x, y: desc.y});
 
-    // Finish up.
-    finalizeLevel();
+            if (desc.type === "Door") {
+                for (let j = 0; j < desc.events.length; j++) {
+                    entity.bind("Interact", function(evtData) {
+                        if (evtData.idString === desc.events[j]) {
+                            this.toggleOpen();
+                        }
+                    });
+                }
+            } else if (desc.type === "Lever") {
+                // TODO: Handle multiple events.
+                if (desc.events) {
+                    entity.setIdString(desc.events[0]);
+                }
+            } else if (desc.type === "Enemy") {
+                entity
+                        .setTeam(desc.team)
+                        .maxHealth(10)
+                        .setActions([
+                            MoveAction,
+                            MeleeAttackAction,
+                        ]);
+            }
+        }
+
+        finalizeLevel();
+
+        // FIXME: This shouldn't be a callback.
+        callback(json.firstTeam);
+    });
 }
 
+export function loadLevel1(callback) {
+    // TODO: Factor out path to levels.
+    loadLevel("../levels/level1.json", callback);
+}
+
+// TODO: Don't build the levels in code.
 export function loadLevel2() {
     clearLevel();
 
