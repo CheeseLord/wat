@@ -53,10 +53,7 @@ export function loadLevel(path, callback) {
                 entity
                         .setTeam(desc.team)
                         .maxHealth(10)
-                        .setActions([
-                            MoveAction,
-                            MeleeAttackAction,
-                        ]);
+                        .setActions(MeleeAttackAction, [MoveAction]);
             }
         }
 

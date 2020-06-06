@@ -29,7 +29,6 @@ import {
     userMessage,
 } from "./message.js";
 import {
-    MeleeAttackAction,
     InteractAction,
     MoveAction,
 } from "./action_type.js";
@@ -311,10 +310,21 @@ function updateAutoActions(subject) {
         // TODO: Make a list and loop over it. Store the ActionDesc instead of
         // a separate AutoActionEnum value, and then reuse that ActionDesc for
         // highlighting and resolving the action.
+        let tryAttack;
+        if (subject.defaultAttack.needsPath()) {
+            tryAttack = subject.defaultAttack.init(subject, target, path);
+        } else {
+            // FIXME: Should try attacking even if we failed to construct a
+            // path. In fact this whole approach is a hack to make ranged
+            // attacks work; probably we should delegate the entire question
+            // "can you auto-generate an action targeting this square" to a
+            // member function of the action type.
+            tryAttack = subject.defaultAttack.init(subject, target);
+        }
         let tryActions = [
             InteractAction.init(subject, target, path),
-            MeleeAttackAction.init(subject, target, path),
             MoveAction.init(subject, path),
+            tryAttack,
         ];
         for (let i = 0; i < tryActions.length; i++) {
             if (tryActions[i].type.check(tryActions[i]).valid) {

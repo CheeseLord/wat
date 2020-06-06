@@ -51,12 +51,14 @@ export function hoverHighlightAction(action) {
         return;
     }
 
-    // We currently don't use action.subject
-    let target = action.target;
-    let path   = action.path;
-    assert(path !== undefined);
+    assert(action.type.isTargeted());
 
-    let pathHighlight = action.type.getHoverHighlightMiddle();
+    // Note: we currently don't use action.subject
+    let target  = action.target;
+
+    let hasPath = action.type.needsPath();
+    let path    = action.path; // Will be undefined if !hasPath.
+
     let endHighlight  = action.type.getHoverHighlightEnd();
 
     // TODO: Why would target be undefined?
@@ -64,21 +66,34 @@ export function hoverHighlightAction(action) {
     //   - Can we check for that more directly somehow?
     //   - Can we not access action.target without first knowing that it
     //     exists?
+    //   - Can we have a uniform way to get the target square of an action,
+    //     regardless of whether it's internally represented as a target entity
+    //     or part of the path?
     if (target !== undefined) {
+        // Highlight the target entity with endHighlight.
         target.setHoverHighlight(endHighlight);
     } else {
+        assert(hasPath);
+        assert(action.path !== undefined);
         hoverHighlightPos(
             path[path.length - 1].x,
             path[path.length - 1].y,
             endHighlight);
     }
 
-    // Start at 1 because 0 is the ground under the character that's moving,
-    // and that character is probably already highlighted as "selected".
-    // End before length-1 because length-1 is the target, which was separately
-    // highlighted above with endHighlight.
-    for (let i = 1; i < path.length - 1; i++) {
-        hoverHighlightPos(path[i].x, path[i].y, pathHighlight);
+    // Highlight the path, but only if there is a path (so for example, not for
+    // ranged attacks).
+    if (hasPath) {
+        assert(path !== undefined);
+        let pathHighlight = action.type.getHoverHighlightMiddle();
+
+        // Start at 1 because 0 is the ground under the character that's
+        // moving, and that character is probably already highlighted as
+        // "selected".  End before length-1 because length-1 is the target,
+        // which was separately highlighted above with endHighlight.
+        for (let i = 1; i < path.length - 1; i++) {
+            hoverHighlightPos(path[i].x, path[i].y, pathHighlight);
+        }
     }
 }
 

@@ -56,7 +56,14 @@ const BaseAction = Object.freeze({
     },
 
     isTargeted: function() {
-        this.mustOverride("needsTarget");
+        this.mustOverride("isTargeted");
+    },
+
+    // FIXME: There has got to be a better solution than dynamically querying
+    // for specific aspects of the constructor's type signature.
+    needsPath: function() {
+        // Usually this is the right answer.
+        return this.isTargeted();
     },
 
     initNoTarget: function(subject) {
@@ -271,6 +278,10 @@ export const SwapPlacesAction = actionSubclass({
         return true;
     },
 
+    needsPath: function() {
+        return false;
+    },
+
     check: function(action) {
         return this.commonCheck(action, checkSwap);
     },
@@ -356,6 +367,10 @@ export const RangedAttackAction = actionSubclass({
         return true;
     },
 
+    needsPath: function() {
+        return false;
+    },
+
     check: function(action) {
         return this.commonCheck(action, checkRangedAttack);
     },
@@ -379,6 +394,14 @@ export const RangedAttackAction = actionSubclass({
     },
 
     animate: animateRangedAttack,
+
+    getDefaultHighlight: function() {
+        return Highlight.CAN_ATTACK;
+    },
+
+    getHoverHighlightEnd: function() {
+        return Highlight.HOVER_ATTACK_END;
+    },
 
     getState: function() {
         return StateEnum.CHARACTER_RANGED_ATTACK;
@@ -427,6 +450,10 @@ export const FireballSpellAction = actionSubclass({
         return true;
     },
 
+    needsPath: function() {
+        return false;
+    },
+
     check: function(action) {
         return this.commonCheck(action, checkFireballSpell);
     },
@@ -439,6 +466,14 @@ export const FireballSpellAction = actionSubclass({
     updateState: updateStateFireballSpell,
 
     animate: animateFireballSpell,
+
+    getDefaultHighlight: function() {
+        return Highlight.CAN_ATTACK;
+    },
+
+    getHoverHighlightEnd: function() {
+        return Highlight.HOVER_ATTACK_END;
+    },
 
     getState: function() {
         return StateEnum.CHARACTER_FIREBALL;
