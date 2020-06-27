@@ -8,4 +8,6 @@ export var state = {
     // TODO [#36]: Separate "which action is being targeted" from the rest of
     // clickType
     clickType: ClickEnum.DEFAULT,
+
+    isInDialogue: false,
 };
