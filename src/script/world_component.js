@@ -369,6 +369,7 @@ Crafty.c("Character", {
     init: function() {
         this.attr({
             availableActions: [],
+            defaultAttack:    null,
             speed:            4,
             team:             -1,
             z:                Z_CHARACTER,
@@ -386,8 +387,10 @@ Crafty.c("Character", {
         return this;
     },
 
-    setActions: function(actions) {
-        this.availableActions = actions;
+    setActions: function(defaultAttack, actions) {
+        assert(defaultAttack.isTargeted());
+        this.defaultAttack    = defaultAttack;
+        this.availableActions = [defaultAttack].concat(actions);
         return this;
     },
 

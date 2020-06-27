@@ -19,9 +19,8 @@ export function createPlayerCharacters() {
                 .setSpeed(6)
                 .setTeam(0)
                 .setAnimation(0, 4)
-                .setActions([
+                .setActions(RangedAttackAction, [
                     MoveAction,
-                    RangedAttackAction,
                     InteractAction,
                 ]),
 
@@ -32,9 +31,8 @@ export function createPlayerCharacters() {
                 .setSpeed(3)
                 .setTeam(0)
                 .setAnimation(1, 4)
-                .setActions([
+                .setActions(MeleeAttackAction, [
                     MoveAction,
-                    MeleeAttackAction,
                     InteractAction,
                 ]),
 
@@ -45,9 +43,8 @@ export function createPlayerCharacters() {
                 .setSpeed(5)
                 .setTeam(0)
                 .setAnimation(2, 4)
-                .setActions([
+                .setActions(MeleeAttackAction, [
                     MoveAction,
-                    MeleeAttackAction,
                     SpecialAttackAction,
                     InteractAction,
                 ]),
@@ -61,11 +58,10 @@ export function createPlayerCharacters() {
                 .setSpeed(8)
                 .setTeam(0)
                 .setAnimation(3, 4)
-                .setActions([
+                .setActions(FireballSpellAction, [
                     MoveAction,
                     SwapPlacesAction,
                     SpecialAttackAction,
-                    FireballSpellAction,
                     InteractAction,
                 ]),
     ];

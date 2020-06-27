@@ -13,7 +13,6 @@ import {
 } from "./consts.js";
 import {
     findPaths,
-    getPath,
 } from "./geometry.js";
 import {
     clearAllHighlights,
@@ -29,7 +28,6 @@ import {
     userMessage,
 } from "./message.js";
 import {
-    MeleeAttackAction,
     InteractAction,
     MoveAction,
 } from "./action_type.js";
@@ -300,25 +298,23 @@ function updateAutoActions(subject) {
     Crafty("GridObject").each(function() {
         let target = this;
         this.autoAction = null;
-        let path = getPath(theMap, subjectPos, target.getPos());
-        if (path === null) {
-            return;
-        } else if (path.length <= 1) {
-            // Don't set auto-actions on your own cell, since clicking on your
-            // own cell is intercepted by the player UI.
+        // Hack: try to recompute those cases where UI will intercept the click
+        // and not use the auto action. This logic is probably not quite right.
+        // Should probably instead have UI get a say in the highlighting rather
+        // than always using the autoAction.
+        if (target.has("Character") && target.team === subject.team) {
             return;
         }
-        // TODO: Make a list and loop over it. Store the ActionDesc instead of
-        // a separate AutoActionEnum value, and then reuse that ActionDesc for
-        // highlighting and resolving the action.
-        let tryActions = [
-            InteractAction.init(subject, target, path),
-            MeleeAttackAction.init(subject, target, path),
-            MoveAction.init(subject, path),
+        let tryActionTypes = [
+            InteractAction,
+            MoveAction,
+            subject.defaultAttack,
         ];
-        for (let i = 0; i < tryActions.length; i++) {
-            if (tryActions[i].type.check(tryActions[i]).valid) {
-                this.autoAction = tryActions[i];
+        for (let i = 0; i < tryActionTypes.length; i++) {
+            let tryAction = tryActionTypes[i].tryInitAutoAction(subject,
+                target, theMap);
+            if (tryAction !== null && tryAction.type.check(tryAction).valid) {
+                this.autoAction = tryAction;
                 break;
             }
         }
