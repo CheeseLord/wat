@@ -50,13 +50,6 @@ import {
     randInt,
 } from "./util.js";
 
-// In JavaScript, if you import a variable and then assign a new value to it,
-// other modules don't see the new value. Therefore, instead of allowing other
-// modules import globalState directly, have them access it through
-// {get,set}GlobalState.
-export function getGlobalState() { return state.clickType; }
-export function setGlobalState(newState) { state.clickType = newState; }
-
 ///////////////////////////////////////////////////////////////////////////////
 // Action handlers
 
@@ -66,7 +59,7 @@ export function canDoAction(character, actionType) {
 }
 
 export function animateMove(action, callback) {
-    setGlobalState(ClickEnum.ANIMATING);
+    state.clickType = ClickEnum.ANIMATING;
     let anims = seriesAnimations([]);
 
     let path = action.path;
@@ -84,7 +77,7 @@ export function animateMove(action, callback) {
 }
 
 export function animateSwap(action, callback) {
-    setGlobalState(ClickEnum.ANIMATING);
+    state.clickType = ClickEnum.ANIMATING;
     let anims = seriesAnimations([]);
 
     // Swap positions of subject and target.
@@ -103,7 +96,7 @@ export function animateSwap(action, callback) {
 }
 
 export function animateMeleeAttack(action, callback) {
-    setGlobalState(ClickEnum.ANIMATING);
+    state.clickType = ClickEnum.ANIMATING;
     let anims = seriesAnimations([]);
 
     assert(action.path.length > 1);
@@ -156,7 +149,7 @@ export function animateMeleeAttack(action, callback) {
 }
 
 export function animateRangedAttack(action, callback) {
-    setGlobalState(ClickEnum.ANIMATING);
+    state.clickType = ClickEnum.ANIMATING;
     let anims = seriesAnimations([]);
 
     let bullet = Crafty.e("2D, DOM, bullet_anim, Tween")
@@ -184,7 +177,7 @@ export function animateRangedAttack(action, callback) {
 }
 
 export function animateSpecialAttack(action, callback) {
-    setGlobalState(ClickEnum.ANIMATING);
+    state.clickType = ClickEnum.ANIMATING;
     let anims = seriesAnimations([]);
 
     // TODO: Actually animate special attacks
@@ -196,7 +189,7 @@ export function animateFireballSpell(action, callback) {
     // TODO: For now this is a copy of animateRangedAttack, but without the
     // takeDamageAnim (because there are multiple different damage values to
     // determine and they need to be synced with updateStateFireballSpell).
-    setGlobalState(ClickEnum.ANIMATING);
+    state.clickType = ClickEnum.ANIMATING;
     let anims = seriesAnimations([]);
 
     let bullet = Crafty.e("2D, DOM, bullet_anim, Tween")
@@ -223,7 +216,7 @@ export function animateFireballSpell(action, callback) {
 }
 
 export function animateInteract(action, callback) {
-    setGlobalState(ClickEnum.ANIMATING);
+    state.clickType = ClickEnum.ANIMATING;
     let anims = seriesAnimations([]);
 
     assert(action.path.length > 0);
@@ -244,7 +237,7 @@ export function animateInteract(action, callback) {
 
 export function animateEndTurn(action, callback) {
     // Intentionally no animation.
-    setGlobalState(ClickEnum.ANIMATING);
+    state.clickType = ClickEnum.ANIMATING;
     callback();
 }
 

@@ -3,10 +3,6 @@
 "use strict";
 
 import {
-    getGlobalState,
-} from "./resolve_action.js";
-
-import {
     SPRITE_DUR_PER_FRAME,
     ClickEnum,
     TILE_HEIGHT,
@@ -30,6 +26,10 @@ import {
     assert,
     userMessage,
 } from "./message.js";
+
+import {
+    state,
+} from "./state.js";
 
 import {
     getProportion,
@@ -62,7 +62,7 @@ Crafty.c("GridObject", {
             // would actually be performed).
             // TODO: Move this logic... somewhere else. Seems like maybe a UI
             // question to me.
-            if (getGlobalState() === ClickEnum.CHARACTER_SELECTED) {
+            if (state.clickType === ClickEnum.CHARACTER_SELECTED) {
                 hoverHighlightAction(this.autoAction);
             }
         },

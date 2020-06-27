@@ -25,8 +25,10 @@ import {
 } from "./message.js";
 import {
     canDoAction,
-    setGlobalState,
 } from  "./resolve_action.js";
+import {
+    state,
+} from "./state.js";
 import {
     afterPlayerMove,
     deselectCharacter,
@@ -104,7 +106,7 @@ const ACTION_TYPE_TREE = {
 const CLEAR_MENU  = {};
 const PARENT_MENU = {};
 
-const clearMenuState = ClickEnum.DEFAULT;
+const clearMenuClickType = ClickEnum.DEFAULT;
 
 // menuStack - list of menus that would be transitioned to if you click a
 //     "back" button. Does not include the current menu.
@@ -212,7 +214,7 @@ export function doMenu(menuDesc) {
 }
 
 export function clearMenu() {
-    setGlobalState(clearMenuState);
+    state.clickType = clearMenuClickType;
     Crafty.s("ButtonMenu").clearMenu();
 }
 
@@ -245,10 +247,10 @@ function applyMenuByDesc(menuDesc) {
         return;
     }
 
-    let title   = menuDesc["title"];
-    let onEntry = menuDesc["onEntry"];
-    let onExit  = menuDesc["onExit"];
-    let state   = menuDesc["state"];
+    let title     = menuDesc["title"];
+    let onEntry   = menuDesc["onEntry"];
+    let onExit    = menuDesc["onExit"];
+    let clickType = menuDesc["state"]; // Should be called clickType.
 
     // onEntry and onExit are optional. If they're not specified, just treat
     // them as doNothing.
@@ -259,7 +261,7 @@ function applyMenuByDesc(menuDesc) {
         onExit = doNothing;
     }
 
-    setGlobalState(state);
+    state.clickType = clickType;
 
     let buttonList = [];
     for (let i = 0; i < menuDesc["buttons"].length; i++) {
