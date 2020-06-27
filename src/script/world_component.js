@@ -8,7 +8,7 @@ import {
 
 import {
     SPRITE_DUR_PER_FRAME,
-    StateEnum,
+    ClickEnum,
     TILE_HEIGHT,
     TILE_WIDTH,
     Z_CHARACTER,
@@ -62,7 +62,7 @@ Crafty.c("GridObject", {
             // would actually be performed).
             // TODO: Move this logic... somewhere else. Seems like maybe a UI
             // question to me.
-            if (getGlobalState() === StateEnum.CHARACTER_SELECTED) {
+            if (getGlobalState() === ClickEnum.CHARACTER_SELECTED) {
                 hoverHighlightAction(this.autoAction);
             }
         },

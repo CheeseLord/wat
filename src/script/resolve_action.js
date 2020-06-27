@@ -24,7 +24,7 @@ import {
     RANGED_ATTACK_RANGE,
     SPECIAL_ATTACK_DAMAGE_MIN,
     SPECIAL_ATTACK_DAMAGE_MAX,
-    StateEnum,
+    ClickEnum,
     Z_PARTICLE,
     Z_WORLD_UI,
 } from "./consts.js";
@@ -44,6 +44,9 @@ import {
     userMessage,
 } from "./message.js";
 import {
+    state,
+} from "./state.js";
+import {
     randInt,
 } from "./util.js";
 
@@ -51,10 +54,8 @@ import {
 // other modules don't see the new value. Therefore, instead of allowing other
 // modules import globalState directly, have them access it through
 // {get,set}GlobalState.
-// TODO [#36]: What the heck is globalState, and why is it in action.js?
-var globalState = StateEnum.DEFAULT;
-export function getGlobalState() { return globalState; }
-export function setGlobalState(newState) { globalState = newState; }
+export function getGlobalState() { return state.clickType; }
+export function setGlobalState(newState) { state.clickType = newState; }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Action handlers
@@ -65,7 +66,7 @@ export function canDoAction(character, actionType) {
 }
 
 export function animateMove(action, callback) {
-    setGlobalState(StateEnum.ANIMATING);
+    setGlobalState(ClickEnum.ANIMATING);
     let anims = seriesAnimations([]);
 
     let path = action.path;
@@ -83,7 +84,7 @@ export function animateMove(action, callback) {
 }
 
 export function animateSwap(action, callback) {
-    setGlobalState(StateEnum.ANIMATING);
+    setGlobalState(ClickEnum.ANIMATING);
     let anims = seriesAnimations([]);
 
     // Swap positions of subject and target.
@@ -102,7 +103,7 @@ export function animateSwap(action, callback) {
 }
 
 export function animateMeleeAttack(action, callback) {
-    setGlobalState(StateEnum.ANIMATING);
+    setGlobalState(ClickEnum.ANIMATING);
     let anims = seriesAnimations([]);
 
     assert(action.path.length > 1);
@@ -155,7 +156,7 @@ export function animateMeleeAttack(action, callback) {
 }
 
 export function animateRangedAttack(action, callback) {
-    setGlobalState(StateEnum.ANIMATING);
+    setGlobalState(ClickEnum.ANIMATING);
     let anims = seriesAnimations([]);
 
     let bullet = Crafty.e("2D, DOM, bullet_anim, Tween")
@@ -183,7 +184,7 @@ export function animateRangedAttack(action, callback) {
 }
 
 export function animateSpecialAttack(action, callback) {
-    setGlobalState(StateEnum.ANIMATING);
+    setGlobalState(ClickEnum.ANIMATING);
     let anims = seriesAnimations([]);
 
     // TODO: Actually animate special attacks
@@ -195,7 +196,7 @@ export function animateFireballSpell(action, callback) {
     // TODO: For now this is a copy of animateRangedAttack, but without the
     // takeDamageAnim (because there are multiple different damage values to
     // determine and they need to be synced with updateStateFireballSpell).
-    setGlobalState(StateEnum.ANIMATING);
+    setGlobalState(ClickEnum.ANIMATING);
     let anims = seriesAnimations([]);
 
     let bullet = Crafty.e("2D, DOM, bullet_anim, Tween")
@@ -222,7 +223,7 @@ export function animateFireballSpell(action, callback) {
 }
 
 export function animateInteract(action, callback) {
-    setGlobalState(StateEnum.ANIMATING);
+    setGlobalState(ClickEnum.ANIMATING);
     let anims = seriesAnimations([]);
 
     assert(action.path.length > 0);
@@ -243,7 +244,7 @@ export function animateInteract(action, callback) {
 
 export function animateEndTurn(action, callback) {
     // Intentionally no animation.
-    setGlobalState(StateEnum.ANIMATING);
+    setGlobalState(ClickEnum.ANIMATING);
     callback();
 }
 

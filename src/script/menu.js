@@ -2,7 +2,7 @@
 
 "use strict";
 
-import {StateEnum} from "./consts.js";
+import {ClickEnum} from "./consts.js";
 
 import {
     EndTurnAction,
@@ -40,7 +40,7 @@ import {
 const ACTION_TYPE_TREE = {
     action:   false,
     name:     "Select Action",
-    state:    StateEnum.CHARACTER_SELECTED,
+    state:    ClickEnum.CHARACTER_SELECTED,
     children: [
         {
             action: true,
@@ -55,7 +55,7 @@ const ACTION_TYPE_TREE = {
         {
             action:   false,
             name:     "Attack",
-            state:    StateEnum.CHARACTER_ATTACK,
+            state:    ClickEnum.CHARACTER_ATTACK,
             children: [
                 {
                     action: true,
@@ -104,7 +104,7 @@ const ACTION_TYPE_TREE = {
 const CLEAR_MENU  = {};
 const PARENT_MENU = {};
 
-const clearMenuState = StateEnum.DEFAULT;
+const clearMenuState = ClickEnum.DEFAULT;
 
 // menuStack - list of menus that would be transitioned to if you click a
 //     "back" button. Does not include the current menu.
