@@ -28,8 +28,29 @@ import {
     splash,
 } from "./splash.js";
 
+import {
+    showVarsA,
+    doAssignA,
+    doFieldA,
+} from "./a.js";
+import {
+    showVarsB,
+    doAssignB,
+    doFieldB,
+} from "./b.js";
+
 
 export function doTheThing() {
+    showVarsA(); showVarsB();
+    doFieldA();
+    showVarsA(); showVarsB();
+    doFieldB();
+    showVarsA(); showVarsB();
+    doAssignA();
+    showVarsA(); showVarsB();
+    doAssignB();
+    showVarsA(); showVarsB();
+
     // Initialize Crafty on the div with id "game". Check that this isn't
     // changing the size of that div, since that causes the page elements to
     // jump around.
