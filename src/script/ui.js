@@ -16,7 +16,7 @@ import {
     chooseAiAction,
 } from  "./ai.js";
 import {
-    StateEnum,
+    ClickEnum,
     TILE_HEIGHT,
     TILE_HGAP,
     TILE_VGAP,
@@ -38,8 +38,8 @@ import {
     userError,
 } from "./message.js";
 import {
-    getGlobalState,
-} from "./resolve_action.js";
+    state,
+} from "./state.js";
 import {
     afterPlayerMove,
     canMoveThisTurn,
@@ -161,12 +161,12 @@ export function worldClickHandler(evt) {
 // Figure out what the users input actually means. Return a UserDisambig. This
 // function should be free of side effects, but may query the world state.
 function figureOutWhatTheUserMeant(inputDesc) {
-    if (getGlobalState() === StateEnum.ANIMATING) {
+    if (state.clickType === ClickEnum.ANIMATING) {
         // Never try to handle a click if we're in the middle of an animation.
         // That's just asking for the game to wind up in an inconsistent state
         // where things get weirdly messed up.
         return disambigNothing();
-    } else if (getGlobalState() === StateEnum.NO_INPUT) {
+    } else if (state.clickType === ClickEnum.NO_INPUT) {
         // Ditto if we're not accepting input.
         // TODO merge these two states.
         return disambigNothing();
@@ -212,18 +212,18 @@ function figureOutWhatTheUserMeant(inputDesc) {
     }
     assert(target.has("GridObject"));
 
-    if (getGlobalState() === StateEnum.DEFAULT ||
-            getGlobalState() === StateEnum.CHARACTER_SELECTED) {
+    if (state.clickType === ClickEnum.DEFAULT ||
+            state.clickType === ClickEnum.CHARACTER_SELECTED) {
         // If we can select the target, favor that over any other action.
         let disambig = checkSelectCharacter(target);
 
-        // For StateEnum.DEFAULT, we have to select because there's no one
+        // For ClickEnum.DEFAULT, we have to select because there's no one
         // already selected to take some other action. Propagate up any error
-        // from checkSelectCharacter. For StateEnum.CHARACTER_SELECTED, if the
+        // from checkSelectCharacter. For ClickEnum.CHARACTER_SELECTED, if the
         // select failed then fall through into the code below which will try
         // to choose another action.
         if (disambig.type === UserDisambigType.SELECT ||
-                getGlobalState() === StateEnum.DEFAULT) {
+                state.clickType === ClickEnum.DEFAULT) {
             return disambig;
         }
     }
@@ -231,29 +231,29 @@ function figureOutWhatTheUserMeant(inputDesc) {
     let theMap = findPaths(subject.getPos(), subject.speed);
     let path = getPath(theMap, subject.getPos(), targetPos);
 
-    switch (getGlobalState()) {
-        case StateEnum.CHARACTER_SELECTED:
+    switch (state.clickType) {
+        case ClickEnum.CHARACTER_SELECTED:
             return disambigFromAutoAction(target.autoAction);
-        case StateEnum.CHARACTER_MOVE:
+        case ClickEnum.CHARACTER_MOVE:
             return disambigActionIfPathExistsElseError(
                 path,
                 MoveAction.init(subject, path)
             );
-        case StateEnum.CHARACTER_ATTACK:
+        case ClickEnum.CHARACTER_ATTACK:
             return disambigActionIfPathExistsElseError(
                 path,
                 MeleeAttackAction.init(subject, target, path)
             );
-        case StateEnum.CHARACTER_INTERACT:
+        case ClickEnum.CHARACTER_INTERACT:
             return disambigActionIfPathExistsElseError(
                 path,
                 InteractAction.init(subject, target, path)
             );
-        case StateEnum.CHARACTER_RANGED_ATTACK:
+        case ClickEnum.CHARACTER_RANGED_ATTACK:
             return disambigAction(RangedAttackAction.init(subject, target));
-        case StateEnum.CHARACTER_FIREBALL:
+        case ClickEnum.CHARACTER_FIREBALL:
             return disambigAction(FireballSpellAction.init(subject, target));
-        case StateEnum.CHARACTER_SWAP:
+        case ClickEnum.CHARACTER_SWAP:
             return disambigAction(SwapPlacesAction.init(subject, target));
         default:
             internalError("Unknown state value.");

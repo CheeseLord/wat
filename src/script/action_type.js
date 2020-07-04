@@ -6,7 +6,7 @@ import {
     Highlight,
     RANGED_ATTACK_DAMAGE_MAX,
     RANGED_ATTACK_DAMAGE_MIN,
-    StateEnum,
+    ClickEnum,
 } from "./consts.js";
 import {
     getPath,
@@ -82,7 +82,7 @@ const BaseAction = Object.freeze({
     },
 
     // TODO: initWithTarget is handled in figureOutWhatTheUserMeant, based on
-    // globalState.
+    // state.clickType.
 
     // Executing the action
 
@@ -146,7 +146,7 @@ const BaseAction = Object.freeze({
 
     // Other misc
 
-    // TODO [#36]: Rework globalState
+    // TODO [#36]: Rework state.clickType
     getState: function() {
         if (!this.isTargeted()) {
             internalError("getState() of untargeted action");
@@ -278,7 +278,7 @@ export const MoveAction = actionSubclass({
     },
 
     getState: function() {
-        return StateEnum.CHARACTER_MOVE;
+        return ClickEnum.CHARACTER_MOVE;
     },
 });
 
@@ -314,7 +314,7 @@ export const SwapPlacesAction = actionSubclass({
     animate: animateSwap,
 
     getState: function() {
-        return StateEnum.CHARACTER_SWAP;
+        return ClickEnum.CHARACTER_SWAP;
     },
 });
 
@@ -377,7 +377,7 @@ export const MeleeAttackAction = actionSubclass({
     },
 
     getState: function() {
-        return StateEnum.CHARACTER_ATTACK;
+        return ClickEnum.CHARACTER_ATTACK;
     },
 });
 
@@ -436,7 +436,7 @@ export const RangedAttackAction = actionSubclass({
     },
 
     getState: function() {
-        return StateEnum.CHARACTER_RANGED_ATTACK;
+        return ClickEnum.CHARACTER_RANGED_ATTACK;
     },
 });
 
@@ -512,7 +512,7 @@ export const FireballSpellAction = actionSubclass({
     },
 
     getState: function() {
-        return StateEnum.CHARACTER_FIREBALL;
+        return ClickEnum.CHARACTER_FIREBALL;
     },
 });
 
@@ -567,7 +567,7 @@ export const InteractAction = actionSubclass({
     },
 
     getState: function() {
-        return StateEnum.CHARACTER_INTERACT;
+        return ClickEnum.CHARACTER_INTERACT;
     },
 });
 

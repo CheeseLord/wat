@@ -66,9 +66,8 @@ export const FIREBALL_RANGE      = 4;
 // Based on one of the comments on:
 //     https://stackoverflow.com/a/5040502
 // Always use === for checking equality, otherwise always true
-export const StateEnum = Object.freeze({
+export const ClickEnum = Object.freeze({
     DEFAULT:                 {},
-    IN_DIALOGUE:             {},
     NO_INPUT:                {},
     ANIMATING:               {},
     CHARACTER_SELECTED:      {},

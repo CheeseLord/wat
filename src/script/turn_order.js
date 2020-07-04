@@ -9,7 +9,7 @@ import {
     Highlight,
     NUM_TEAMS,
     PLAYER_TEAM,
-    StateEnum,
+    ClickEnum,
 } from "./consts.js";
 import {
     findPaths,
@@ -32,8 +32,8 @@ import {
     MoveAction,
 } from "./action_type.js";
 import {
-    setGlobalState,
-} from "./resolve_action.js";
+    state,
+} from "./state.js";
 import {
     setFocusOn,
 } from "./view.js";
@@ -128,7 +128,7 @@ function startCharacter(character) {
 }
 
 export function endCharacter(character) {
-    setGlobalState(StateEnum.NO_INPUT);
+    state.clickType = ClickEnum.NO_INPUT;
     deselectCharacter();
 
     if (checkForGameEnd()) {
@@ -224,7 +224,7 @@ export function beginLevel(team) {
 // Requesting moves (TODO maybe put in different module?)
 
 function requestMoveFromPlayer(character) {
-    setGlobalState(StateEnum.DEFAULT);
+    state.clickType = ClickEnum.DEFAULT;
 }
 
 function requestMoveFromAI(character) {
