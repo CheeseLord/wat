@@ -368,6 +368,7 @@ Crafty.c("Character", {
 
     init: function() {
         this.attr({
+            actionPoints:     0,
             availableActions: [],
             defaultAttack:    null,
             speed:            4,
