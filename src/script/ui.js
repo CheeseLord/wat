@@ -171,6 +171,7 @@ function figureOutWhatTheUserMeant(inputDesc) {
         return disambigNothing();
     } else if (state.isInDialogue) {
         advanceDialogue();
+        return disambigNothing();
     } else if (state.clickType === ClickEnum.NO_INPUT) {
         // Ditto if we're not accepting input.
         // TODO merge these two states.
