@@ -49,6 +49,9 @@ import {
     // TODO: Does this work??
     selectedCharacter,
 } from "./turn_order.js";
+import {
+    advanceDialogue,
+} from "./dialogue.js";
 
 ///////////////////////////////////////////////////////////////////////////////
 // "Janky class" UserInputDesc -- describes a raw input from the user (at the
@@ -166,6 +169,8 @@ function figureOutWhatTheUserMeant(inputDesc) {
         // That's just asking for the game to wind up in an inconsistent state
         // where things get weirdly messed up.
         return disambigNothing();
+    } else if (state.isInDialogue) {
+        advanceDialogue();
     } else if (state.clickType === ClickEnum.NO_INPUT) {
         // Ditto if we're not accepting input.
         // TODO merge these two states.

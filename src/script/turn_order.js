@@ -37,6 +37,9 @@ import {
 import {
     setFocusOn,
 } from "./view.js";
+import {
+    advanceDialogue,
+} from "./dialogue.js";
 
 // TODO can we not export this? Or make it a UI-only thing?
 // At the very least, selectedCharacter and checkSelectCharacter should be in
@@ -218,6 +221,9 @@ export function beginLevel(team) {
     Crafty.s("ButtonMenu").clearMenu();
     startTeam(team);
     assert(anyCharactersReady());
+    // TODO: Remove once we have alternative method in initializing
+    // dialogue
+    advanceDialogue();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

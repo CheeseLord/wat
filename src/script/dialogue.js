@@ -1,6 +1,11 @@
 /* global Crafty */
 
 "use strict";
+
+import {
+    state,
+} from "./state.js";
+
 let dialogueDisplay = null;
 let dialogueQueue = [];
 let dialogueBackground = null;
@@ -17,16 +22,21 @@ Crafty.c("DialogueDisplay", {
     },
 
     advanceDialogue: function() {
-        if (dialogueQueue.length() === 0) {
+        Crafty.log(dialogueQueue);
+        if (dialogueQueue.length === 0) {
             hideDialogue();
+            state.isInDialogue = false;
+            return;
         } else {
             showDialogue();
+            state.isInDialogue = true;
         }
-        let dialogue = dialogueQueue.pop();
+        let dialogue = dialogueQueue.shift();
+        this._log.push(dialogue);
         let character = dialogue[0];
         let message = dialogue[1];
         this._log.push(message);
-        this.text(character.name + ":\n\t" + message);
+        this.text(character.name_ + ":<br/>&nbsp;&nbsp;" + message);
     },
 });
 
@@ -36,7 +46,7 @@ export function initDialogueDisplay(attrs) {
     dialogueBackground.attr(attrs);
     dialogueDisplay = Crafty.e("DialogueDisplay");
     dialogueDisplay.attr(attrs);
-    dialogueDisplay.textColor("#eeeeee00");
+    dialogueDisplay.textColor("#fff");
     dialogueDisplay.textAlign("left");
     hideDialogue();
 }

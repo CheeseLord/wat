@@ -11,6 +11,9 @@ import {
     MeleeAttackAction,
     MoveAction,
 } from "./action_type.js";
+import {
+    addDialogue,
+} from "./dialogue.js";
 
 export function loadLevel(path, callback) {
     $.getJSON(path, function(json) {
@@ -30,6 +33,11 @@ export function loadLevel(path, callback) {
             let character = playerCharacters[i];
             character.initPos({x: thing[i].x, y: thing[i].y});
         }
+        // TODO: Remove once we have alternative method in initializing
+        // dialogue
+        addDialogue(playerCharacters[0], "Hello World!");
+        addDialogue(playerCharacters[1], "Test 1 2 3 <br/> Test 4 5 6");
+        addDialogue(playerCharacters[2], "Ending Dialogue");
 
         // Unpack the entities.
         for (let i = 0; i < json.entities.length; i++) {
