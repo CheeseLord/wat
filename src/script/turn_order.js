@@ -124,11 +124,20 @@ function startCharacter(character) {
         // sort of callback tied to each one specifying how it chooses its
         // turns.
         if (currentTeamIndex === PLAYER_TEAM) {
-            requestMoveFromPlayer(character, function() {
-                endCharacter(selectedCharacter);
+            requestMoveFromPlayer(character, function(action) {
+                action.type.doit(action, function() {
+                    // TODO: Call clearMenu (from menu.js) instead. Can't do
+                    // that right now because of cyclic imports.
+                    Crafty.s("ButtonMenu").clearMenu();
+                    endCharacter(character);
+                });
             });
         } else {
-            requestMoveFromAI(character);
+            requestMoveFromAI(character, function(action) {
+                action.type.doit(action, () => {
+                    endCharacter(character);
+                });
+            });
         }
     });
 }
@@ -237,13 +246,10 @@ function requestMoveFromPlayer(character, callback) {
     onPlayerAction(callback);
 }
 
-function requestMoveFromAI(character) {
+function requestMoveFromAI(character, callback) {
     // TODO this creates the movement grid, don't want that.
     selectCharacter(character);
-    let action = chooseAiAction(character);
-    action.type.doit(action, () => {
-        endCharacter(character);
-    });
+    callback(chooseAiAction(character));
 }
 
 let playerActionCallback = null;
@@ -255,14 +261,11 @@ function onPlayerAction(callback) {
 export function gotPlayerAction(action) {
     let checkVal = action.type.check(action);
     if (checkVal.valid) {
-        action.type.doit(action, function() {
-            // TODO: Call clearMenu (from menu.js) instead. Can't do that right
-            // now because of cyclic imports.
-            Crafty.s("ButtonMenu").clearMenu();
-            if (playerActionCallback !== null) {
-                playerActionCallback();
-            }
-        });
+        if (playerActionCallback !== null) {
+            let callback = playerActionCallback;
+            playerActionCallback = null;
+            callback(action);
+        }
     } else {
         userError(checkVal.reason);
     }
