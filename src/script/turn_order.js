@@ -25,6 +25,7 @@ import {
     assert,
     debugLog,
     internalError,
+    userError,
     userMessage,
 } from "./message.js";
 import {
@@ -123,7 +124,9 @@ function startCharacter(character) {
         // sort of callback tied to each one specifying how it chooses its
         // turns.
         if (currentTeamIndex === PLAYER_TEAM) {
-            requestMoveFromPlayer(character);
+            requestMoveFromPlayer(character, function() {
+                endCharacter(selectedCharacter);
+            });
         } else {
             requestMoveFromAI(character);
         }
@@ -229,8 +232,9 @@ export function beginLevel(team) {
 ///////////////////////////////////////////////////////////////////////////////
 // Requesting moves (TODO maybe put in different module?)
 
-function requestMoveFromPlayer(character) {
+function requestMoveFromPlayer(character, callback) {
     state.clickType = ClickEnum.DEFAULT;
+    onPlayerAction(callback);
 }
 
 function requestMoveFromAI(character) {
@@ -242,15 +246,30 @@ function requestMoveFromAI(character) {
     });
 }
 
+let playerActionCallback = null;
+
+function onPlayerAction(callback) {
+    playerActionCallback = callback;
+}
+
+export function gotPlayerAction(action) {
+    let checkVal = action.type.check(action);
+    if (checkVal.valid) {
+        action.type.doit(action, function() {
+            // TODO: Call clearMenu (from menu.js) instead. Can't do that right
+            // now because of cyclic imports.
+            Crafty.s("ButtonMenu").clearMenu();
+            if (playerActionCallback !== null) {
+                playerActionCallback();
+            }
+        });
+    } else {
+        userError(checkVal.reason);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Menu-related action helpers (and some misc?)
-
-export function afterPlayerMove() {
-    // TODO: Call clearMenu (from menu.js) instead. Can't do that right now
-    // because of cyclic imports.
-    Crafty.s("ButtonMenu").clearMenu();
-    endCharacter(selectedCharacter);
-}
 
 export function selectCharacter(character) {
     assert(character.has("Character"));

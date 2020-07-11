@@ -21,7 +21,6 @@ import {
 import {
     debugLog,
     internalError,
-    userError,
 } from "./message.js";
 import {
     canDoAction,
@@ -30,8 +29,8 @@ import {
     state,
 } from "./state.js";
 import {
-    afterPlayerMove,
     deselectCharacter,
+    gotPlayerAction,
     // TODO: Does this work??
     selectedCharacter,
 } from "./turn_order.js";
@@ -182,16 +181,7 @@ function buildOneMenuButton(actionTypeSubtree, character) {
                 CLEAR_MENU,
                 () => {
                     let action = makeUntargetedAction(actionTypeSubtree.type);
-                    // TODO: Go through a common UI function for "player
-                    // intended this action", so we can report failure in a
-                    // consistent way without duplicating code. Need to resolve
-                    // cyclic imports to make this work.
-                    let result = action.type.check(action);
-                    if (result.valid) {
-                        action.type.doit(action, afterPlayerMove);
-                    } else {
-                        userError(result.reason);
-                    }
+                    gotPlayerAction(action);
                 },
             ];
         }

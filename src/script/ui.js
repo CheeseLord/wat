@@ -41,8 +41,8 @@ import {
     state,
 } from "./state.js";
 import {
-    afterPlayerMove,
     canMoveThisTurn,
+    gotPlayerAction,
     isOnCurrentTeam,
     selectCharacter,
     selectNextCharacter,
@@ -150,12 +150,7 @@ export function worldClickHandler(evt) {
         }
 
         // Handle actions.
-        let checkVal = disambig.action.type.check(disambig.action);
-        if (checkVal.valid) {
-            disambig.action.type.doit(disambig.action, afterPlayerMove);
-        } else {
-            userError(checkVal.reason);
-        }
+        gotPlayerAction(disambig.action);
     } else if (evt.mouseButton === Crafty.mouseButtons.RIGHT) {
         debugLog(aaaaaer.next().value);
     }
