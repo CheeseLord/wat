@@ -53,6 +53,8 @@ import {
     advanceDialogue,
 } from "./dialogue.js";
 
+let aaaaaer = aaaaa();
+
 ///////////////////////////////////////////////////////////////////////////////
 // "Janky class" UserInputDesc -- describes a raw input from the user (at the
 // level of "clicked on X").
@@ -155,7 +157,16 @@ export function worldClickHandler(evt) {
             userError(checkVal.reason);
         }
     } else if (evt.mouseButton === Crafty.mouseButtons.RIGHT) {
-        debugLog("AAAAAAAAAA");
+        debugLog(aaaaaer.next().value);
+    }
+}
+
+function * aaaaa() {
+    let x = 0;
+    while (true) {
+        yield `AAAAA ${x}`;
+        yield `BBBBB ${x}`;
+        x++;
     }
 }
 
