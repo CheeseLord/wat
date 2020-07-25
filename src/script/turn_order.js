@@ -89,101 +89,110 @@ function getAllReadyCharacters() {
 ///////////////////////////////////////////////////////////////////////////////
 // "Milestones" in turn order
 
-export function startTeam(team) {
-    debugLog(`Starting turn for team ${team}.`);
+var combatLoop = null;
 
-    currentTeamIndex = team;
-    currentTeamMembers = [];
-    Crafty("Character").each(function() {
-        if (this.team === team) {
-            this.readyActions();
-            currentTeamMembers.push(this);
-        }
-    });
-
-    let nextCharacter = getFirstReadyCharacter();
-    if (nextCharacter !== null) {
-        startCharacter(nextCharacter);
-    }
-    // Otherwise, intentionally don't ready anyone. This comes up because
-    // endTeam calls startTeam speculatively on each subsequent team, searching
-    // for one that has someone left on it to move.
-    // TODO: This logic is somewhat confusing. Can we do it a different way?
-}
-
-function startCharacter(character) {
-    // TODO Move this to requestMoveFromPlayer.
+export function beginLevel(team) {
     clearAllHighlights();
-    highlightAvailableCharacters();
-
-    // TODO: Why does startCharacter not call selectCharacter? Who calls it
-    // instead?
-    // TODO: Should we select them, too?
-    setFocusOn(character, function() {
-        // TODO refactor this. Have a real concept of teams, probably with some
-        // sort of callback tied to each one specifying how it chooses its
-        // turns.
-        if (currentTeamIndex === PLAYER_TEAM) {
-            requestMoveFromPlayer(character, function(action) {
-                action.type.doit(action, function() {
-                    // TODO: Call clearMenu (from menu.js) instead. Can't do
-                    // that right now because of cyclic imports.
-                    Crafty.s("ButtonMenu").clearMenu();
-                    endCharacter(character);
-                });
-            });
-        } else {
-            requestMoveFromAI(character, function(action) {
-                action.type.doit(action, () => {
-                    endCharacter(character);
-                });
-            });
-        }
-    });
+    // TODO: Call clearMenu (from menu.js) instead. Can't do that right now
+    // because of cyclic imports.
+    Crafty.s("ButtonMenu").clearMenu();
+    combatLoop = genCombatLoop(team);
+    continueCombat();
+    assert(anyCharactersReady());
+    // TODO: Remove once we have alternative method in initializing
+    // dialogue
+    advanceDialogue();
 }
 
-export function endCharacter(character) {
-    state.clickType = ClickEnum.NO_INPUT;
-    deselectCharacter();
-
-    if (checkForGameEnd()) {
-        // Don't continue the game loop.
-        // checkForGameEnd already did whatever's appropriate to signal to the
-        // player that the game is over.
-    } else {
-        let nextCharacter = getFirstReadyCharacter();
-        if (nextCharacter !== null) {
-            // There are still more characters to move.
-            startCharacter(nextCharacter);
-        } else {
-            // This was the last character on the team; end the team's turn.
-            endTeam();
-        }
-    }
+export function continueCombat() {
+    combatLoop.next();
 }
 
-export function endTeam() {
-    debugLog(`Reached end of turn for team ${currentTeamIndex}.`);
+function * genCombatLoop(firstTeam) {
+    let numSkippedTeams = 0;
 
-    let team = currentTeamIndex;
-    let maxTries = NUM_TEAMS;
-    // If the next team has no one on it to act, skip over them. Repeat until
-    // we find a team that has someone ready to act, or until we've tried all
-    // teams.
-    do {
-        team = (team + 1) % NUM_TEAMS;
-        // TODO: Maybe just have startTeam return success or failure? Or maybe
-        // put this loop in startTeam?
-        startTeam(team);
-        maxTries--;
-    } while (!anyCharactersReady() && maxTries > 0);
+    for (let team = firstTeam; ; team = (team + 1) % NUM_TEAMS) {
+        ////////////////////////////////////////
+        // startTeam
+        debugLog(`Starting turn for team ${team}.`);
+        currentTeamIndex = team;
+        currentTeamMembers = [];
+        Crafty("Character").each(function() {
+            if (this.team === team) {
+                this.readyActions();
+                currentTeamMembers.push(this);
+            }
+        });
 
-    if (!anyCharactersReady()) {
-        assert(maxTries === 0);
-        // Eventually, this should probably be detected and result in something
-        // actually happening in-game. (Maybe a game-over screen since your
-        // whole team is dead?)
-        internalError("There's no one left to act.");
+        let character = getFirstReadyCharacter();
+        if (character === null) {
+            // There is no one ready on this team. Skip it.
+            assert(!anyCharactersReady());
+            numSkippedTeams++;
+            if (numSkippedTeams >= NUM_TEAMS) {
+                // Eventually, this should probably be detected and result in
+                // something actually happening in-game. (Maybe a game-over
+                // screen since your whole team is dead?)
+                internalError("There's no one left to act.");
+                return;
+            }
+            // Try the next team.
+            continue;
+        }
+        numSkippedTeams = 0;
+
+        while (character !== null) {
+            ////////////////////////////////////////
+            // startCharacter
+            // TODO Move this to requestMoveFromPlayer.
+            clearAllHighlights();
+            highlightAvailableCharacters();
+
+            // TODO: Why does startCharacter not call selectCharacter? Who
+            // calls it instead?
+            // TODO: Should we select them, too?
+            setFocusOn(character, function() {
+                // TODO refactor this. Have a real concept of teams, probably
+                // with some sort of callback tied to each one specifying how
+                // it chooses its turns.
+                if (currentTeamIndex === PLAYER_TEAM) {
+                    requestMoveFromPlayer(character, function(action) {
+                        action.type.doit(action, function() {
+                            // TODO: Call clearMenu (from menu.js) instead.
+                            // Can't do that right now because of cyclic
+                            // imports.
+                            Crafty.s("ButtonMenu").clearMenu();
+                            continueCombat();
+                        });
+                    });
+                } else {
+                    requestMoveFromAI(character, function(action) {
+                        action.type.doit(action, () => {
+                            continueCombat();
+                        });
+                    });
+                }
+            });
+            yield;
+
+            ////////////////////////////////////////
+            // endCharacter
+            state.clickType = ClickEnum.NO_INPUT;
+            deselectCharacter();
+
+            character = getFirstReadyCharacter();
+
+            if (checkForGameEnd()) {
+                // Don't continue the game loop.
+                // checkForGameEnd already did whatever's appropriate to signal
+                // to the player that the game is over.
+                return;
+            }
+        }
+
+        ////////////////////////////////////////
+        // endTeam
+        debugLog(`Reached end of turn for team ${currentTeamIndex}.`);
     }
 }
 
@@ -225,18 +234,6 @@ function checkForGameEnd() {
     }
 }
 
-
-export function beginLevel(team) {
-    clearAllHighlights();
-    // TODO: Call clearMenu (from menu.js) instead. Can't do that right now
-    // because of cyclic imports.
-    Crafty.s("ButtonMenu").clearMenu();
-    startTeam(team);
-    assert(anyCharactersReady());
-    // TODO: Remove once we have alternative method in initializing
-    // dialogue
-    advanceDialogue();
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Requesting moves (TODO maybe put in different module?)
