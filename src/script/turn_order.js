@@ -89,7 +89,7 @@ function getAllReadyCharacters() {
 ///////////////////////////////////////////////////////////////////////////////
 // "Milestones" in turn order
 
-var combatLoop = null;
+let combatLoop = null;
 
 export function beginLevel(team) {
     clearAllHighlights();
