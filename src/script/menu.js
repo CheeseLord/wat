@@ -20,8 +20,6 @@ import {
 // } from  "./ai.js";
 import {
     assert,
-    // debugLog,
-    // internalError,
 } from "./message.js";
 import {
     canDoAction,
