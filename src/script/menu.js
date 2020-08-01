@@ -19,8 +19,9 @@ import {
 //     chooseAiAction,
 // } from  "./ai.js";
 import {
-    debugLog,
-    internalError,
+    assert,
+    // debugLog,
+    // internalError,
 } from "./message.js";
 import {
     canDoAction,
@@ -31,7 +32,6 @@ import {
 import {
     deselectCharacter,
     gotPlayerAction,
-    // TODO: Does this work??
     selectedCharacter,
 } from "./turn_order.js";
 
@@ -100,180 +100,94 @@ const ACTION_TYPE_TREE = {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// Menu table handling
-
-const CLEAR_MENU  = {};
-const PARENT_MENU = {};
+// Menu logic
 
 const clearMenuClickType = ClickEnum.DEFAULT;
 
-// menuStack - list of menus that would be transitioned to if you click a
-//     "back" button. Does not include the current menu.
-// currMenuName - the menuDesc of the currently-displayed menu, or null if
-//     there is no menu displayed.
-var menuStack    = [];
-var currMenuDesc = null;
+let actionMenuPos = [];
+let actionMenuCharacter = null;
 
-function doNothing() {}
-
-export function getTopMenu(character) {
-    return buildOneMenuNode(ACTION_TYPE_TREE, character, /* isTop = */true);
+export function doActionMenu(character) {
+    actionMenuCharacter = character;
+    pushActionSubmenu(ACTION_TYPE_TREE);
 }
 
-function buildOneMenuNode(actionTypeSubtree, character, isTop) {
-    if (actionTypeSubtree.action) {
-        // .action, .name, .type
-        if (actionTypeSubtree.type.isTargeted()) {
-            return {
-                title:   actionTypeSubtree.name,
-                state:   actionTypeSubtree.type.getState(),
-                buttons: [
-                    // Text  New Menu     Action
-                    ["Back", PARENT_MENU, doNothing],
-                ],
-            };
-        } else {
-            internalError("buildOneMenuNode() of untargeted action type");
-            return CLEAR_MENU;
-        }
+function pushActionSubmenu(subtree) {
+    actionMenuPos.push(subtree);
+    displayActionMenuPage(subtree);
+}
+
+function popActionMenu() {
+    actionMenuPos.pop(1);
+    if (actionMenuPos.length === 0) {
+        // We popped the last one.
+        clearActionMenu();
+        deselectCharacter();
     } else {
-        // .action, .name, .state, .children
-        let buttons = [];
-        for (let i = 0; i < actionTypeSubtree.children.length; i++) {
-            let nextButton = buildOneMenuButton(actionTypeSubtree.children[i],
-                character);
-            if (nextButton !== null) {
-                buttons.push(nextButton);
-            }
-        }
-        if (isTop) {
-            buttons.push([
-                "Cancel",
-                CLEAR_MENU,
-                () => { deselectCharacter(); },
-            ]);
-        } else {
-            buttons.push(["Back", PARENT_MENU, doNothing]);
-        }
-        return {
-            title:   actionTypeSubtree.name,
-            state:   actionTypeSubtree.state,
-            buttons: buttons,
-        };
+        displayActionMenuPage(actionMenuPos[actionMenuPos.length - 1]);
     }
 }
 
-function buildOneMenuButton(actionTypeSubtree, character) {
-    if (actionTypeSubtree.action) {
-        // .action, .name, .type
-        if (!canDoAction(character, actionTypeSubtree.type)) {
-            return null;
-        }
-        if (actionTypeSubtree.type.isTargeted()) {
-            return [
-                actionTypeSubtree.name,
-                buildOneMenuNode(actionTypeSubtree, character, false),
-                doNothing,
-            ];
-        } else {
-            return [
-                actionTypeSubtree.name,
-                CLEAR_MENU,
-                () => {
-                    let action = makeUntargetedAction(actionTypeSubtree.type);
+function clearActionMenu() {
+    state.clickType = clearMenuClickType;
+    Crafty.s("ButtonMenu").clearMenu();
+}
+
+function displayActionMenuPage(subtree) {
+    // Set clickType.
+    // TODO rename these from "state".
+    if (!subtree.action) {
+        state.clickType = subtree.state;
+    } else {
+        assert(subtree.type.isTargeted());
+        state.clickType = subtree.type.getState();
+    }
+
+    let title = subtree.name;
+
+    // Build the button descriptions for all children of this subnode.
+    let buttonDescs = [];
+    if (!subtree.action) {
+        for (let i = 0; i < subtree.children.length; i++) {
+            let child = subtree.children[i];
+            let onClick;
+            if (!child.action) {
+                // A sub-submenu.
+                onClick = function() {
+                    pushActionSubmenu(child);
+                };
+            } else if (!canDoAction(actionMenuCharacter, child.type)) {
+                continue;
+            } else if (child.type.isTargeted()) {
+                // Targeted actions also get their own submenus.
+                onClick = function() {
+                    pushActionSubmenu(child);
+                };
+            } else {
+                // Untargeted actions just get executed.
+                onClick = function() {
+                    clearActionMenu();
+                    let action = makeUntargetedAction(child.type);
                     gotPlayerAction(action);
-                },
-            ];
+                };
+            }
+            buttonDescs.push([child.name, onClick]);
         }
-    } else {
-        // .action, .name, .state, .children
-        return [
-            actionTypeSubtree.name,
-            buildOneMenuNode(actionTypeSubtree, character, false),
-            doNothing,
-        ];
     }
+
+    // All submenus have a Back/Cancel button. The difference in implementation
+    // is handled by popActionMenu.
+    let backName = "Back";
+    if (actionMenuPos.length === 1) {
+        // This is the top menu.
+        backName = "Cancel";
+    }
+    buttonDescs.push([backName, popActionMenu]);
+
+    Crafty.s("ButtonMenu").setMenu(title, buttonDescs);
 }
 
 function makeUntargetedAction(actionType) {
     return actionType.initNoTarget(selectedCharacter);
 }
 
-export function doMenu(menuDesc) {
-    transitionToMenuDesc(menuDesc, /* isTop = */true);
-}
-
-export function clearMenu() {
-    state.clickType = clearMenuClickType;
-    Crafty.s("ButtonMenu").clearMenu();
-}
-
-function transitionToMenuDesc(menuDesc, isTop) {
-    if (menuDesc === CLEAR_MENU) {
-        clearMenu();
-    } else if (menuDesc === PARENT_MENU) {
-        // Pop menu
-        if (menuStack.length === 0) {
-            Crafty.s("ButtonMenu").clearMenu();
-            currMenuDesc = null;
-        } else {
-            menuDesc = menuStack.pop();
-            applyMenuByDesc(menuDesc);
-            currMenuDesc = menuDesc;
-        }
-    } else {
-        applyMenuByDesc(menuDesc);
-        // TODO: If isTop, do we clear the stack anywhere?
-        if (currMenuDesc !== null && !isTop) {
-            menuStack.push(currMenuDesc);
-        }
-        currMenuDesc = menuDesc;
-    }
-}
-
-function applyMenuByDesc(menuDesc) {
-    if (!menuDesc["title"] || !menuDesc["state"] || !menuDesc["buttons"]) {
-        internalError("Description for menu is ill-formed.");
-        return;
-    }
-
-    let title     = menuDesc["title"];
-    let onEntry   = menuDesc["onEntry"];
-    let onExit    = menuDesc["onExit"];
-    let clickType = menuDesc["state"]; // Should be called clickType.
-
-    // onEntry and onExit are optional. If they're not specified, just treat
-    // them as doNothing.
-    if (!onEntry) {
-        onEntry = doNothing;
-    }
-    if (!onExit) {
-        onExit = doNothing;
-    }
-
-    state.clickType = clickType;
-
-    let buttonList = [];
-    for (let i = 0; i < menuDesc["buttons"].length; i++) {
-        let buttonDesc = menuDesc["buttons"][i];
-        if (buttonDesc.length !== 3) {
-            internalError("Description for menu is ill-formed.");
-            return;
-        }
-        let buttonText   = buttonDesc[0];
-        let newMenu      = buttonDesc[1];
-        let buttonAction = buttonDesc[2];
-        buttonList.push([
-            buttonText,
-            () => {
-                buttonAction();
-                onExit();
-                transitionToMenuDesc(newMenu, /* isTop = */false);
-            },
-        ]);
-    }
-
-    debugLog("About to enter menu");
-    onEntry();
-    Crafty.s("ButtonMenu").setMenu(title, buttonList);
-}
