@@ -28,8 +28,7 @@ import {
     getPath,
 } from "./geometry.js";
 import {
-    doMenu,
-    getTopMenu,
+    doActionMenu,
 } from "./menu.js";
 import {
     assert,
@@ -138,7 +137,7 @@ export function worldClickHandler(evt) {
                 debugLog("User intended SELECT");
                 selectCharacter(disambig.target);
                 // TODO: Also setFocusOn? Or even call out to startCharacter?
-                doMenu(getTopMenu(disambig.target));
+                doActionMenu(disambig.target);
                 return;
             case UserDisambigType.ACTION:
                 debugLog("User intended ACTION");
@@ -312,7 +311,7 @@ export function setupKeyHandler() {
     Crafty.s("Keyboard").bind("KeyDown", function(e) {
         if (e.key === Crafty.keys.SPACE) {
             let character = selectNextCharacter();
-            doMenu(getTopMenu(character));
+            doActionMenu(character);
         }
     });
 }
