@@ -9,5 +9,5 @@ export var state = {
     // clickType
     clickType: ClickEnum.DEFAULT,
 
-    isInDialogue: false,
+    isInCutscene: false,
 };

@@ -39,7 +39,7 @@ import {
     setFocusOn,
 } from "./view.js";
 import {
-    advanceDialogue,
+    advanceCutscene,
 } from "./dialogue.js";
 
 // TODO can we not export this? Or make it a UI-only thing?
@@ -101,7 +101,7 @@ export function beginLevel(team) {
     assert(anyCharactersReady());
     // TODO: Remove once we have alternative method in initializing
     // dialogue
-    advanceDialogue();
+    advanceCutscene();
 }
 
 export function continueCombat() {

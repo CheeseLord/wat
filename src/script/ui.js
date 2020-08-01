@@ -50,7 +50,7 @@ import {
     selectedCharacter,
 } from "./turn_order.js";
 import {
-    advanceDialogue,
+    advanceCutscene,
 } from "./dialogue.js";
 
 let aaaaaer = aaaaa();
@@ -175,8 +175,8 @@ function figureOutWhatTheUserMeant(inputDesc) {
         // That's just asking for the game to wind up in an inconsistent state
         // where things get weirdly messed up.
         return disambigNothing();
-    } else if (state.isInDialogue) {
-        advanceDialogue();
+    } else if (state.isInCutscene) {
+        advanceCutscene();
         return disambigNothing();
     } else if (state.clickType === ClickEnum.NO_INPUT) {
         // Ditto if we're not accepting input.

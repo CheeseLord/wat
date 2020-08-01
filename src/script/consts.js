@@ -79,6 +79,13 @@ export const ClickEnum = Object.freeze({
     CHARACTER_FIREBALL:      {},
 });
 
+// Cutscene Element Types
+// i.e. Dialogue or Animation
+export const CutsceneEnum = Object.freeze({
+    DIALOGUE:  {},
+    ANIMATION: {},
+});
+
 // Highlighting colors.
 // TODO proper rgba handling
 //   - For now, these have to be exactly 9 characters long ("#RRGGBBAA").
