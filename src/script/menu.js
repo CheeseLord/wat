@@ -107,6 +107,7 @@ let actionMenuCharacter = null;
 
 export function doActionMenu(character) {
     actionMenuCharacter = character;
+    clearActionMenu();
     pushActionSubmenu(ACTION_TYPE_TREE);
 }
 
@@ -129,6 +130,7 @@ function popActionMenu() {
 function clearActionMenu() {
     state.clickType = clearMenuClickType;
     Crafty.s("ButtonMenu").clearMenu();
+    actionMenuPos = [];
 }
 
 function displayActionMenuPage(subtree) {
