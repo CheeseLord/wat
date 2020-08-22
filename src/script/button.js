@@ -179,10 +179,12 @@ Crafty.s("ButtonMenu", {
     },
 
     onKeyPress: function(e) {
-        if (e.key === Crafty.keys.UP_ARROW) {
-            this.moveFocus(-1);
-        } else if (e.key === Crafty.keys.DOWN_ARROW) {
-            this.moveFocus(+1);
+        if (e.key === Crafty.keys.TAB) {
+            if (Crafty.s("Keyboard").isKeyDown(Crafty.keys.SHIFT)) {
+                this.moveFocus(-1);
+            } else {
+                this.moveFocus(+1);
+            }
         } else if (e.key === Crafty.keys.ENTER) {
             if (0 <= this._focusIndex &&
                      this._focusIndex < this._buttons.length) {
