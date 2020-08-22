@@ -30,7 +30,7 @@ import {
 import {
     deselectCharacter,
     gotPlayerAction,
-    selectedCharacter,
+    // selectedCharacter,
 } from "./turn_order.js";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -188,6 +188,6 @@ function displayActionMenuPage(subtree) {
 }
 
 function makeUntargetedAction(actionType) {
-    return actionType.initNoTarget(selectedCharacter);
+    return actionType.initNoTarget(actionMenuCharacter);
 }
 
